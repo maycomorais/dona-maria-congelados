@@ -173,6 +173,71 @@
         </div>
     </section>
 
+    <!-- ESCOLHA SEU PEDIDO -->
+     <section class="menu-selection" id="montar-prato">
+    <div class="max-width">
+        <h2 class="title">Monte seu Pedido</h2>
+        <div class="menu-box">
+            <div class="selection-header">
+                <div class="field">
+                    <label>1. Escolha seu Plano:</label>
+                    <select id="plano-selecionado" onchange="configurarPlano()">
+                        <option value="">Selecione o plano...</option>
+                        <option value="Individual">Individual (Até 13 pratos)</option>
+                        <option value="Mensal">Mensal (14 pratos semanais)</option>
+                        <option value="FDS">Fins de Semana Livres (10 pratos semanais)</option>
+                        <option value="Semanal">Semanal (14 pratos)</option>
+                    </select>
+                </div>
+                <p id="counter">Pratos: <span id="atual">0</span> / <span id="limite-txt">0</span></p>
+                <progress id="progresso" value="0" max="14"></progress>
+            </div>
+
+            <div id="controles-prato" style="display:none;">
+                <div class="field">
+                    <label>2. Escolha a Linha:</label>
+                    <select id="linha-escolhida" onchange="atualizarOpcoesItens()">
+                        <option value="Tradicional">Linha Tradicional</option>
+                        <option value="Gourmet">Linha Gourmet</option>
+                        <option value="Kids">Linha Kids</option>
+                        <option value="Fit">Linha Fit</option>
+                    </select>
+                </div>
+
+                <div class="field checkbox-personalizado">
+                    <input type="checkbox" id="is-personalizado" onchange="togglePersonalizado()">
+                    <label for="is-personalizado">Desejo personalizar as gramas deste prato</label>
+                </div>
+
+                <div class="field">
+                    <label>3. Proteína (Escolha 1):</label>
+                    <select id="select-proteina"></select>
+                    <div id="g-prot-container" style="display:none; margin-top:5px;">
+                        <input type="number" id="g-prot" placeholder="Gramas da Proteína (ex: 150g)">
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label>4. Acompanhamentos (Escolha até 3):</label>
+                    <div id="lista-acompanhamentos" class="acomp-grid">
+                        </div>
+                </div>
+
+                <button type="button" onclick="adicionarPratoLista()" class="btn-add">Adicionar Prato ao Carrinho</button>
+            </div>
+
+            <div class="selected-list">
+                <h4>Itens no Carrinho:</h4>
+                <ul id="carrinho-itens"></ul>
+            </div>
+
+            <button id="btn-whatsapp" class="disabled" onclick="enviarPedidoZap()" disabled>
+                Finalizar e Enviar via WhatsApp
+            </button>
+        </div>
+    </div>
+</section>
+
     <section class="projects" id="projects">
         <div class="max-width">
             <h2 class="title">Nossos Pratos</h2>

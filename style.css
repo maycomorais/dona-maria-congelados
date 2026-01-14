@@ -419,6 +419,49 @@ section .title::after {
     color: #555;
 }
 
+/* --- ESTILIZAÇÃO DO SISTEMA DE PEDIDOS --- */
+.menu-selection { padding: 80px 0; background: #fdfdfd; }
+.menu-box {
+    background: #fff; padding: 30px; border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 850px; margin: 0 auto;
+}
+.selection-header { border-bottom: 2px solid #2D5A27; padding-bottom: 20px; margin-bottom: 20px; }
+.menu-box select, .menu-box input[type="number"] {
+    width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 5px;
+}
+.checkbox-personalizado {
+    background: #e9f5e8; padding: 10px; border-radius: 5px; margin: 15px 0;
+    display: flex; align-items: center; gap: 10px; font-weight: bold; color: #2D5A27;
+}
+.acomp-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px;
+}
+.acomp-item {
+    background: #f9f9f9; padding: 10px; border-radius: 8px; border: 1px solid #eee;
+    display: flex; flex-direction: column; gap: 5px;
+}
+.acomp-check { display: flex; align-items: center; gap: 8px; }
+.g-acomp { width: 80px !important; height: 30px; font-size: 12px; }
+
+.btn-add {
+    width: 100%; background: #2D5A27; color: #fff; padding: 15px; border: none;
+    border-radius: 8px; margin-top: 20px; cursor: pointer; font-weight: bold;
+}
+#carrinho-itens { list-style: none; margin-top: 20px; }
+#carrinho-itens li {
+    background: #fff; border: 1px solid #ddd; padding: 10px; margin-bottom: 5px;
+    display: flex; justify-content: space-between; align-items: center; border-left: 5px solid #2D5A27;
+}
+#carrinho-itens button { background: #ff4d4d; color: #fff; border: none; padding: 5px 8px; border-radius: 4px; cursor: pointer; }
+
+.btn-zap-ativo {
+    width: 100%; background: #25d366; color: white; padding: 20px; border: none;
+    border-radius: 8px; font-size: 1.2rem; font-weight: bold; margin-top: 20px; cursor: pointer;
+}
+.disabled { background: #ccc !important; cursor: not-allowed; width: 100%; padding: 20px; border: none; border-radius: 8px; margin-top: 20px; }
+
+@media (max-width: 600px) { .acomp-grid { grid-template-columns: 1fr; } }
+
 /* --- Pratos (Carousel) --- */
 .projects .carousel .card {
     background: #fff;

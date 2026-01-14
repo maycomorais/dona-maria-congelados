@@ -126,3 +126,112 @@ function updatePrices(linha) {
             parent.find('.content').css('height', contentHeight + 'px');
         }
     });
+
+    // Lógica Pedidos
+    const cardapios = {
+    "Tradicional": ["Carne Moída Refogada", "Macarrão com Almôndega", "Carne de Panela Desfiada", "Carré Suíno", "Frango em Cubos", "Sobrecoxa", "Frango Desfiado", "Frango a Parmegiana", "Frango Xadrez", "Strogonoff de Frango"],
+    "Gourmet": ["Frango Mostarda e Mel", "Escalopinho de Alcatra ao Molho Madeira", "Bife Acebolado", "Lombo Suíno Agridoce", "Costelinha Suína ao molho Barbecue", "Rocambole de Frango", "Escondidinho de Carne Moída (Ou Frango)", "Charuto de Repolho e Carne Moída (ou frango)", "Strogonoff de Carne", "Iscas de Frango ao Molho Mostarda"],
+    "Kids": ["Nugget de frango enriquecido com Legumes", "Hamburger de Frango ou Carne enriquecido com Legumes", "Almôndega de Frango ou Carne Enriquecido com Legumes", "Panqueca recheada de frango ou carne enriquecida com Legumes", "Escondidinho Colorido"],
+    "Fit": ["Peito de Frango Grelhado", "Escondidinho de Batata Doce e Frango", "Crepioca de Frango", "Patinho Moído ao Sugo", "Frango em Cubos Grelhado", "Picadinho de Patinho com Legumes", "Torna de Frango com Massa de Grão de Bico", "Lombo Suíno em Cubos"],
+    "acompanhamentos_base": ["Feijão", "Arroz", "Macarrão", "Purê de Batata", "Purê de Batata Doce", "Purê de Mandioca", "Seleta de Legumes"]
+};
+
+let itensPedido = [];
+let limitePratos = 0;
+
+function configurarPlano() {
+    const plano = document.getElementById('plano-selecionado').value;
+    const limites = { "Individual": 13, "Mensal": 14, "FDS": 10, "Semanal": 14 };
+    limitePratos = limites[plano] || 0;
+    document.getElementById('limite-txt').innerText = limitePratos;
+    document.getElementById('progresso').max = limitePratos;
+    document.getElementById('controles-prato').style.display = plano ? 'block' : 'none';
+    atualizarOpcoesItens();
+}
+
+function togglePersonalizado() {
+    const isPerso = document.getElementById('is-personalizado').checked;
+    document.getElementById('g-prot-container').style.display = isPerso ? 'block' : 'none';
+    const inputsG = document.querySelectorAll('.g-acomp-container');
+    inputsG.forEach(div => div.style.display = isPerso ? 'block' : 'none');
+}
+
+function atualizarOpcoesItens() {
+    const linha = document.getElementById('linha-escolhida').value;
+    const protSelect = document.getElementById('select-proteina');
+    const acompDiv = document.getElementById('lista-acompanhamentos');
+    const isPerso = document.getElementById('is-personalizado').checked;
+
+    protSelect.innerHTML = cardapios[linha].map(p => `<option value="${p}">${p}</option>`).join('');
+    
+    acompDiv.innerHTML = cardapios.acompanhamentos_base.map(a => `
+        <div class="acomp-item">
+            <div class="acomp-check">
+                <input type="checkbox" name="acomp" value="${a}" id="ac-${a}">
+                <label for="ac-${a}">${a}</label>
+            </div>
+            <div class="g-acomp-container" style="display:${isPerso ? 'block' : 'none'}">
+                <input type="number" class="g-acomp" placeholder="g">
+            </div>
+        </div>
+    `).join('');
+}
+
+function adicionarPratoLista() {
+    if (itensPedido.length >= limitePratos) {
+        alert("Limite do plano atingido!"); return;
+    }
+
+    const linha = document.getElementById('linha-escolhida').value;
+    const prot = document.getElementById('select-proteina').value;
+    const isPerso = document.getElementById('is-personalizado').checked;
+    const gProt = document.getElementById('g-prot').value;
+    const checks = document.querySelectorAll('input[name="acomp"]:checked');
+
+    if (checks.length === 0 || checks.length > 3) {
+        alert("Escolha exatamente 1 proteína e até 3 acompanhamentos."); return;
+    }
+
+    let acompTexto = [];
+    checks.forEach(c => {
+        let txt = c.value;
+        if (isPerso) {
+            const g = c.closest('.acomp-item').querySelector('.g-acomp').value;
+            txt += ` (${g || 0}g)`;
+        }
+        acompTexto.push(txt);
+    });
+
+    itensPedido.push({
+        linha: isPerso ? `${linha} (Personalizado)` : linha,
+        detalhe: `${prot}${isPerso ? ' ('+gProt+'g)' : ''} + ${acompTexto.join(', ')}`
+    });
+
+    // Reseta checkbox de personalização para o próximo prato
+    document.getElementById('is-personalizado').checked = false;
+    togglePersonalizado();
+    renderizarCarrinho();
+}
+
+function renderizarCarrinho() {
+    const lista = document.getElementById('carrinho-itens');
+    lista.innerHTML = itensPedido.map((p, i) => `
+        <li>
+            <span><b>${i+1}.</b> [${p.linha}] ${p.detalhe}</span>
+            <button onclick="removerPrato(${i})">Remover</button>
+        </li>
+    `).join('');
+    document.getElementById('atual').innerText = itensPedido.length;
+    document.getElementById('progresso').value = itensPedido.length;
+    const pronto = (itensPedido.length === limitePratos) || (document.getElementById('plano-selecionado').value === "Individual" && itensPedido.length > 0);
+    document.getElementById('btn-whatsapp').disabled = !pronto;
+    document.getElementById('btn-whatsapp').className = pronto ? "btn-zap-ativo" : "disabled";
+}
+
+function removerPrato(i) { itensPedido.splice(i, 1); renderizarCarrinho(); }
+
+function enviarPedidoZap() {
+    let msg = `*NOVO PEDIDO - DONA MARIA*\nPlano: ${document.getElementById('plano-selecionado').value}\n\n`;
+    itensPedido.forEach((p, i) => msg += `*Prato ${i+1} (${p.linha}):* ${p.detalhe}\n`);
+    window.open(`https://wa.me/595976771714?text=${encodeURIComponent(msg)}`);
+}
