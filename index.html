@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dona Maria Congelados</title>
+    
+    <link rel="shortcut icon" href="img/favicon.png" type="image/x-icon">
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.11/typed.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
+    <script src="https://kit.fontawesome.com/c08d346443.js" crossorigin="anonymous"></script>
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    
+    <div class="navbar">
+        <div class="max-width">
+            <div class="logo"><a href="#">Dona<span>Maria</span></a></div>
+            <ul class="menu">
+                <li><a href="#home">Início</a></li>
+                <li><a href="#about">Sobre</a></li>
+                <li><a href="#services">Linhas</a></li>
+                <li><a href="#skills">Planos</a></li>
+                <li><a href="#projects">Pratos</a></li>
+                <li><a href="#contact">Contato</a></li>
+            </ul>
+            <div class="menu-btn">
+                <i class="fas fa-bars"></i>
+            </div>
+        </div>
+    </div>
+    
+    <section class="home" id="home">
+        <div class="max-width">
+            <div class="home-content">
+                <div class="text1">O sabor de casa na sua mesa,</div>
+                <div class="text2">Refeições Saudáveis</div>
+                <div class="text3">Congeladas e <br><span class="typing"></span></div>
+                <a href="#skills">Ver Planos</a>
+            </div>
+        </div>
+    </section>    
+
+    <section class="about" id="about">
+        <div class="max-width">
+            <h2 class="title">Você Merece</h2>
+            <div class="about-content">
+                <div class="column left">
+                    <img src="img/129658224_2869376346718818_2725712129321425610_n.jpg" alt="Dona Maria Cozinhando">
+                </div>
+                <div class="column right">
+                    <div class="text">Foque no seu tempo, <span class="typing-2"></span></div>
+                    <p>Sabemos que a rotina é intensa, seja você estudante de medicina, trabalhador ou dona de casa. O tempo que você gasta indo ao Supermercado, higienizando legumes e lavando louça é um tempo precioso de estudo ou descanso.</p>
+                    <p>A <strong>Dona Maria</strong> não entrega apenas comida; entregamos <strong>tempo e saúde</strong>. Nossas refeições são preparadas com insumos frescos, sem conservantes, e congeladas para manter o sabor de recém-feito. Você economiza o trabalho de planejar, comprar e cozinhar.</p>
+                    <a href="https://api.whatsapp.com/send?phone=595991635604&text=Olá!%20Tenho%20interesse%20no%20nas%20refeições!">Quero ganhar tempo</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="services" id="services">
+        <div class="max-width">
+            <h2 class="title">Nossas Linhas</h2>
+            <div class="services-content">
+                <div class="card">
+                    <div class="box">
+                        <i class="fas fa-utensils"></i>
+                        <div class="text">Tradicional</div>
+                        <p>Pratos deliciosos para o seu dia-a-dia ficar ainda mais prático e com sabor de casa.</p>
+                        <h3>₲ 30.000*</h3>
+                        <p class="cta">*Preço por prato</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="box">
+                        <i class="fas fa-mortar-pestle"></i> 
+                        <div class="text">Gourmet</div>
+                        <p>Pratos refinados e diferenciados, que reúnem sabor e sofisticação.</p>
+                        <h3>₲ 35.000*</h3>
+                        <p class="cta">*Preço por prato</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="box">
+                        <i class="fas fa-dumbbell"></i>
+                        <div class="text">Fitness</div>
+                        <p>Focada em você que quer cuidar da saúde sem abrir mão do paladar.</p>
+                        <h3>₲ 35.000*</h3>
+                        <p class="cta">*Preço por prato</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="box">
+                        <i class="fas fa-apple-alt"></i>
+                        <div class="text">Kids</div>
+                        <p>Refeições nutritivas e divertidas, enriquecidas com legumes para os pequenos.</p>
+                        <h3>₲ 28.000*</h3>
+                        <p class="cta">*Preço por prato</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="box">
+                        <i class="fas fa-balance-scale"></i>
+                        <div class="text">Personalizada</div>
+                        <p>Montamos sua refeição grama por grama, conforme sua dieta.</p>
+                        <h3>Consulta*</h3>
+                        <p class="cta">*Sob medida</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="skills" id="skills">
+        <div class="max-width">
+            <h2 class="title">Nossos Planos</h2>
+            
+            <div class="line-selector">
+                <button class="tab-btn active" onclick="updatePrices('tradicional')">Tradicional</button>
+                <button class="tab-btn" onclick="updatePrices('gourmet')">Gourmet/Fit</button>
+                <button class="tab-btn" onclick="updatePrices('kids')">Kids</button>
+                <button class="tab-btn" onclick="updatePrices('personalizada')">Personalizada</button>
+            </div>
+
+            <div class="skills-content">
+                <div class="card-plan">
+                    <div class="box">
+                        <div class="text">Plano Mensal</div>
+                        <p class="plan-desc">56 Refeições<br><span>(4 Entregas de 14)</span></p>
+                        <div class="price-container">
+                            <span class="old-price" id="old-libertad">₲ 1.680.000</span>
+                            <span class="discount-badge" id="desc-libertad">10% OFF</span>
+                            <h3 id="price-libertad">₲ 1.512.000</h3>
+                        </div>
+                        <a href="https://api.whatsapp.com/send?phone=595991635604&text=Olá!%20Tenho%20interesse%20no%20Plano%20Mensal!" class="btn-plan" target="_blank">Assinar</a>
+                    </div>
+                </div>
+
+                <div class="card-plan featured">
+                    <div class="box">
+                        <div class="text">Fins de Semana Livres</div>
+                        <p class="plan-desc">40 Refeições<br><span>(4 Entregas de 10)</span></p>
+                        <div class="price-container">
+                            <span class="old-price" id="old-business">₲ 1.200.000</span>
+                            <span class="discount-badge" id="desc-business">5% OFF</span>
+                            <h3 id="price-business">₲ 1.140.000</h3>
+                        </div>
+                        <a href="https://api.whatsapp.com/send?phone=595991635604&text=Olá!%20Tenho%20interesse%20no%20Plano%20Fins%20de%20Semana%20Livres!" class="btn-plan" target="_blank">Mais Vendido</a>
+                    </div>
+                </div>
+
+                <div class="card-plan">
+                    <div class="box">
+                        <div class="text">Semanal</div>
+                        <p class="plan-desc">14 Refeições<br><span>(1 Entrega)</span></p>
+                        <div class="price-container">
+                            <span class="old-price" id="old-semanal">₲ 420.000</span>
+                            <span class="discount-badge" id="desc-semanal">5% OFF</span>
+                            <h3 id="price-semanal">₲ 399.000</h3>
+                        </div>
+                        <a href="https://api.whatsapp.com/send?phone=595991635604&text=Olá!%20Tenho%20interesse%20no%20Plano%20Semanal!" class="btn-plan" target="_blank">Pedir Agora</a>
+                    </div>
+                </div>
+            </div>
+            <p class="delivery-info">* Delivery a consultar conforme localização em Mariano Roque Alonso.</p>
+        </div>
+    </section>
+
+    <section class="projects" id="projects">
+        <div class="max-width">
+            <h2 class="title">Nossos Pratos</h2>
+            <div class="carousel owl-carousel">
+                <div class="card">
+                    <div class="box">
+                        <img src="https://pd-clientes-all.s3.us-west-2.amazonaws.com/cdn.bemcaseirinho/upload/m3---estrogonofe-de-frango---arroz-branco-e-batata-palha_27082024113552.webp" alt="Strogonoff de Carne">
+                        <div class="text">Strogonoff de Carne</div>
+                        <p class="plate-line">Linha Tradicional</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="box">
+                        <img src="https://pd-clientes-all.s3.us-west-2.amazonaws.com/cdn.bemcaseirinho/upload/m1--fricasse-de-frango-com-arroz-branco_18062024115446.webp" alt="Escondidinho de Frango">
+                        <div class="text">Escondidinho de Frango</div>
+                        <p class="plate-line">Linha Fitness</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="box">
+                        <img src="https://pd-clientes-all.s3.us-west-2.amazonaws.com/cdn.bemcaseirinho/upload/m8---carne-de-panela--arroz-branco-e-feijao_19062024074228.webp" alt="Medalhão ao Molho Madeira">
+                        <div class="text">Medalhão ao Molho Madeira</div>
+                        <p class="plate-line">Linha Gourmet</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="box">
+                        <img src="https://pd-clientes-all.s3.us-west-2.amazonaws.com/cdn.bemcaseirinho/upload/m11--carreteiro--feijao-e-aipim-na-manteiga_27082024114002.webp" alt="Nuggets Artesanais">
+                        <div class="text">Nuggets Artesanais</div>
+                        <p class="plate-line">Linha Kids</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="box">
+                        <img src="https://pd-clientes-all.s3.us-west-2.amazonaws.com/cdn.bemcaseirinho/upload/m10---iscas-de-frango-com-molho-de-mostarda--arroz-e-feijao_27082024113915.webp" alt="Prato do Cliente">
+                        <div class="text">Monte seu Prato</div>
+                        <p class="plate-line">Linha Personalizada</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="box">
+                        <img src="https://images.unsplash.com/photo-1541518763669-27f70452fcc0?q=80&w=500&auto=format&fit=crop" alt="Carne Moída">
+                        <div class="text">Carne Moída Refogada</div>
+                        <p class="plate-line">Linha Tradicional</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="box">
+                        <img src="https://images.unsplash.com/photo-1515516969-d4008cc6241a?q=80&w=500&auto=format&fit=crop" alt="Macarrão Almôndega">
+                        <div class="text">Macarrão com Almôndegas</div>
+                        <p class="plate-line">Linha Tradicional</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="how-it-works" id="how">
+        <div class="max-width">
+            <h2 class="title">Como Funciona</h2>
+            <div class="how-content">
+                <div class="card">
+                    <div class="box">
+                        <i class="fas fa-snowflake"></i>
+                        <div class="text">Armazenamento</div>
+                        <p>Mantenha no <b>freezer a -18°C</b>. Validade de até 90 dias com sabor e nutrientes preservados.</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="box">
+                        <i class="fas fa-mitten"></i>
+                        <div class="text">Aquecimento</div>
+                        <p>Micro-ondas por <b>8 a 12 minutos</b> (depende da potência). Não pode ir com tampa <b>(ATENÇÃO)</b>.</p>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="box">
+                        <i class="fas fa-sync-alt"></i>
+                        <div class="text">Dica de Chef</div>
+                        <p>Para aquecer por igual: <b>pare a cada 2 minutos e mexa</b>. Evita bordas quentes e centro frio.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="testimonials" id="testimonials">
+        <div class="max-width">
+            <h2 class="title">Depoimentos</h2>
+            <div class="carousel owl-carousel">
+                <div class="card">
+                    <div class="box">
+                        <i class="fas fa-quote-left"></i>
+                        <p>"Como estudante de medicina, meu tempo é zero. As marmitas salvaram minha dieta e meu bolso. Tempero de mãe!"</p>
+                        <div class="stars">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                        </div>
+                        <div class="client-info">
+                            <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Cliente">
+                            <div class="details">
+                                <span class="name">Ana Paula</span>
+                                <span class="role">Estudante de Medicina</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="box">
+                        <i class="fas fa-quote-left"></i>
+                        <p>"A linha Gourmet é sensacional. O Escalopinho ao Molho Madeira nem parece comida congelada. Nota 10!"</p>
+                        <div class="stars">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                        </div>
+                        <div class="client-info">
+                            <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Cliente">
+                            <div class="details">
+                                <span class="name">Carlos Mendonça</span>
+                                <span class="role">Advogado</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="box">
+                        <i class="fas fa-quote-left"></i>
+                        <p>"Finalmente meu filho come legumes sem reclamar! A linha Kids me deixa muito tranquila."</p>
+                        <div class="stars">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                        </div>
+                        <div class="client-info">
+                            <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Cliente">
+                            <div class="details">
+                                <span class="name">Juliana Costa</span>
+                                <span class="role">Mãe</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="faq" id="faq">
+    <div class="max-width">
+        <h2 class="title">Dúvidas Frequentes</h2>
+        <div class="faq-content">
+            
+            <div class="wrapper">
+                <div class="toggle">
+                    Quais são as formas de pagamento?
+                    <i class="fas fa-plus icon"></i>
+                </div>
+                <div class="content">
+                    <p>Aceitamos Pix (cotação do dia via MoneyGram) e dinheiro efetivo na entrega. Para planos mensais e semanais, o pagamento é antecipado.</p>
+                </div>
+            </div>
+
+            <div class="wrapper">
+                <div class="toggle">
+                    Onde vocês entregam? Pode fazer Retirada?
+                    <i class="fas fa-plus icon"></i>
+                </div>
+                <div class="content">
+                    <p>Entregamos em toda Mariano Roque Alonso e bairros selecionados de Asunción. Consulte a taxa de entrega para sua localização no WhatsApp. E sim, pode fazer retirada.</p>
+                </div>
+            </div>
+
+            <div class="wrapper">
+                <div class="toggle">
+                    As marmitas vêm congeladas? Qual a validade?
+                    <i class="fas fa-plus icon"></i>
+                </div>
+                <div class="content">
+                    <p>Sim! Entregamos nossas refeições congeladas para garantir sabor e nutrientes. No freezer (-18°C), elas duram até 90 dias. Na geladeira, consuma em até 2 dias.</p>
+                </div>
+            </div>
+
+            <div class="wrapper">
+                <div class="toggle">
+                    Posso personalizar meu cardápio?
+                    <i class="fas fa-plus icon"></i>
+                </div>
+                <div class="content">
+                    <p>Nos planos Tradicional, Fit e Gourmet os pratos são variados pelo nosso Chef. Se você tem restrições alimentares ou dieta específica, escolha a <b>Linha Personalizada</b>.</p>
+                </div>
+            </div>
+
+            <div class="wrapper">
+                <div class="toggle">
+                    As embalagens podem ir ao micro-ondas?
+                    <i class="fas fa-plus icon"></i>
+                </div>
+                <div class="content">
+                    <p>Com certeza! Nossas embalagens são livres de BPA (bisfenol) e próprias para aquecimento. Apenas lembre-se de tirar a tampa antes de aquecer.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+    <section class="contact" id="contact">
+        <div class="max-width">
+            <h2 class="title">Contato</h2>
+            
+            <div class="card-container">
+                <div class="card">
+                    <div class="box">
+                        <a href="https://api.whatsapp.com/send?phone=595991635604" target="_blank" title="Chamar no WhatsApp">
+                            <i class="fab fa-whatsapp-square"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="box">
+                        <a href="https://instagram.com/congelados.dona.maria" target="_blank" title="Seguir no Instagram">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="contact-content">
+                <div class="column left">
+                    <div class="text">Fale com a gente!</div>
+                    <p>Tire suas dúvidas e garanta sua alimentação saudável.</p>
+                    
+                    <div class="icons">
+                        <div class="row">
+                            <i class="fas fa-user"></i>
+                            <div class="info">
+                                <div class="head">Nome</div>
+                                <div class="sub-title">Dona Maria Congelados</div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <div class="info">
+                                <div class="head">Cidade</div>
+                                <div class="sub-title">Mariano Roque Alonso - PY</div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <i class="fab fa-whatsapp"></i>
+                            <div class="info">
+                                <a href="https://api.whatsapp.com/send?phone=595991635604" target="_blank">
+                                    <div class="head2">Whatsapp</div>
+                                    <div class="sub-title2">+595991635604</div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="column right">
+                    <div class="text">Envie um e-mail</div>
+                    <form action="https://formspree.io/f/SUA_ID_AQUI" method="POST">
+                        <div class="fields">
+                            <div class="field name">
+                                <input type="text" name="nome" placeholder="Seu Nome" required>
+                            </div>
+                            <div class="field email">
+                                <input type="email" name="email" placeholder="Seu E-mail" required>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <input type="text" name="assunto" placeholder="Assunto (Ex: Plano Semanal)" required>
+                        </div>
+                        <div class="field textarea">
+                            <textarea name="mensagem" placeholder="Como podemos te ajudar?" required></textarea>
+                        </div>
+                        <div class="button-area">
+                            <button type="submit">Enviar Mensagem</button>
+                        </div>
+                    </form>
+                </div> 
+            </div>
+        </div>
+    </section>
+
+    <a href="https://api.whatsapp.com/send?phone=595991635604&text=Olá!%20Gostaria%20de%20informações%20sobre%20as%20refeições%20congeladas!" class="whatsapp-float" target="_blank">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+
+    <footer>
+        <span>Dona Maria Congelados | <span class="far fa-copyright"></span> 2026 - Todos os direitos reservados.</span>
+    </footer>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
