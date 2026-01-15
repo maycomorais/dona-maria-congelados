@@ -52,7 +52,7 @@
                     <img src="img/129658224_2869376346718818_2725712129321425610_n.jpg" alt="Dona Maria Cozinhando">
                 </div>
                 <div class="column right">
-                    <div class="text">Foque no seu tempo, <span class="typing-2"></span></div>
+                    <div class="text">Foque no seu tempo, <br><span class="typing-2"></span></div>
                     <p>Sabemos que a rotina é intensa, seja você estudante de medicina, trabalhador ou dona de casa. O tempo que você gasta indo ao Supermercado, higienizando legumes e lavando louça é um tempo precioso de estudo ou descanso.</p>
                     <p>A <strong>Dona Maria</strong> não entrega apenas comida; entregamos <strong>tempo e saúde</strong>. Nossas refeições são preparadas com insumos frescos, sem conservantes, e congeladas para manter o sabor de recém-feito. Você economiza o trabalho de planejar, comprar e cozinhar.</p>
                     <a href="https://api.whatsapp.com/send?phone=595991635604&text=Olá!%20Tenho%20interesse%20no%20nas%20refeições!">Quero ganhar tempo</a>
@@ -178,7 +178,7 @@
     <div class="max-width">
         <h2 class="title">Monte seu Pedido</h2>
         <div class="menu-box">
-            <div class="selection-header">
+            <div class="selection-header" id="container-linha">
                 <div class="field">
                     <label>1. Escolha seu Plano:</label>
                     <select id="plano-selecionado" onchange="configurarPlano()">
@@ -188,6 +188,9 @@
                         <option value="FDS">Fins de Semana Livres (10 pratos semanais)</option>
                         <option value="Semanal">Semanal (14 pratos)</option>
                     </select>
+                    <small id="aviso-linha" style="display:none; color: #666; font-style: italic;">
+                        *Para este plano, todos os pratos devem ser da mesma linha.
+                    </small>
                 </div>
                 <p id="counter">Pratos: <span id="atual">0</span> / <span id="limite-txt">0</span></p>
                 <progress id="progresso" value="0" max="14"></progress>
@@ -231,6 +234,11 @@
                 <ul id="carrinho-itens"></ul>
             </div>
 
+            <div class="field observation-field" style="margin-top: 20px;">
+                <label>Alguma observação para o seu pedido?</label>
+                <textarea id="observacoes-gerais" placeholder="Ex: Não colocar cebola, não colocar azeitona, etc." rows="3"></textarea>
+            </div>
+
             <button id="btn-whatsapp" class="disabled" onclick="enviarPedidoZap()" disabled>
                 Finalizar e Enviar via WhatsApp
             </button>
@@ -238,53 +246,55 @@
     </div>
 </section>
 
+<!-- PRATOS -->
+
     <section class="projects" id="projects">
         <div class="max-width">
             <h2 class="title">Nossos Pratos</h2>
             <div class="carousel owl-carousel">
-                <div class="card">
+                <div class="card" onclick="abrirDetalhes('Strogonoff de Carne')">
                     <div class="box">
                         <img src="https://pd-clientes-all.s3.us-west-2.amazonaws.com/cdn.bemcaseirinho/upload/m3---estrogonofe-de-frango---arroz-branco-e-batata-palha_27082024113552.webp" alt="Strogonoff de Carne">
                         <div class="text">Strogonoff de Carne</div>
                         <p class="plate-line">Linha Tradicional</p>
                     </div>
                 </div>
-                <div class="card">
+                <div class="card" onclick="abrirDetalhes('Escondidinho de Frango')">
                     <div class="box">
                         <img src="https://pd-clientes-all.s3.us-west-2.amazonaws.com/cdn.bemcaseirinho/upload/m1--fricasse-de-frango-com-arroz-branco_18062024115446.webp" alt="Escondidinho de Frango">
                         <div class="text">Escondidinho de Frango</div>
                         <p class="plate-line">Linha Fitness</p>
                     </div>
                 </div>
-                <div class="card">
+                <div class="card" onclick="abrirDetalhes('Medalhão ao Molho Madeira')">
                     <div class="box">
                         <img src="https://pd-clientes-all.s3.us-west-2.amazonaws.com/cdn.bemcaseirinho/upload/m8---carne-de-panela--arroz-branco-e-feijao_19062024074228.webp" alt="Medalhão ao Molho Madeira">
                         <div class="text">Medalhão ao Molho Madeira</div>
                         <p class="plate-line">Linha Gourmet</p>
                     </div>
                 </div>
-                <div class="card">
+                <div class="card" onclick="abrirDetalhes('sobrecoxa')">
                     <div class="box">
                         <img src="https://pd-clientes-all.s3.us-west-2.amazonaws.com/cdn.bemcaseirinho/upload/m11--carreteiro--feijao-e-aipim-na-manteiga_27082024114002.webp" alt="Nuggets Artesanais">
                         <div class="text">Nuggets Artesanais</div>
                         <p class="plate-line">Linha Kids</p>
                     </div>
                 </div>
-                <div class="card">
+                <div class="card" onclick="abrirDetalhes('sobrecoxa')">
                     <div class="box">
                         <img src="https://pd-clientes-all.s3.us-west-2.amazonaws.com/cdn.bemcaseirinho/upload/m10---iscas-de-frango-com-molho-de-mostarda--arroz-e-feijao_27082024113915.webp" alt="Prato do Cliente">
                         <div class="text">Monte seu Prato</div>
                         <p class="plate-line">Linha Personalizada</p>
                     </div>
                 </div>
-                <div class="card">
+                <div class="card" onclick="abrirDetalhes('sobrecoxa')">
                     <div class="box">
                         <img src="https://images.unsplash.com/photo-1541518763669-27f70452fcc0?q=80&w=500&auto=format&fit=crop" alt="Carne Moída">
                         <div class="text">Carne Moída Refogada</div>
                         <p class="plate-line">Linha Tradicional</p>
                     </div>
                 </div>
-                <div class="card">
+                <div class="card" onclick="abrirDetalhes('sobrecoxa')">
                     <div class="box">
                         <img src="https://images.unsplash.com/photo-1515516969-d4008cc6241a?q=80&w=500&auto=format&fit=crop" alt="Macarrão Almôndega">
                         <div class="text">Macarrão com Almôndegas</div>
@@ -530,5 +540,40 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
     <script src="script.js"></script>
+
+    <div id="dish-modal" class="modal-details">
+    <div class="modal-content">
+        <span class="close-modal" onclick="fecharModal()">&times;</span>
+        
+        <div class="modal-body">
+            <h2 id="modal-titulo">Nome do Prato</h2>
+            <p id="modal-descricao">Descrição aqui...</p>
+            
+            <div class="portion-info">
+                <p><strong>Porção 350g:</strong> <span id="cal-350">0</span> Kcal</p>
+                <p><strong>Porção 450g:</strong> <span id="cal-450">0</span> Kcal</p>
+            </div>
+
+            <div class="allergens">
+                <p id="modal-alergenos"></p>
+            </div>
+
+            <div class="nutritional-table">
+                <h3>Informação Nutricional (Porção Base)</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Componente</th>
+                            <th>Quantidade</th>
+                            <th>VD%</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-nutri">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>

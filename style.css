@@ -462,6 +462,82 @@ section .title::after {
 
 @media (max-width: 600px) { .acomp-grid { grid-template-columns: 1fr; } }
 
+/* MODAL */
+/* --- MODAL DE DETALHES --- */
+.modal-details {
+    display: none; 
+    position: fixed; 
+    z-index: 10000; 
+    left: 0; top: 0; width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.7);
+    overflow-y: auto;
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 5% auto;
+    padding: 30px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 600px;
+    position: relative;
+    animation: zoomIn 0.3s;
+}
+
+@keyframes zoomIn {
+    from {transform: scale(0.8); opacity: 0;}
+    to {transform: scale(1); opacity: 1;}
+}
+
+.close-modal {
+    position: absolute;
+    right: 20px; top: 10px;
+    font-size: 35px; cursor: pointer; color: #888;
+}
+
+#modal-titulo { color: #2D5A27; margin-bottom: 15px; }
+
+.portion-info { 
+    background: #f1f8f0; padding: 15px; 
+    border-radius: 8px; margin: 15px 0; 
+}
+
+.allergens { color: #d9534f; font-size: 0.9rem; font-weight: bold; }
+
+.nutritional-table table {
+    width: 100%; border-collapse: collapse; margin-top: 15px;
+}
+
+.nutritional-table th { background: #2D5A27; color: white; padding: 10px; text-align: left; }
+
+.nutritional-table td { padding: 8px; border-bottom: 1px solid #eee; font-size: 14px; }
+
+.nutritional-table tr:nth-child(even) { background: #f9f9f9; }
+
+.observation-field label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #2D5A27;
+}
+
+#observacoes-gerais {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-family: 'Ubuntu', sans-serif;
+    font-size: 14px;
+    resize: vertical; /* Permite aumentar apenas a altura */
+    outline: none;
+    transition: 0.3s;
+}
+
+#observacoes-gerais:focus {
+    border-color: #2D5A27;
+    box-shadow: 0 0 5px rgba(45, 90, 39, 0.2);
+}
+
 /* --- Pratos (Carousel) --- */
 .projects .carousel .card {
     background: #fff;
