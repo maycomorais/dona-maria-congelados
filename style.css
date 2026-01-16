@@ -538,6 +538,25 @@ section .title::after {
     box-shadow: 0 0 5px rgba(45, 90, 39, 0.2);
 }
 
+/* Notificação Flutuante */
+.toast-success {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: #2D5A27;
+    color: white;
+    padding: 15px 25px;
+    border-radius: 5px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    z-index: 10000;
+    display: none;
+    animation: slideIn 0.5s ease;
+}
+@keyframes slideIn {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+}
+
 /* --- Pratos (Carousel) --- */
 .projects .carousel .card {
     background: #fff;

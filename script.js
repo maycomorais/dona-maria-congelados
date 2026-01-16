@@ -368,3 +368,8 @@ function enviarPedidoZap() {
     window.open(`https://wa.me/595991635604?text=${encodeURIComponent(msg)}`, '_blank');
     localStorage.removeItem('donaMaria_pedido');
 }
+
+// Mostrar aviso de sucesso
+const toast = $('<div class="toast-success">Prato adicionado ao seu plano!</div>');
+$('body').append(toast);
+toast.fadeIn().delay(2000).fadeOut(function() { $(this).remove(); });
