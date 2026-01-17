@@ -4,16 +4,16 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Dona Maria Congelados: Comida caseira, saudável e prática em Ciudad del Este. Planos semanais e mensais para facilitar sua rotina.">
-    <meta name="keywords" content="marmita congelada, comida saudavel, Ciudad del Este, Paraguay, Dona Maria, planos de alimentação">
-    <meta name="author" content="Dona Maria Congelados">
+    <meta name="description" content="Doña Maria Congelados: Comida caseira, saudável e prática em Ciudad del Este. Planos semanais e mensais para facilitar sua rotina.">
+    <meta name="keywords" content="marmita congelada, comida saudavel, Ciudad del Este, Paraguay, Doña Maria, planos de alimentação">
+    <meta name="author" content="Doña Maria Congelados">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://maycomorais.github.io/dona-maria-congelados/"> <meta property="og:title" content="Dona Maria Congelados | Sabor de Casa com Praticidade">
+    <meta property="og:url" content="https://maycomorais.github.io/Doña-maria-congelados/"> <meta property="og:title" content="Doña Maria Congelados | Sabor de Casa com Praticidade">
     <meta property="og:description" content="Escolha seu plano, monte seu cardápio e receba suas refeições prontas em casa.">
-    <meta property="og:image" content="https://maycomorais.github.io/dona-maria-congelados/img/preview-whatsapp.jpg"> <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:title" content="Dona Maria Congelados">
+    <meta property="og:image" content="https://maycomorais.github.io/Doña-maria-congelados/img/preview-whatsapp.jpg"> <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="Doña Maria Congelados">
     <meta property="twitter:description" content="Marmitas congeladas saudáveis e deliciosas.">
-    <title>Dona Maria Congelados</title>
+    <title>Doña Maria Congelados</title>
     
     <link rel="shortcut icon" href="img/favicon.png" type="image/x-icon">
     
@@ -24,17 +24,27 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    
+    <div class="scroll-up-btn">
+        <i class="fas fa-angle-up"></i>
+    </div>
+
+    <a href="#montar-prato" class="float-btn-order">
+        <i class="fas fa-utensils"></i> Monte Seu Pedido
+    </a>
+
     <div class="navbar">
         <div class="max-width">
-            <div class="logo"><a href="#">Dona<span>Maria</span></a></div>
+            <div class="logo">
+                <a href="#">
+                    <img src="img/logo.png" alt="Dona Maria Logo">Doña<span>Maria</span></a></div>
             <ul class="menu">
-                <li><a href="#home">Início</a></li>
-                <li><a href="#about">Sobre</a></li>
-                <li><a href="#services">Linhas</a></li>
-                <li><a href="#skills">Planos</a></li>
-                <li><a href="#projects">Pratos</a></li>
-                <li><a href="#contact">Contato</a></li>
+                <li><a href="#home" class="menu-btn">Início</a></li>
+                <li><a href="#how-it-works" class="menu-btn">Como Funciona</a></li>
+                <li><a href="#projects" class="menu-btn">Pratos</a></li>
+                <li><a href="#skills" class="menu-btn">Planos</a></li>
+                <li><a href="#montar-prato" class="menu-btn" style="color:#A62626; font-weight:bold;">Fazer Pedido</a></li>
+                <li><a href="#about" class="menu-btn">Sobre</a></li>
+                <li><a href="#contact" class="menu-btn">Contato</a></li>
             </ul>
             <div class="menu-btn">
                 <i class="fas fa-bars"></i>
@@ -48,94 +58,133 @@
                 <div class="text1">O sabor de casa na sua mesa,</div>
                 <div class="text2">Refeições Saudáveis</div>
                 <div class="text3">Congeladas e <br><span class="typing"></span></div>
-                <a href="#skills">Ver Planos</a>
+                <a href="#montar-prato">Montar Meu Pedido</a>
             </div>
         </div>
     </section>    
 
-    <section class="about" id="about">
+    <section class="services" id="how-it-works" style="background:#fff;">
         <div class="max-width">
-            <h2 class="title">Você Merece</h2>
-            <div class="about-content">
-                <div class="column left">
-                    <img src="img/129658224_2869376346718818_2725712129321425610_n.jpg" alt="Dona Maria Cozinhando">
+            <h2 class="title">Como Funciona</h2>
+            <div class="serv-content" style="justify-content: center; text-align: center; display: flex; flex-wrap: wrap; gap: 20px;">
+                
+                <div class="card" style="flex: 1; min-width: 200px; padding: 20px;">
+                    <div class="box">
+                        <i class="fas fa-list-alt" style="font-size: 40px; color: #2D5A27; margin-bottom:15px;"></i>
+                        <div class="text" style="font-size:20px;">1. Escolha o Plano</div>
+                        <p>Escolha se quer o plano Individual, Semanal, Fim de Semana Livre ou Mensal.</p>
+                    </div>
                 </div>
-                <div class="column right">
-                    <div class="text">Foque no seu tempo, <br><span class="typing-2"></span></div>
-                    <p>Sabemos que a rotina é intensa, seja você estudante de medicina, trabalhador ou dona de casa. O tempo que você gasta indo ao Supermercado, higienizando legumes e lavando louça é um tempo precioso de estudo ou descanso.</p>
-                    <p>A <strong>Dona Maria</strong> não entrega apenas comida; entregamos <strong>tempo e saúde</strong>. Nossas refeições são preparadas com insumos frescos, sem conservantes, e congeladas para manter o sabor de recém-feito. Você economiza o trabalho de planejar, comprar e cozinhar.</p>
-                    <a href="https://api.whatsapp.com/send?phone=595991635604&text=Olá!%20Tenho%20interesse%20no%20nas%20refeições!">Quero ganhar tempo</a>
+
+                <div class="card" style="flex: 1; min-width: 200px; padding: 20px;">
+                    <div class="box">
+                        <i class="fas fa-check-square" style="font-size: 40px; color: #2D5A27; margin-bottom:15px;"></i>
+                        <div class="text" style="font-size:20px;">2. Monte o Cardápio</div>
+                        <p>Escolha seus pratos favoritos entre as linhas Tradicional, Gourmet, Fit ou Kids aqui mesmo pelo site.</p>
+                    </div>
                 </div>
+
+                 <div class="card" style="flex: 1; min-width: 200px; padding: 20px;">
+                    <div class="box">
+                        <i class="fas fa-money-bill" style="font-size: 40px; color: #2D5A27; margin-bottom:15px;"></i>
+                        <div class="text" style="font-size:20px;">3. Faça o Pagamento</div>
+                        <p>Os pagamentos devem ser realizados em até 3 dias antes da entrega.</p>
+                    </div>
+                </div>
+
+                <div class="card" style="flex: 1; min-width: 200px; padding: 20px;">
+                    <div class="box">
+                        <i class="fas fa-truck" style="font-size: 40px; color: #2D5A27; margin-bottom:15px;"></i>
+                        <div class="text" style="font-size:20px;">4. Receba em Casa</div>
+                        <p>Entregamos às Segundas ou Terças entre 18h e 23h.</p>
+                    </div>
+                </div>
+
+                <div class="card" style="flex: 1; min-width: 200px; padding: 20px;">
+                    <div class="box">
+                        <i class="fas fa-fire" style="font-size: 40px; color: #2D5A27; margin-bottom:15px;"></i>
+                        <div class="text" style="font-size:20px;">5. Aqueça e Coma</div>
+                        <p>Do freezer para o micro-ondas. Pronto em minutos!</p>
+                    </div>
+                </div>
+
             </div>
         </div>
     </section>
 
-    <section class="services" id="services">
+    <section class="projects" id="projects">
         <div class="max-width">
-            <h2 class="title">Nossas Linhas</h2>
-            <div class="services-content">
-                <div class="card">
-                    <div class="box">
-                        <i class="fas fa-utensils"></i>
-                        <div class="text">Tradicional</div>
-                        <p>Pratos deliciosos para o seu dia-a-dia ficar ainda mais prático e com sabor de casa.</p>
-                        <h3>₲ 30.000*</h3>
-                        <p class="cta">*Preço por prato</p>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="box">
-                        <i class="fas fa-mortar-pestle"></i> 
-                        <div class="text">Gourmet</div>
-                        <p>Pratos refinados e diferenciados, que reúnem sabor e sofisticação.</p>
-                        <h3>₲ 35.000*</h3>
-                        <p class="cta">*Preço por prato</p>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="box">
-                        <i class="fas fa-dumbbell"></i>
-                        <div class="text">Fitness</div>
-                        <p>Focada em você que quer cuidar da saúde sem abrir mão do paladar.</p>
-                        <h3>₲ 35.000*</h3>
-                        <p class="cta">*Preço por prato</p>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="box">
-                        <i class="fas fa-apple-alt"></i>
-                        <div class="text">Kids</div>
-                        <p>Refeições nutritivas e divertidas, enriquecidas com legumes para os pequenos.</p>
-                        <h3>₲ 28.000*</h3>
-                        <p class="cta">*Preço por prato</p>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="box">
-                        <i class="fas fa-balance-scale"></i>
-                        <div class="text">Personalizada</div>
-                        <p>Montamos sua refeição grama por grama, conforme sua dieta.</p>
-                        <h3>Consulta*</h3>
-                        <p class="cta">*Sob medida</p>
-                    </div>
-                </div>
+            <h2 class="title">Nossos Pratos</h2>
+        
+        <div class="price-banner">
+            <div class="price-tag">
+                <span>Linha Tradicional</span>
+                <strong>₲ 30.000</strong>
+            </div>
+            <div class="price-tag">
+                <span>Gourmet / Fit </span>
+                <strong>₲ 35.000</strong>
+            </div>
+            <div class="price-tag">
+                <span>Kids</span>
+                <strong>₲ 28.000</strong>
             </div>
         </div>
-    </section>
-
-    <section class="skills" id="skills">
-        <div class="max-width">
-            <h2 class="title">Nossos Planos</h2>
             
+            <h3 class="line-title" style="color:#2D5A27; margin: 20px 0 10px; border-left: 5px solid #2D5A27; padding-left: 10px;">Linha Tradicional</h3>
+            <div class="carousel owl-carousel">
+                <div class="card" onclick="abrirDetalhes('trad1')"><div class="box"><img src="https://images.unsplash.com/photo-1541518763669-27f70452fcc0?auto=format&fit=crop&w=500"><div class="text">1. Carne Moída Refogada</div><p class="plate-line">Tradicional</p></div></div>
+                <div class="card" onclick="abrirDetalhes('trad2')"><div class="box"><img src="https://images.unsplash.com/photo-1515516969-d4008cc6241a?auto=format&fit=crop&w=500"><div class="text">2. Macarrão com Almôndega</div><p class="plate-line">Tradicional</p></div></div>
+                <div class="card" onclick="abrirDetalhes('trad3')"><div class="box"><img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=500"><div class="text">3. Carne de Panela Desfiada</div><p class="plate-line">Tradicional</p></div></div>
+                <div class="card" onclick="abrirDetalhes('trad4')"><div class="box"><img src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=500"><div class="text">4. Carré Suíno</div><p class="plate-line">Tradicional</p></div></div>
+                <div class="card" onclick="abrirDetalhes('trad5')"><div class="box"><img src="https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=500"><div class="text">5. Frango em Cubos Cremoso</div><p class="plate-line">Tradicional</p></div></div>
+                <div class="card" onclick="abrirDetalhes('trad6')"><div class="box"><img src="https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=500"><div class="text">6. Sobrecoxa Assada</div><p class="plate-line">Tradicional</p></div></div>
+                <div class="card" onclick="abrirDetalhes('trad7')"><div class="box"><img src="https://images.unsplash.com/photo-1606728035253-49e8a23146de?auto=format&fit=crop&w=500"><div class="text">7. Frango Desfiado</div><p class="plate-line">Tradicional</p></div></div>
+                <div class="card" onclick="abrirDetalhes('trad8')"><div class="box"><img src="https://images.unsplash.com/photo-1632778149955-e80f8ceca2e8?auto=format&fit=crop&w=500"><div class="text">8. Frango a Parmegiana</div><p class="plate-line">Tradicional</p></div></div>
+                <div class="card" onclick="abrirDetalhes('trad9')"><div class="box"><img src="https://images.unsplash.com/photo-1525385133512-2f3bdd039054?auto=format&fit=crop&w=500"><div class="text">9. Frango Xadrez</div><p class="plate-line">Tradicional</p></div></div>
+                <div class="card" onclick="abrirDetalhes('trad10')"><div class="box"><img src="https://images.unsplash.com/photo-1555126634-323283e090fa?auto=format&fit=crop&w=500"><div class="text">10. Strogonoff de Frango</div><p class="plate-line">Tradicional</p></div></div>
+            </div>
+
+            <h3 class="line-title" style="color:#2D5A27; margin: 40px 0 10px; border-left: 5px solid #2D5A27; padding-left: 10px;">Linha Gourmet</h3>
+            <div class="carousel owl-carousel">
+                <div class="card" onclick="abrirDetalhes('gourmet1')"><div class="box"><img src="https://images.unsplash.com/photo-1607330207224-e676b47c0589?auto=format&fit=crop&w=500"><div class="text">1. Frango Mostarda e Mel</div><p class="plate-line">Gourmet</p></div></div>
+                <div class="card" onclick="abrirDetalhes('gourmet2')"><div class="box"><img src="https://images.unsplash.com/photo-1600891964092-4316c288032e?auto=format&fit=crop&w=500"><div class="text">2. Escalopinho ao Molho Madeira</div><p class="plate-line">Gourmet</p></div></div>
+                <div class="card" onclick="abrirDetalhes('gourmet3')"><div class="box"><img src="https://images.unsplash.com/photo-1603073163308-9654c3fb70b9?auto=format&fit=crop&w=500"><div class="text">3. Bife Acebolado</div><p class="plate-line">Gourmet</p></div></div>
+                <div class="card" onclick="abrirDetalhes('gourmet4')"><div class="box"><img src="https://images.unsplash.com/photo-1624726175512-19c9746903ce?auto=format&fit=crop&w=500"><div class="text">4. Lombo Suíno Agridoce</div><p class="plate-line">Gourmet</p></div></div>
+                <div class="card" onclick="abrirDetalhes('gourmet5')"><div class="box"><img src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=500"><div class="text">5. Costelinha BBQ</div><p class="plate-line">Gourmet</p></div></div>
+                <div class="card" onclick="abrirDetalhes('gourmet6')"><div class="box"><img src="https://images.unsplash.com/photo-1631515243349-e0603604305a?auto=format&fit=crop&w=500"><div class="text">6. Rocambole de Frango</div><p class="plate-line">Gourmet</p></div></div>
+                <div class="card" onclick="abrirDetalhes('gourmet7')"><div class="box"><img src="https://images.unsplash.com/photo-1596797038530-2c107229654b?auto=format&fit=crop&w=500"><div class="text">7. Escondidinho</div><p class="plate-line">Gourmet</p></div></div>
+                <div class="card" onclick="abrirDetalhes('gourmet8')"><div class="box"><img src="https://images.unsplash.com/photo-1616509091215-57bbffe75a64?auto=format&fit=crop&w=500"><div class="text">8. Charuto de Repolho</div><p class="plate-line">Gourmet</p></div></div>
+                <div class="card" onclick="abrirDetalhes('gourmet9')"><div class="box"><img src="https://images.unsplash.com/photo-1555126634-323283e090fa?auto=format&fit=crop&w=500"><div class="text">9. Strogonoff de Carne</div><p class="plate-line">Gourmet</p></div></div>
+                <div class="card" onclick="abrirDetalhes('gourmet10')"><div class="box"><img src="https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=500"><div class="text">10. Iscas ao Molho Mostarda</div><p class="plate-line">Gourmet</p></div></div>
+            </div>
+
+            <h3 class="line-title" style="color:#2D5A27; margin: 40px 0 10px; border-left: 5px solid #2D5A27; padding-left: 10px;">Linha Fit</h3>
+            <div class="carousel owl-carousel">
+                <div class="card" onclick="abrirDetalhes('fit1')"><div class="box"><img src="https://images.unsplash.com/photo-1532550907401-a500c9a57435?auto=format&fit=crop&w=500"><div class="text">1. Peito de Frango Grelhado</div><p class="plate-line">Fit</p></div></div>
+                <div class="card" onclick="abrirDetalhes('fit2')"><div class="box"><img src="https://images.unsplash.com/photo-1505253304499-671c55fb57fe?auto=format&fit=crop&w=500"><div class="text">2. Escondidinho Batata Doce</div><p class="plate-line">Fit</p></div></div>
+                <div class="card" onclick="abrirDetalhes('fit3')"><div class="box"><img src="https://images.unsplash.com/photo-1605493666579-08bfab87e838?auto=format&fit=crop&w=500"><div class="text">3. Panqueca de Frango</div><p class="plate-line">Fit</p></div></div>
+                <div class="card" onclick="abrirDetalhes('fit4')"><div class="box"><img src="https://images.unsplash.com/photo-1594041680534-e8c8cdebd659?auto=format&fit=crop&w=500"><div class="text">4. Patinho Moído ao Sugo</div><p class="plate-line">Fit</p></div></div>
+                <div class="card" onclick="abrirDetalhes('fit5')"><div class="box"><img src="https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=500"><div class="text">5. Frango em Cubos Grelhado</div><p class="plate-line">Fit</p></div></div>
+                <div class="card" onclick="abrirDetalhes('fit6')"><div class="box"><img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=500"><div class="text">6. Picadinho de Patinho</div><p class="plate-line">Fit</p></div></div>
+            </div>
+
+            <h3 class="line-title" style="color:#2D5A27; margin: 40px 0 10px; border-left: 5px solid #2D5A27; padding-left: 10px;">Linha Kid's</h3>
+            <div class="carousel owl-carousel">
+                <div class="card" onclick="abrirDetalhes('kids1')"><div class="box"><img src="https://images.unsplash.com/photo-1563805042-7684c019e1cb?auto=format&fit=crop&w=500"><div class="text">1. Nuggets c/ Legumes</div><p class="plate-line">Kids</p></div></div>
+                <div class="card" onclick="abrirDetalhes('kids2')"><div class="box"><img src="https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=500"><div class="text">2. Hamburger c/ Legumes</div><p class="plate-line">Kids</p></div></div>
+                <div class="card" onclick="abrirDetalhes('kids3')"><div class="box"><img src="https://images.unsplash.com/photo-1515516969-d4008cc6241a?auto=format&fit=crop&w=500"><div class="text">3. Almôndega c/ Legumes</div><p class="plate-line">Kids</p></div></div>
+                <div class="card" onclick="abrirDetalhes('kids4')"><div class="box"><img src="https://images.unsplash.com/photo-1605493666579-08bfab87e838?auto=format&fit=crop&w=500"><div class="text">4. Panqueca c/ Legumes</div><p class="plate-line">Kids</p></div></div>
+                <div class="card" onclick="abrirDetalhes('kids5')"><div class="box"><img src="https://images.unsplash.com/photo-1596797038530-2c107229654b?auto=format&fit=crop&w=500"><div class="text">5. Escondidinho Colorido</div><p class="plate-line">Kids</p></div></div>
+            </div>
+        </div>
+
+    </section>     
             <div class="line-selector">
-                <button class="tab-btn active" onclick="updatePrices('tradicional')">Tradicional</button>
-                <button class="tab-btn" onclick="updatePrices('gourmet')">Gourmet/Fit</button>
-                <button class="tab-btn" onclick="updatePrices('kids')">Kids</button>
-                <button class="tab-btn" onclick="updatePrices('personalizada')">Personalizada</button>
+                <button class="tab-btn active" onclick="updatePrices('tradicional', this)">Tradicional</button>
+                <button class="tab-btn" onclick="updatePrices('gourmet', this)">Gourmet/Fit</button>
+                <button class="tab-btn" onclick="updatePrices('kids', this)">Kids</button>
+                <button class="tab-btn" onclick="updatePrices('personalizada', this)">Personalizada</button>
             </div>
 
             <div class="skills-content">
@@ -148,7 +197,7 @@
                             <span class="discount-badge" id="desc-libertad">10% OFF</span>
                             <h3 id="price-libertad">₲ 1.512.000</h3>
                         </div>
-                        <a href="https://api.whatsapp.com/send?phone=595991635604&text=Olá!%20Tenho%20interesse%20no%20Plano%20Mensal!" class="btn-plan" target="_blank">Assinar</a>
+                        <a href="#montar-prato" class="btn-plan">Assinar</a>
                     </div>
                 </div>
 
@@ -161,7 +210,7 @@
                             <span class="discount-badge" id="desc-business">5% OFF</span>
                             <h3 id="price-business">₲ 1.140.000</h3>
                         </div>
-                        <a href="https://api.whatsapp.com/send?phone=595991635604&text=Olá!%20Tenho%20interesse%20no%20Plano%20Fins%20de%20Semana%20Livres!" class="btn-plan" target="_blank">Mais Vendido</a>
+                        <a href="#montar-prato" class="btn-plan">Mais Vendido</a>
                     </div>
                 </div>
 
@@ -174,7 +223,7 @@
                             <span class="discount-badge" id="desc-semanal">5% OFF</span>
                             <h3 id="price-semanal">₲ 399.000</h3>
                         </div>
-                        <a href="https://api.whatsapp.com/send?phone=595991635604&text=Olá!%20Tenho%20interesse%20no%20Plano%20Semanal!" class="btn-plan" target="_blank">Pedir Agora</a>
+                        <a href="#montar-prato" class="btn-plan">Pedir Agora</a>
                     </div>
                 </div>
             </div>
@@ -182,382 +231,105 @@
         </div>
     </section>
 
-    <!-- ESCOLHA SEU PEDIDO -->
-     <section class="menu-selection" id="montar-prato">
-    <div class="max-width">
-        <h2 class="title">Monte seu Pedido</h2>
-        <div class="menu-box">
-            <div class="selection-header" id="container-linha">
-                <div class="field">
-                    <label>1. Escolha seu Plano:</label>
-                    <select id="plano-selecionado" onchange="configurarPlano()">
-                        <option value="">Selecione o plano...</option>
-                        <option value="Individual">Individual (Até 13 pratos)</option>
-                        <option value="Mensal">Mensal (14 pratos semanais)</option>
-                        <option value="FDS">Fins de Semana Livres (10 pratos semanais)</option>
-                        <option value="Semanal">Semanal (14 pratos)</option>
-                    </select>
-                    <small id="aviso-linha" style="display:none; color: #666; font-style: italic;">
-                        *Para este plano, todos os pratos devem ser da mesma linha.
-                    </small>
-                </div>
-                <p id="counter">Pratos: <span id="atual">0</span> / <span id="limite-txt">0</span></p>
-                <progress id="progresso" value="0" max="14"></progress>
-            </div>
-
-            <div id="controles-prato" style="display:none;">
-                <div class="field">
-                    <label>2. Escolha a Linha:</label>
-                    <select id="linha-escolhida" onchange="atualizarOpcoesItens()">
-                        <option value="Tradicional">Linha Tradicional</option>
-                        <option value="Gourmet">Linha Gourmet</option>
-                        <option value="Kids">Linha Kids</option>
-                        <option value="Fit">Linha Fit</option>
-                    </select>
-                </div>
-
-                <div class="field checkbox-personalizado">
-                    <input type="checkbox" id="is-personalizado" onchange="togglePersonalizado()">
-                    <label for="is-personalizado">Desejo personalizar as gramas deste prato</label>
-                </div>
-
-                <div class="field">
-                    <label>3. Proteína (Escolha 1):</label>
-                    <select id="select-proteina"></select>
-                    <div id="g-prot-container" style="display:none; margin-top:5px;">
-                        <input type="number" id="g-prot" placeholder="Gramas da Proteína (ex: 150g)">
-                    </div>
-                </div>
-
-                <div class="field">
-                    <label>4. Acompanhamentos (Escolha até 3):</label>
-                    <div id="lista-acompanhamentos" class="acomp-grid">
-                        </div>
-                </div>
-
-                <button type="button" onclick="adicionarPratoLista()" class="btn-add">Adicionar Prato ao Carrinho</button>
-            </div>
-
-            <div class="selected-list">
-                <h4>Itens no Carrinho:</h4>
-                <ul id="carrinho-itens"></ul>
-            </div>
-
-            <div class="field observation-field" style="margin-top: 20px;">
-                <label>Alguma observação para o seu pedido?</label>
-                <textarea id="observacoes-gerais" placeholder="Ex: Não colocar cebola, não colocar azeitona, etc." rows="3"></textarea>
-            </div>
-
-            <button id="btn-whatsapp" class="disabled" onclick="enviarPedidoZap()" disabled>
-                Finalizar e Enviar via WhatsApp
-            </button>
-        </div>
-    </div>
-</section>
-
-<!-- PRATOS -->
-<section class="projects" id="projects">
+    <section class="menu-selection" id="montar-prato">
         <div class="max-width">
-            <h2 class="title">Nossos Pratos</h2>
-            
-            <h3 class="line-title" style="color:#2D5A27; margin: 20px 0 10px; border-left: 5px solid #2D5A27; padding-left: 10px;">Linha Tradicional</h3>
-            <div class="carousel owl-carousel">
-                <div class="card" onclick="abrirDetalhes('trad1')">
-                    <div class="box">
-                        <img src="https://images.unsplash.com/photo-1541518763669-27f70452fcc0?auto=format&fit=crop&w=500" alt="Carne Moída">
-                        <div class="text">1. Carne Moída Refogada</div>
-                        <p class="plate-line">Tradicional</p>
+            <h2 class="title">Monte seu Pedido</h2>
+            <div class="menu-box">
+                <div class="selection-header" id="container-linha">
+                    <div class="field">
+                        <label>1. Escolha seu Plano:</label>
+                        <select id="plano-selecionado" onchange="configurarPlano()">
+                            <option value="">Selecione o plano...</option>
+                            <option value="Individual">Individual / Degustação</option>
+                            <option value="Semanal">Semanal (14 pratos)</option>
+                            <option value="FDS">Fins de Semana Livres (10 pratos semanais)</option>
+                            <option value="Mensal">Mensal (14 pratos semanais)</option>
+                        </select>
+                        <small id="aviso-linha" style="display:none; color: #666; font-style: italic;">
+                            *Para este plano, recomenda-se escolher pratos da mesma linha (ex: só Fit).
+                        </small>
                     </div>
+                    <p id="counter">Pratos Selecionados: <span id="atual">0</span> / <span id="limite-txt">0</span></p>
+                    <progress id="progresso" value="0" max="14"></progress>
                 </div>
-                <div class="card" onclick="abrirDetalhes('trad2')">
-                    <div class="box">
-                        <img src="https://images.unsplash.com/photo-1515516969-d4008cc6241a?auto=format&fit=crop&w=500" alt="Macarrão Almôndega">
-                        <div class="text">2. Macarrão com Almôndega</div>
-                        <p class="plate-line">Tradicional</p>
-                    </div>
-                </div>
-                <div class="card" onclick="abrirDetalhes('trad3')">
-                    <div class="box">
-                        <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=500" alt="Carne de Panela">
-                        <div class="text">3. Carne de Panela Desfiada</div>
-                        <p class="plate-line">Tradicional</p>
-                    </div>
-                </div>
-                <div class="card" onclick="abrirDetalhes('trad4')">
-                    <div class="box">
-                        <img src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=500" alt="Carré Suíno">
-                        <div class="text">4. Carré Suíno</div>
-                        <p class="plate-line">Tradicional</p>
-                    </div>
-                </div>
-                <div class="card" onclick="abrirDetalhes('trad5')">
-                    <div class="box">
-                        <img src="https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=500" alt="Frango Cubos">
-                        <div class="text">5. Frango em Cubos Cremoso</div>
-                        <p class="plate-line">Tradicional</p>
-                    </div>
-                </div>
-                <div class="card" onclick="abrirDetalhes('trad6')">
-                    <div class="box">
-                        <img src="https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=500" alt="Sobrecoxa">
-                        <div class="text">6. Sobrecoxa Assada</div>
-                        <p class="plate-line">Tradicional</p>
-                    </div>
-                </div>
-                <div class="card" onclick="abrirDetalhes('trad7')">
-                    <div class="box">
-                        <img src="https://images.unsplash.com/photo-1606728035253-49e8a23146de?auto=format&fit=crop&w=500" alt="Frango Desfiado">
-                        <div class="text">7. Frango Desfiado</div>
-                        <p class="plate-line">Tradicional</p>
-                    </div>
-                </div>
-                <div class="card" onclick="abrirDetalhes('trad8')">
-                    <div class="box">
-                        <img src="https://images.unsplash.com/photo-1632778149955-e80f8ceca2e8?auto=format&fit=crop&w=500" alt="Parmegiana">
-                        <div class="text">8. Frango a Parmegiana</div>
-                        <p class="plate-line">Tradicional</p>
-                    </div>
-                </div>
-                <div class="card" onclick="abrirDetalhes('trad9')">
-                    <div class="box">
-                        <img src="https://images.unsplash.com/photo-1525385133512-2f3bdd039054?auto=format&fit=crop&w=500" alt="Frango Xadrez">
-                        <div class="text">9. Frango Xadrez</div>
-                        <p class="plate-line">Tradicional</p>
-                    </div>
-                </div>
-                <div class="card" onclick="abrirDetalhes('trad10')">
-                    <div class="box">
-                        <img src="https://images.unsplash.com/photo-1555126634-323283e090fa?auto=format&fit=crop&w=500" alt="Strogonoff Frango">
-                        <div class="text">10. Strogonoff de Frango</div>
-                        <p class="plate-line">Tradicional</p>
-                    </div>
-                </div>
-            </div>
 
-            <h3 class="line-title" style="color:#2D5A27; margin: 40px 0 10px; border-left: 5px solid #2D5A27; padding-left: 10px;">Linha Gourmet</h3>
-            <div class="carousel owl-carousel">
-                <div class="card" onclick="abrirDetalhes('gourmet1')">
-                    <div class="box">
-                        <img src="https://images.unsplash.com/photo-1607330207224-e676b47c0589?auto=format&fit=crop&w=500" alt="Frango Mostarda e Mel">
-                        <div class="text">1. Frango Mostarda e Mel</div>
-                        <p class="plate-line">Gourmet</p>
+                <div id="controles-prato" style="display:none;">
+                    <div class="field">
+                        <label>2. Escolha a Linha:</label>
+                        <select id="linha-escolhida" onchange="atualizarOpcoesItens()">
+                            <option value="Tradicional">Linha Tradicional</option>
+                            <option value="Gourmet">Linha Gourmet</option>
+                            <option value="Kids">Linha Kids</option>
+                            <option value="Fit">Linha Fit</option>
+                        </select>
                     </div>
-                </div>
-                <div class="card" onclick="abrirDetalhes('gourmet2')">
-                    <div class="box">
-                        <img src="https://images.unsplash.com/photo-1600891964092-4316c288032e?auto=format&fit=crop&w=500" alt="Escalopinho">
-                        <div class="text">2. Escalopinho ao Molho Madeira</div>
-                        <p class="plate-line">Gourmet</p>
-                    </div>
-                </div>
-                <div class="card" onclick="abrirDetalhes('gourmet3')">
-                    <div class="box">
-                        <img src="https://images.unsplash.com/photo-1603073163308-9654c3fb70b9?auto=format&fit=crop&w=500" alt="Bife Acebolado">
-                        <div class="text">3. Bife Acebolado</div>
-                        <p class="plate-line">Gourmet</p>
-                    </div>
-                </div>
-                <div class="card" onclick="abrirDetalhes('gourmet4')">
-                    <div class="box">
-                        <img src="https://images.unsplash.com/photo-1624726175512-19c9746903ce?auto=format&fit=crop&w=500" alt="Lombo Agridoce">
-                        <div class="text">4. Lombo Suíno Agridoce</div>
-                        <p class="plate-line">Gourmet</p>
-                    </div>
-                </div>
-                <div class="card" onclick="abrirDetalhes('gourmet5')">
-                    <div class="box">
-                        <img src="https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=500" alt="Costelinha BBQ">
-                        <div class="text">5. Costelinha BBQ</div>
-                        <p class="plate-line">Gourmet</p>
-                    </div>
-                </div>
-                <div class="card" onclick="abrirDetalhes('gourmet6')">
-                    <div class="box">
-                        <img src="https://images.unsplash.com/photo-1631515243349-e0603604305a?auto=format&fit=crop&w=500" alt="Rocambole">
-                        <div class="text">6. Rocambole de Frango</div>
-                        <p class="plate-line">Gourmet</p>
-                    </div>
-                </div>
-                <div class="card" onclick="abrirDetalhes('gourmet7')">
-                    <div class="box">
-                        <img src="https://images.unsplash.com/photo-1596797038530-2c107229654b?auto=format&fit=crop&w=500" alt="Escondidinho">
-                        <div class="text">7. Escondidinho (Carne/Frango)</div>
-                        <p class="plate-line">Gourmet</p>
-                    </div>
-                </div>
-                <div class="card" onclick="abrirDetalhes('gourmet8')">
-                    <div class="box">
-                        <img src="https://images.unsplash.com/photo-1616509091215-57bbffe75a64?auto=format&fit=crop&w=500" alt="Charuto">
-                        <div class="text">8. Charuto de Repolho</div>
-                        <p class="plate-line">Gourmet</p>
-                    </div>
-                </div>
-                <div class="card" onclick="abrirDetalhes('gourmet9')">
-                    <div class="box">
-                        <img src="https://images.unsplash.com/photo-1555126634-323283e090fa?auto=format&fit=crop&w=500" alt="Strogonoff Carne">
-                        <div class="text">9. Strogonoff de Carne</div>
-                        <p class="plate-line">Gourmet</p>
-                    </div>
-                </div>
-                <div class="card" onclick="abrirDetalhes('gourmet10')">
-                    <div class="box">
-                        <img src="https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=500" alt="Iscas Frango">
-                        <div class="text">10. Iscas ao Molho Mostarda</div>
-                        <p class="plate-line">Gourmet</p>
-                    </div>
-                </div>
-            </div>
 
-            <h3 class="line-title" style="color:#2D5A27; margin: 40px 0 10px; border-left: 5px solid #2D5A27; padding-left: 10px;">Linha Fit</h3>
-            <div class="carousel owl-carousel">
-                <div class="card" onclick="abrirDetalhes('fit1')">
-                    <div class="box">
-                        <img src="https://images.unsplash.com/photo-1532550907401-a500c9a57435?auto=format&fit=crop&w=500" alt="Frango Grelhado">
-                        <div class="text">1. Peito de Frango Grelhado</div>
-                        <p class="plate-line">Fit</p>
+                    <div class="field checkbox-personalizado">
+                        <input type="checkbox" id="is-personalizado" onchange="togglePersonalizado()">
+                        <label for="is-personalizado">Desejo personalizar as gramas deste prato</label>
                     </div>
-                </div>
-                <div class="card" onclick="abrirDetalhes('fit2')">
-                    <div class="box">
-                        <img src="https://images.unsplash.com/photo-1505253304499-671c55fb57fe?auto=format&fit=crop&w=500" alt="Escondidinho Fit">
-                        <div class="text">2. Escondidinho Batata Doce</div>
-                        <p class="plate-line">Fit</p>
-                    </div>
-                </div>
-                <div class="card" onclick="abrirDetalhes('fit3')">
-                    <div class="box">
-                        <img src="https://images.unsplash.com/photo-1605493666579-08bfab87e838?auto=format&fit=crop&w=500" alt="Panqueca Fit">
-                        <div class="text">3. Panqueca de Frango</div>
-                        <p class="plate-line">Fit</p>
-                    </div>
-                </div>
-                <div class="card" onclick="abrirDetalhes('fit4')">
-                    <div class="box">
-                        <img src="https://images.unsplash.com/photo-1594041680534-e8c8cdebd659?auto=format&fit=crop&w=500" alt="Patinho ao Sugo">
-                        <div class="text">4. Patinho Moído ao Sugo</div>
-                        <p class="plate-line">Fit</p>
-                    </div>
-                </div>
-                <div class="card" onclick="abrirDetalhes('fit5')">
-                    <div class="box">
-                        <img src="https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=500" alt="Frango Cubos">
-                        <div class="text">5. Frango em Cubos Grelhado</div>
-                        <p class="plate-line">Fit</p>
-                    </div>
-                </div>
-                <div class="card" onclick="abrirDetalhes('fit6')">
-                    <div class="box">
-                        <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=500" alt="Picadinho Patinho">
-                        <div class="text">6. Picadinho de Patinho</div>
-                        <p class="plate-line">Fit</p>
-                    </div>
-                </div>
-            </div>
 
-            <h3 class="line-title" style="color:#2D5A27; margin: 40px 0 10px; border-left: 5px solid #2D5A27; padding-left: 10px;">Linha Kid's</h3>
-            <div class="carousel owl-carousel">
-                <div class="card" onclick="abrirDetalhes('kids1')">
-                    <div class="box">
-                        <img src="https://images.unsplash.com/photo-1563805042-7684c019e1cb?auto=format&fit=crop&w=500" alt="Nuggets">
-                        <div class="text">1. Nuggets c/ Legumes</div>
-                        <p class="plate-line">Kids</p>
+                    <div class="field">
+                        <label>3. Proteína (Escolha 1):</label>
+                        <select id="select-proteina"></select>
+                        <div id="g-prot-container" style="display:none; margin-top:5px;">
+                            <input type="number" id="g-prot" placeholder="Gramas da Proteína (ex: 150g)">
+                        </div>
                     </div>
-                </div>
-                <div class="card" onclick="abrirDetalhes('kids2')">
-                    <div class="box">
-                        <img src="https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=500" alt="Hamburger">
-                        <div class="text">2. Hamburger c/ Legumes</div>
-                        <p class="plate-line">Kids</p>
+
+                    <div class="field">
+                        <label>4. Acompanhamentos (Escolha até 3):</label>
+                        <div id="lista-acompanhamentos" class="acomp-grid"></div>
                     </div>
+
+                    <button type="button" onclick="adicionarPratoLista()" class="btn-add">Adicionar Prato ao Carrinho</button>
                 </div>
-                <div class="card" onclick="abrirDetalhes('kids3')">
-                    <div class="box">
-                        <img src="https://images.unsplash.com/photo-1515516969-d4008cc6241a?auto=format&fit=crop&w=500" alt="Almondaga Kids">
-                        <div class="text">3. Almôndega c/ Legumes</div>
-                        <p class="plate-line">Kids</p>
+
+                <div class="selected-list">
+                    <h4>Itens no Carrinho:</h4>
+                    <ul id="carrinho-itens"></ul>
+                </div>
+
+                <div class="field observation-field" style="margin-top: 20px;">
+                    <label>Alguma observação para o seu pedido?</label>
+                    <textarea id="observacoes-gerais" placeholder="Ex: Não colocar cebola, etc." rows="3"></textarea>
+                </div>
+
+                <div class="shipping-box" style="margin-top: 30px; background: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px dashed #2D5A27;">
+                    <h4 style="color: #2D5A27; margin-bottom: 10px;"><i class="fas fa-motorcycle"></i> Calcule seu Frete</h4>
+                    <p style="font-size: 0.9rem; color: #555; margin-bottom: 10px;">Clique abaixo para usar sua localização e ver a taxa de entrega.</p>
+
+                    <div class="frete-container">
+                        <button onclick="obterLocalizacaoEFrete()" id="btn-calcular-frete" class="btn-frete" style="background: #555; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">
+                            <i class="fas fa-location-arrow"></i> Calcular Entrega
+                        </button>
+                        <p>Valor do Frete: <span id="valor-frete-display">Aguardando...</span></p>
                     </div>
-                </div>
-                <div class="card" onclick="abrirDetalhes('kids4')">
-                    <div class="box">
-                        <img src="https://images.unsplash.com/photo-1605493666579-08bfab87e838?auto=format&fit=crop&w=500" alt="Panqueca Kids">
-                        <div class="text">4. Panqueca c/ Legumes</div>
-                        <p class="plate-line">Kids</p>
+                    
+                    <div id="resultado-frete" style="margin-top: 10px; display: none;">
+                        <p><strong>Distância:</strong> <span id="distancia-km"></span> km | <strong>Taxa:</strong> <span id="valor-frete" style="font-weight: bold; color: #2D5A27;"></span></p>
                     </div>
+                    <div id="erro-frete" style="color: red; font-size: 12px; margin-top: 5px; display: none;"></div>
                 </div>
-                <div class="card" onclick="abrirDetalhes('kids5')">
-                    <div class="box">
-                        <img src="https://images.unsplash.com/photo-1596797038530-2c107229654b?auto=format&fit=crop&w=500" alt="Escondidinho Colorido">
-                        <div class="text">5. Escondidinho Colorido</div>
-                        <p class="plate-line">Kids</p>
-                    </div>
-                </div>
+
+                <button id="btn-whatsapp" class="disabled" onclick="enviarPedidoZap()" disabled>
+                    Finalizar e Enviar via WhatsApp
+                </button>
             </div>
         </div>
     </section>
 
-    <div id="dish-modal" class="modal-details">
-        <div class="modal-content" style="display:flex; flex-wrap:wrap; gap:20px;">
-            <span class="close-modal" onclick="fecharModal()">&times;</span>
-            
-            <div class="modal-img-container" style="flex:1; min-width:250px;">
-                <img id="modal-img" src="" alt="Prato" style="width:100%; height:100%; object-fit:cover; border-radius:10px;">
-            </div>
-
-            <div class="modal-body" style="flex:1; min-width:250px;">
-                <h2 id="modal-titulo" style="margin-top:0;">Nome do Prato</h2>
-                <p id="modal-descricao">Descrição aqui...</p>
-                
-                <div class="portion-info">
-                    <p><strong>Porção 350g:</strong> <span id="cal-350">0</span> Kcal</p>
-                    <p><strong>Porção 450g:</strong> <span id="cal-450">0</span> Kcal</p>
-                </div>
-
-                <div class="allergens">
-                    <p id="modal-alergenos"></p>
-                </div>
-
-                <div class="nutritional-table">
-                    <h3>Informação Nutricional (Porção Base)</h3>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Componente</th>
-                                <th>Quantidade</th>
-                                <th>VD%</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabela-nutri">
-                            </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <section class="how-it-works" id="how">
+    <section class="about" id="about">
         <div class="max-width">
-            <h2 class="title">Como Funciona</h2>
-            <div class="how-content">
-                <div class="card">
-                    <div class="box">
-                        <i class="fas fa-snowflake"></i>
-                        <div class="text">Armazenamento</div>
-                        <p>Mantenha no <b>freezer a -18°C</b>. Validade de até 90 dias com sabor e nutrientes preservados.</p>
-                    </div>
+            <h2 class="title">Você Merece</h2>
+            <div class="about-content">
+                <div class="column left">
+                    <img src="img/129658224_2869376346718818_2725712129321425610_n.jpg" alt="Doña Maria Cozinhando">
                 </div>
-                <div class="card">
-                    <div class="box">
-                        <i class="fas fa-mitten"></i>
-                        <div class="text">Aquecimento</div>
-                        <p>Micro-ondas por <b>8 a 12 minutos</b> (depende da potência). Não pode ir com tampa <b>(ATENÇÃO)</b>.</p>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="box">
-                        <i class="fas fa-sync-alt"></i>
-                        <div class="text">Dica de Chef</div>
-                        <p>Para aquecer por igual: <b>pare a cada 2 minutos e mexa</b>. Evita bordas quentes e centro frio.</p>
-                    </div>
+                <div class="column right">
+                    <div class="text">Foque no seu tempo, <br><span class="typing-2"></span></div>
+                    <p>Sabemos que a rotina é intensa. O tempo que você gasta no supermercado e na cozinha é um tempo precioso de estudo ou descanso.</p>
+                    <p>A <strong>Doña Maria</strong> não entrega apenas comida; entregamos <strong>tempo e saúde</strong>. Nossas refeições são ultracongeladas para manter o sabor de recém-feito.</p>
                 </div>
             </div>
         </div>
@@ -571,15 +343,10 @@
                     <div class="box">
                         <i class="fas fa-quote-left"></i>
                         <p>"Como estudante de medicina, meu tempo é zero. As marmitas salvaram minha dieta e meu bolso. Tempero de mãe!"</p>
-                        <div class="stars">
-                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-                        </div>
+                        <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
                         <div class="client-info">
                             <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Cliente">
-                            <div class="details">
-                                <span class="name">Ana Paula</span>
-                                <span class="role">Estudante de Medicina</span>
-                            </div>
+                            <div class="details"><span class="name">Ana Paula</span><span class="role">Estudante de Medicina</span></div>
                         </div>
                     </div>
                 </div>
@@ -587,15 +354,10 @@
                     <div class="box">
                         <i class="fas fa-quote-left"></i>
                         <p>"A linha Gourmet é sensacional. O Escalopinho ao Molho Madeira nem parece comida congelada. Nota 10!"</p>
-                        <div class="stars">
-                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-                        </div>
+                        <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
                         <div class="client-info">
                             <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Cliente">
-                            <div class="details">
-                                <span class="name">Carlos Mendonça</span>
-                                <span class="role">Advogado</span>
-                            </div>
+                            <div class="details"><span class="name">Carlos Mendonça</span><span class="role">Advogado</span></div>
                         </div>
                     </div>
                 </div>
@@ -603,15 +365,10 @@
                     <div class="box">
                         <i class="fas fa-quote-left"></i>
                         <p>"Finalmente meu filho come legumes sem reclamar! A linha Kids me deixa muito tranquila."</p>
-                        <div class="stars">
-                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
-                        </div>
+                        <div class="stars"><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i></div>
                         <div class="client-info">
                             <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Cliente">
-                            <div class="details">
-                                <span class="name">Juliana Costa</span>
-                                <span class="role">Mãe</span>
-                            </div>
+                            <div class="details"><span class="name">Juliana Costa</span><span class="role">Mãe</span></div>
                         </div>
                     </div>
                 </div>
@@ -620,150 +377,103 @@
     </section>
 
     <section class="faq" id="faq">
-    <div class="max-width">
-        <h2 class="title">Dúvidas Frequentes</h2>
-        <div class="faq-content">
-            
-            <div class="wrapper">
-                <div class="toggle">
-                    Quais são as formas de pagamento?
-                    <i class="fas fa-plus icon"></i>
-                </div>
-                <div class="content">
-                    <p>Aceitamos Pix (cotação do dia via MoneyGram) e dinheiro efetivo na entrega. Para planos mensais e semanais, o pagamento é antecipado.</p>
-                </div>
-            </div>
-
-            <div class="wrapper">
-                <div class="toggle">
-                    Onde vocês entregam? Pode fazer Retirada?
-                    <i class="fas fa-plus icon"></i>
-                </div>
-                <div class="content">
-                    <p>Entregamos em toda Mariano Roque Alonso e bairros selecionados de Asunción. Consulte a taxa de entrega para sua localização no WhatsApp. E sim, pode fazer retirada.</p>
-                </div>
-            </div>
-
-            <div class="wrapper">
-                <div class="toggle">
-                    As marmitas vêm congeladas? Qual a validade?
-                    <i class="fas fa-plus icon"></i>
-                </div>
-                <div class="content">
-                    <p>Sim! Entregamos nossas refeições congeladas para garantir sabor e nutrientes. No freezer (-18°C), elas duram até 90 dias. Na geladeira, consuma em até 2 dias.</p>
-                </div>
-            </div>
-
-            <div class="wrapper">
-                <div class="toggle">
-                    Posso personalizar meu cardápio?
-                    <i class="fas fa-plus icon"></i>
-                </div>
-                <div class="content">
-                    <p>Nos planos Tradicional, Fit e Gourmet os pratos são variados pelo nosso Chef. Se você tem restrições alimentares ou dieta específica, escolha a <b>Linha Personalizada</b>.</p>
-                </div>
-            </div>
-
-            <div class="wrapper">
-                <div class="toggle">
-                    As embalagens podem ir ao micro-ondas?
-                    <i class="fas fa-plus icon"></i>
-                </div>
-                <div class="content">
-                    <p>Com certeza! Nossas embalagens são livres de BPA (bisfenol) e próprias para aquecimento. Apenas lembre-se de tirar a tampa antes de aquecer.</p>
-                </div>
-            </div>
-
-        </div>
-    </div>
-</section>
-
-    <section class="contact" id="contact">
         <div class="max-width">
-            <h2 class="title">Contato</h2>
-            
-            <div class="card-container">
-                <div class="card">
-                    <div class="box">
-                        <a href="https://api.whatsapp.com/send?phone=595991635604" target="_blank" title="Chamar no WhatsApp">
-                            <i class="fab fa-whatsapp-square"></i>
-                        </a>
+            <h2 class="title">Dúvidas Frequentes</h2>
+            <div class="faq-content">
+                
+                <div class="wrapper">
+                    <div class="toggle">
+                        Como faço para descongelar?
+                        <i class="fas fa-plus icon"></i>
                     </div>
-                </div>
-                <div class="card">
-                    <div class="box">
-                        <a href="https://instagram.com/congelados.dona.maria" target="_blank" title="Seguir no Instagram">
-                            <i class="fab fa-instagram"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <div class="contact-content">
-                <div class="column left">
-                    <div class="text">Fale com a gente!</div>
-                    <p>Tire suas dúvidas e garanta sua alimentação saudável.</p>
-                    
-                    <div class="icons">
-                        <div class="row">
-                            <i class="fas fa-user"></i>
-                            <div class="info">
-                                <div class="head">Nome</div>
-                                <div class="sub-title">Dona Maria Congelados</div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <div class="info">
-                                <div class="head">Cidade</div>
-                                <div class="sub-title">Mariano Roque Alonso - PY</div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <i class="fab fa-whatsapp"></i>
-                            <div class="info">
-                                <a href="https://api.whatsapp.com/send?phone=595991635604" target="_blank">
-                                    <div class="head2">Whatsapp</div>
-                                    <div class="sub-title2">+595991635604</div>
-                                </a>
-                            </div>
-                        </div>
+                    <div class="content">
+                        <p>O ideal é deixar descongelar dentro da geladeira de um dia para o outro. <strong>NUNCA DESCONGELE FORA DA GELADEIRA</strong>, pois pode proliferar bactérias.</p>
                     </div>
                 </div>
 
-                <div class="column right">
-                    <div class="text">Envie um e-mail</div>
-                    <form action="https://formspree.io/f/SUA_ID_AQUI" method="POST">
-                        <div class="fields">
-                            <div class="field name">
-                                <input type="text" name="nome" placeholder="Seu Nome" required>
-                            </div>
-                            <div class="field email">
-                                <input type="email" name="email" placeholder="Seu E-mail" required>
-                            </div>
-                        </div>
-                        <div class="field">
-                            <input type="text" name="assunto" placeholder="Assunto (Ex: Plano Semanal)" required>
-                        </div>
-                        <div class="field textarea">
-                            <textarea name="mensagem" placeholder="Como podemos te ajudar?" required></textarea>
-                        </div>
-                        <div class="button-area">
-                            <button type="submit">Enviar Mensagem</button>
-                        </div>
-                    </form>
-                </div> 
+                <div class="wrapper">
+                    <div class="toggle">
+                        Qual o horário de entrega?
+                        <i class="fas fa-plus icon"></i>
+                    </div>
+                    <div class="content">
+                        <p>Nossas entregas são realizadas todas as <strong>Segundas ou Terças-feiras</strong>, entre <strong>18:00h e 23:00h</strong>.</p>
+                    </div>
+                </div>
+
+                <div class="wrapper">
+                    <div class="toggle">
+                        Posso colocar direto no micro-ondas?
+                        <i class="fas fa-plus icon"></i>
+                    </div>
+                    <div class="content">
+                        <p>Sim, pode! Sempre <strong>SEM a tampa</strong>.</p>
+                    </div>
+                </div>
+
+                <div class="wrapper">
+                    <div class="toggle">
+                        Posso colocar a embalagem no forno?
+                        <i class="fas fa-plus icon"></i>
+                    </div>
+                    <div class="content">
+                        <p>As embalagens padrão das refeições NÃO. Apenas no micro-ondas. <br>Entretanto, as embalagens de <strong>Lasanha, Escondidinho e Canelone SIM</strong>, podem ir ao forno, de preferência em uma bandeja.</p>
+                    </div>
+                </div>
+
+                <div class="wrapper">
+                    <div class="toggle">
+                        Formas de pagamento?
+                        <i class="fas fa-plus icon"></i>
+                    </div>
+                    <div class="content">
+                        <p>Aceitamos Pix (cotação do dia) e dinheiro na entrega. Planos mensais requerem pagamento antecipado.</p>
+                    </div>
+                </div>
+
             </div>
         </div>
     </section>
 
-    <a href="https://api.whatsapp.com/send?phone=595991635604&text=Olá!%20Gostaria%20de%20informações%20sobre%20as%20refeições%20congeladas!" class="whatsapp-float" target="_blank">
+    <section class="contact" id="contact">
+        <div class="max-width">
+            <h2 class="title">Contato</h2>
+            <div class="card-container">
+                <div class="card"><div class="box"><a href="https://api.whatsapp.com/send?phone=595991635604" target="_blank"><i class="fab fa-whatsapp-square"></i></a></div></div>
+                <div class="card"><div class="box"><a href="https://instagram.com/congelados.Doña.maria" target="_blank"><i class="fab fa-instagram"></i></a></div></div>
+            </div>
+            <div class="contact-content">
+                <div class="column left">
+                    <div class="text">Fale com a gente!</div>
+                    <p>Tire suas dúvidas e garanta sua alimentação saudável.</p>
+                    <div class="icons">
+                        <div class="row"><i class="fas fa-user"></i><div class="info"><div class="head">Nome</div><div class="sub-title">Doña Maria Congelados</div></div></div>
+                        <div class="row"><i class="fas fa-map-marker-alt"></i><div class="info"><div class="head">Cidade</div><div class="sub-title">Mariano Roque Alonso - PY</div></div></div>
+                        <div class="row"><i class="fab fa-whatsapp"></i><div class="info"><a href="https://api.whatsapp.com/send?phone=595991635604" target="_blank"><div class="head2">Whatsapp</div><div class="sub-title2">+595991635604</div></a></div></div>
+                    </div>
+                </div>
+                <div class="column right">
+                    <div class="text">Envie um e-mail</div>
+                    <form action="#">
+                        <div class="fields">
+                            <div class="field name"><input type="text" placeholder="Seu Nome" required></div>
+                            <div class="field email"><input type="email" placeholder="Seu E-mail" required></div>
+                        </div>
+                        <div class="field"><input type="text" placeholder="Assunto" required></div>
+                        <div class="field textarea"><textarea cols="30" rows="10" placeholder="Mensagem.." required></textarea></div>
+                        <div class="button-area"><button type="submit">Enviar Mensagem</button></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <a href="https://api.whatsapp.com/send?phone=595991635604&text=Olá!%20Gostaria%20de%20informações!" class="whatsapp-float" target="_blank">
         <i class="fab fa-whatsapp"></i>
     </a>
 
-
     <footer>
-        <span>Dona Maria Congelados | <span class="far fa-copyright"></span> 2026 - Todos os direitos reservados.</span>
+        <span>Doña Maria Congelados | <span class="far fa-copyright"></span> 2026 - Todos os direitos reservados.</span>
     </footer>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -771,38 +481,28 @@
     <script src="script.js"></script>
 
     <div id="dish-modal" class="modal-details">
-    <div class="modal-content">
-        <span class="close-modal" onclick="fecharModal()">&times;</span>
-        
-        <div class="modal-body">
-            <h2 id="modal-titulo">Nome do Prato</h2>
-            <p id="modal-descricao">Descrição aqui...</p>
-            
-            <div class="portion-info">
-                <p><strong>Porção 350g:</strong> <span id="cal-350">0</span> Kcal</p>
-                <p><strong>Porção 450g:</strong> <span id="cal-450">0</span> Kcal</p>
+        <div class="modal-content" style="display:flex; flex-wrap:wrap; gap:20px;">
+            <span class="close-modal" onclick="fecharModal()">&times;</span>
+            <div class="modal-img-container" style="flex:1; min-width:250px;">
+                <img id="modal-img" src="" alt="Prato" style="width:100%; height:100%; object-fit:cover; border-radius:10px;">
             </div>
-
-            <div class="allergens">
-                <p id="modal-alergenos"></p>
-            </div>
-
-            <div class="nutritional-table">
-                <h3>Informação Nutricional (Porção Base)</h3>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Componente</th>
-                            <th>Quantidade</th>
-                            <th>VD%</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabela-nutri">
-                        </tbody>
-                </table>
+            <div class="modal-body" style="flex:1; min-width:250px;">
+                <h2 id="modal-titulo" style="margin-top:0;">Nome do Prato</h2>
+                <p id="modal-descricao">Descrição...</p>
+                <div class="portion-info">
+                    <p><strong>Porção 350g:</strong> <span id="cal-350">0</span> Kcal</p>
+                    <p><strong>Porção 450g:</strong> <span id="cal-450">0</span> Kcal</p>
+                </div>
+                <div class="allergens"><p id="modal-alergenos"></p></div>
+                <div class="nutritional-table">
+                    <h3>Informação Nutricional</h3>
+                    <table>
+                        <thead><tr><th>Item</th><th>Qtd</th><th>VD%</th></tr></thead>
+                        <tbody id="tabela-nutri"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
-</div>
 </body>
 </html>

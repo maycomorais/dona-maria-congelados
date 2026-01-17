@@ -1,3 +1,11 @@
+// VARIÁVEIS GLOBAIS DE ESTADO (Preserva dados entre funções)
+let itensPedido = [];
+let limitePratos = 0;
+let linhaBloqueada = false;
+let freteCalculado = "Não calculado";
+let linkMapsCliente = "Não fornecido";
+const ORIGEM_COORD = { lat: -25.2155, lon: -57.5358 };
+
 $(document).ready(function(){
     // ==========================================
     // 1. EFEITOS VISUAIS E CONFIGURAÇÕES
@@ -5,6 +13,13 @@ $(document).ready(function(){
     $(window).scroll(function(){
         if(this.scrollY > 20) $('.navbar').addClass("sticky");
         else $('.navbar').removeClass("sticky");
+        
+        // Controle do botão flutuante
+        if(this.scrollY > 500){
+            $('.float-btn-order').addClass("show");
+        }else{
+            $('.float-btn-order').removeClass("show");
+        }
     });
 
     $('.menu-btn').click(function(){
@@ -27,6 +42,7 @@ $(document).ready(function(){
         typeSpeed: 100, backSpeed: 60, loop: true
     });
 
+    // Evento de troca de planos para atualizar valores
     $('.planos-btn').click(function(){
         const categoria = $(this).attr('id'); 
         $('.planos-btn').removeClass('active');
@@ -38,9 +54,8 @@ $(document).ready(function(){
 });
 
 // ==========================================
-// 2. BANCO DE DADOS DE DETALHES DOS PRATOS (MODAL)
+// 2. BANCO DE DADOS E MODAL
 // ==========================================
-// Função auxiliar para gerar tabela nutricional padrão baseada no tipo
 function getNutri(tipo) {
     if(tipo === 'bovina') return [
         { item: "Carboidratos", qtd: "45g", vd: "15%" }, { item: "Proteínas", qtd: "35g", vd: "70%" },
@@ -62,7 +77,6 @@ function getNutri(tipo) {
 }
 
 const detalhesPratos = {
-    // --- LINHA TRADICIONAL ---
     "trad1": { titulo: "Carne Moída Refogada", desc: "Clássico caseiro, carne moída de primeira refogada com temperos naturais.", img: "https://images.unsplash.com/photo-1541518763669-27f70452fcc0?auto=format&fit=crop&w=500", cal350: 580, cal450: 750, alergenos: "CONTÉM DERIVADOS DE SOJA.", tabela: getNutri('bovina') },
     "trad2": { titulo: "Macarrão com Almôndega", desc: "Massa al dente com almôndegas suculentas ao molho sugo.", img: "https://images.unsplash.com/photo-1515516969-d4008cc6241a?auto=format&fit=crop&w=500", cal350: 600, cal450: 780, alergenos: "CONTÉM GLÚTEN E OVOS.", tabela: getNutri('bovina') },
     "trad3": { titulo: "Carne de Panela Desfiada", desc: "Carne cozida lentamente até desfiar, cheia de sabor.", img: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=500", cal350: 590, cal450: 760, alergenos: "NÃO CONTÉM GLÚTEN.", tabela: getNutri('bovina') },
@@ -73,8 +87,6 @@ const detalhesPratos = {
     "trad8": { titulo: "Frango a Parmegiana", desc: "Empanado crocante coberto com molho de tomate e queijo derretido.", img: "https://images.unsplash.com/photo-1632778149955-e80f8ceca2e8?auto=format&fit=crop&w=500", cal350: 680, cal450: 850, alergenos: "CONTÉM GLÚTEN E LACTOSE.", tabela: getNutri('frango') },
     "trad9": { titulo: "Frango Xadrez", desc: "Cubos de frango com pimentões, cebola e molho shoyu especial.", img: "https://images.unsplash.com/photo-1525385133512-2f3bdd039054?auto=format&fit=crop&w=500", cal350: 490, cal450: 640, alergenos: "CONTÉM SOJA.", tabela: getNutri('frango') },
     "trad10": { titulo: "Strogonoff de Frango", desc: "O queridinho de todos: frango macio em molho cremoso com cogumelos.", img: "https://images.unsplash.com/photo-1555126634-323283e090fa?auto=format&fit=crop&w=500", cal350: 620, cal450: 800, alergenos: "CONTÉM LACTOSE.", tabela: getNutri('frango') },
-
-    // --- LINHA GOURMET ---
     "gourmet1": { titulo: "Frango Mostarda e Mel", desc: "Combinação agridoce sofisticada em cubos de frango.", img: "https://images.unsplash.com/photo-1607330207224-e676b47c0589?auto=format&fit=crop&w=500", cal350: 560, cal450: 720, alergenos: "CONTÉM MOSTARDA.", tabela: getNutri('frango') },
     "gourmet2": { titulo: "Escalopinho ao Molho Madeira", desc: "Fatias finas de carne bovina em molho escuro e encorpado.", img: "https://images.unsplash.com/photo-1600891964092-4316c288032e?auto=format&fit=crop&w=500", cal350: 610, cal450: 790, alergenos: "CONTÉM GLÚTEN (MOLHO).", tabela: getNutri('bovina') },
     "gourmet3": { titulo: "Bife Acebolado", desc: "Bife macio coberto com cebolas caramelizadas.", img: "https://images.unsplash.com/photo-1603073163308-9654c3fb70b9?auto=format&fit=crop&w=500", cal350: 590, cal450: 770, alergenos: "NÃO CONTÉM GLÚTEN.", tabela: getNutri('bovina') },
@@ -85,16 +97,12 @@ const detalhesPratos = {
     "gourmet8": { titulo: "Charuto de Repolho", desc: "Folhas de repolho recheadas com carne e arroz, cozidas em molho.", img: "https://images.unsplash.com/photo-1616509091215-57bbffe75a64?auto=format&fit=crop&w=500", cal350: 480, cal450: 620, alergenos: "NÃO CONTÉM GLÚTEN.", tabela: getNutri('bovina') },
     "gourmet9": { titulo: "Strogonoff de Carne", desc: "Cubos de carne macia em molho cremoso com champignon.", img: "https://images.unsplash.com/photo-1555126634-323283e090fa?auto=format&fit=crop&w=500", cal350: 640, cal450: 830, alergenos: "CONTÉM LACTOSE.", tabela: getNutri('bovina') },
     "gourmet10": { titulo: "Iscas ao Molho Mostarda", desc: "Tiras de frango grelhadas envolvidas em molho de mostarda suave.", img: "https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=500", cal350: 550, cal450: 710, alergenos: "CONTÉM MOSTARDA.", tabela: getNutri('frango') },
-
-    // --- LINHA FIT ---
     "fit1": { titulo: "Peito de Frango Grelhado", desc: "Grelhado simples com ervas finas, zero gordura adicionada.", img: "https://images.unsplash.com/photo-1532550907401-a500c9a57435?auto=format&fit=crop&w=500", cal350: 380, cal450: 490, alergenos: "NÃO CONTÉM GLÚTEN.", tabela: getNutri('frango') },
     "fit2": { titulo: "Escondidinho Batata Doce", desc: "Versão leve do clássico, com purê de batata doce de baixo índice glicêmico.", img: "https://images.unsplash.com/photo-1505253304499-671c55fb57fe?auto=format&fit=crop&w=500", cal350: 410, cal450: 530, alergenos: "PODE CONTER LEITE.", tabela: getNutri('frango') },
     "fit3": { titulo: "Panqueca de Frango Fit", desc: "Massa integral leve recheada com frango desfiado.", img: "https://images.unsplash.com/photo-1605493666579-08bfab87e838?auto=format&fit=crop&w=500", cal350: 400, cal450: 520, alergenos: "CONTÉM GLÚTEN E OVOS.", tabela: getNutri('frango') },
     "fit4": { titulo: "Patinho Moído ao Sugo", desc: "Carne magra moída com molho de tomate caseiro natural.", img: "https://images.unsplash.com/photo-1594041680534-e8c8cdebd659?auto=format&fit=crop&w=500", cal350: 390, cal450: 510, alergenos: "NÃO CONTÉM GLÚTEN.", tabela: getNutri('bovina') },
     "fit5": { titulo: "Frango em Cubos Grelhado", desc: "Cubos dourados na chapa sem óleo.", img: "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=500", cal350: 380, cal450: 490, alergenos: "NÃO CONTÉM GLÚTEN.", tabela: getNutri('frango') },
     "fit6": { titulo: "Picadinho de Patinho", desc: "Carne magra em cubos cozida com legumes.", img: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=500", cal350: 400, cal450: 520, alergenos: "NÃO CONTÉM GLÚTEN.", tabela: getNutri('bovina') },
-
-    // --- LINHA KIDS ---
     "kids1": { titulo: "Nuggets Artesanais", desc: "Feitos à mão com peito de frango e legumes escondidos.", img: "https://images.unsplash.com/photo-1563805042-7684c019e1cb?auto=format&fit=crop&w=500", cal350: 450, cal450: 580, alergenos: "CONTÉM GLÚTEN.", tabela: getNutri('kids') },
     "kids2": { titulo: "Hamburger Nutritivo", desc: "Blend de carne ou frango enriquecido com cenoura e abobrinha.", img: "https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=500", cal350: 480, cal450: 620, alergenos: "NÃO CONTÉM GLÚTEN.", tabela: getNutri('kids') },
     "kids3": { titulo: "Almôndega Kids", desc: "Bolinhas de carne macias e fáceis de mastigar.", img: "https://images.unsplash.com/photo-1515516969-d4008cc6241a?auto=format&fit=crop&w=500", cal350: 460, cal450: 590, alergenos: "CONTÉM OVOS.", tabela: getNutri('kids') },
@@ -105,22 +113,16 @@ const detalhesPratos = {
 function abrirDetalhes(idPrato) {
     const dados = detalhesPratos[idPrato];
     if (!dados) return;
-
     document.getElementById('modal-titulo').innerText = dados.titulo;
     document.getElementById('modal-descricao').innerText = dados.desc;
     document.getElementById('cal-350').innerText = dados.cal350;
     document.getElementById('cal-450').innerText = dados.cal450;
     document.getElementById('modal-alergenos').innerText = dados.alergenos;
-    
-    // ATUALIZA A IMAGEM DO MODAL
     const modalImg = document.getElementById('modal-img');
     if(modalImg) modalImg.src = dados.img;
-
     const tbody = document.getElementById('tabela-nutri');
     if(tbody) {
-        tbody.innerHTML = dados.tabela.map(row => `
-            <tr><td>${row.item}</td><td>${row.qtd}</td><td>${row.vd}</td></tr>
-        `).join('');
+        tbody.innerHTML = dados.tabela.map(row => `<tr><td>${row.item}</td><td>${row.qtd}</td><td>${row.vd}</td></tr>`).join('');
     }
     document.getElementById('dish-modal').style.display = "block";
 }
@@ -132,13 +134,20 @@ function fecharModal() {
 // ==========================================
 // 3. LÓGICA DE PREÇOS (SEÇÃO PLANOS)
 // ==========================================
-function updatePrices(linha) {
+function updatePrices(linha, elemento) {
     const data = {
         'tradicional': { s: ['₲ 420.000', '5% OFF', '₲ 399.000'], b: ['₲ 1.200.000', '5% OFF', '₲ 1.140.000'], l: ['₲ 1.680.000', '10% OFF', '₲ 1.512.000'] },
         'gourmet': { s: ['₲ 490.000', '5% OFF', '₲ 465.500'], b: ['₲ 1.400.000', '5% OFF', '₲ 1.330.000'], l: ['₲ 1.960.000', '10% OFF', '₲ 1.764.000'] },
         'kids': { s: ['₲ 350.000', '5% OFF', '₲ 332.500'], b: ['₲ 1.000.000', '5% OFF', '₲ 950.000'], l: ['₲ 1.400.000', '10% OFF', '₲ 1.260.000'] },
         'personalizada': { s: ['---', '---', 'Sob Consulta'], b: ['---', '---', 'Sob Consulta'], l: ['---', '---', 'Sob Consulta'] }
     };
+
+    if (elemento) {
+        document.querySelectorAll('.line-selector .tab-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        elemento.classList.add('active');
+    }
 
     const sel = data[linha];
     if(!sel) return;
@@ -158,15 +167,15 @@ function updatePrices(linha) {
     }
 }
 
+
 // ==========================================
-// 4. FUNÇÕES DE PERSONALIZAÇÃO E PEDIDOS
+// 4. PERSONALIZAÇÃO E MONTAGEM DO PEDIDO
 // ==========================================
 function togglePersonalizado() {
     const chk = document.getElementById('is-personalizado');
     const isPerso = chk ? chk.checked : false;
     const gProtContainer = document.getElementById('g-prot-container');
     if(gProtContainer) gProtContainer.style.display = isPerso ? 'block' : 'none';
-    
     const containersG = document.querySelectorAll('.g-acomp-container');
     containersG.forEach(div => div.style.display = isPerso ? 'block' : 'none');
 }
@@ -179,28 +188,21 @@ const cardapios = {
     "acompanhamentos_base": ["Arroz", "Feijão", "Macarrão", "Purê de Batata", "Purê de Batata Doce", "Purê de Mandioca", "Seleta de Legumes"]
 };
 
-let itensPedido = [];
-let limitePratos = 0;
-let linhaBloqueada = false;
-
 function configurarPlano(isLoading = false) {
     const planoSelect = document.getElementById('plano-selecionado');
     if(!planoSelect) return;
     const plano = planoSelect.value;
-    const limites = { "Individual": 1, "Mensal": 14, "FDS": 10, "Semanal": 14 };
-    
+    const limites = { "Individual": 13, "Mensal": 14, "FDS": 10, "Semanal": 14 };
     if (!isLoading && itensPedido.length > 0) {
         if (!confirm("Mudar de plano limpará o carrinho. Continuar?")) return;
         itensPedido = [];
         linhaBloqueada = false;
         document.getElementById('linha-escolhida').disabled = false;
     }
-
     limitePratos = limites[plano] || 0;
-    document.getElementById('limite-txt').innerText = limitePratos;
-    document.getElementById('progresso').max = limitePratos;
+    document.getElementById('limite-txt').innerText = plano === "Individual" ? "13" : limitePratos;
+    document.getElementById('progresso').max = plano === "Individual" ? 13 : limitePratos;
     document.getElementById('controles-prato').style.display = plano ? 'block' : 'none';
-    
     atualizarOpcoesItens();
     renderizarCarrinho();
 }
@@ -210,11 +212,8 @@ function atualizarOpcoesItens() {
     const protSelect = document.getElementById('select-proteina');
     const acompDiv = document.getElementById('lista-acompanhamentos');
     const isPerso = document.getElementById('is-personalizado') ? document.getElementById('is-personalizado').checked : false;
-    
     if (!cardapios[linhaSelect.value]) return;
-
     protSelect.innerHTML = cardapios[linhaSelect.value].map(p => `<option value="${p}">${p}</option>`).join('');
-    
     acompDiv.innerHTML = cardapios.acompanhamentos_base.map(a => `
         <div class="acomp-item">
             <div class="acomp-check">
@@ -224,8 +223,7 @@ function atualizarOpcoesItens() {
             <div class="g-acomp-container" style="display:${isPerso ? 'block' : 'none'}; margin-left: 20px;">
                 <input type="number" class="g-acomp" placeholder="Qtd (g)" style="width:70px; padding:3px;">
             </div>
-        </div>
-    `).join('');
+        </div>`).join('');
 }
 
 function limitarAcompanhamentos() {
@@ -244,20 +242,16 @@ function limitarAcompanhamentos() {
 
 function adicionarPratoLista() {
     if (itensPedido.length >= limitePratos && limitePratos > 0) return;
-
     const linha = document.getElementById('linha-escolhida').value;
     const prot = document.getElementById('select-proteina').value;
     const isPerso = document.getElementById('is-personalizado') ? document.getElementById('is-personalizado').checked : false;
     const gProt = document.getElementById('g-prot')?.value || ""; 
     const checks = document.querySelectorAll('input[name="acomp"]:checked');
-
     if (checks.length === 0) { alert("Escolha os acompanhamentos!"); return; }
-
     if (document.getElementById('plano-selecionado').value !== "Individual" && !linhaBloqueada) {
         linhaBloqueada = true;
         document.getElementById('linha-escolhida').disabled = true;
     }
-
     let acompTexto = [];
     checks.forEach(c => {
         let txt = c.value;
@@ -268,44 +262,75 @@ function adicionarPratoLista() {
         }
         acompTexto.push(txt);
     });
-
     const infoProt = isPerso && gProt ? ` (${gProt}g)` : "";
     const detalheFinal = `${prot}${infoProt} + ${acompTexto.join(', ')}`;
-
     itensPedido.push({ linha: isPerso ? `${linha} (Personalizado)` : linha, detalhe: detalheFinal });
-
     renderizarCarrinho();
     salvarDadosLocalmente();
-    
-    if(isPerso) togglePersonalizado(); 
+    const toast = $('<div class="toast-success">Prato adicionado ao seu plano!</div>');
+    $('body').append(toast);
+    toast.fadeIn().delay(1500).fadeOut(function() { $(this).remove(); });
 }
 
 function repetirPrato(i) {
-    if (itensPedido.length >= limitePratos && limitePratos > 0) return;
-    itensPedido.push({...itensPedido[i]});
+    // Verifica se pode adicionar mais um
+    if (limitePratos > 0 && itensPedido.length >= limitePratos) {
+        alert("Limite de pratos do plano atingido!");
+        return;
+    }
+
+    // Cria uma cópia profunda do objeto para evitar que um altere o outro
+    const novoItem = JSON.parse(JSON.stringify(itensPedido[i]));
+    itensPedido.push(novoItem);
+
+    // Atualiza interface e salva
+    renderizarCarrinho();
+    salvarDadosLocalmente();
+}
+
+function removerPrato(i) {
+    itensPedido.splice(i, 1);
+    
+    // Se o carrinho esvaziar, libera a troca de linha
+    if (itensPedido.length === 0) {
+        linhaBloqueada = false;
+        const linhaSel = document.getElementById('linha-escolhida');
+        if(linhaSel) linhaSel.disabled = false;
+    }
+    
     renderizarCarrinho();
     salvarDadosLocalmente();
 }
 
 function renderizarCarrinho() {
     const lista = document.getElementById('carrinho-itens');
+    const atualSpan = document.getElementById('atual');
+    const progressoBar = document.getElementById('progresso');
+    
     if(!lista) return;
 
+    // Gera o HTML dos itens
     lista.innerHTML = itensPedido.map((p, i) => `
         <li style="border-bottom: 1px solid #eee; padding: 10px 0; list-style:none;">
             <div style="font-size: 14px;"><b>${i+1}.</b> [${p.linha}] ${p.detalhe}</div>
-            <div style="margin-top: 5px;">
-                <button onclick="repetirPrato(${i})" style="background:#2D5A27; color:white; border:none; padding:3px 8px; cursor:pointer; border-radius:4px; font-size:11px;">Repetir</button>
-                <button onclick="removerPrato(${i})" style="background:#ff4d4d; color:white; border:none; padding:3px 8px; cursor:pointer; border-radius:4px; font-size:11px;">Remover</button>
+            <div style="margin-top: 5px; display: flex; gap: 10px;">
+                <button type="button" onclick="repetirPrato(${i})" style="background:#2D5A27; color:white; border:none; padding:5px 10px; cursor:pointer; border-radius:4px; font-size:11px;">
+                    <i class="fas fa-copy"></i> Repetir
+                </button>
+                <button type="button" onclick="removerPrato(${i})" style="background:#ff4d4d; color:white; border:none; padding:5px 10px; cursor:pointer; border-radius:4px; font-size:11px;">
+                    <i class="fas fa-trash"></i> Remover
+                </button>
             </div>
-        </li>
-    `).join('');
+        </li>`).join('');
 
-    document.getElementById('atual').innerText = itensPedido.length;
-    document.getElementById('progresso').value = itensPedido.length;
+    // Atualiza contadores
+    if(atualSpan) atualSpan.innerText = itensPedido.length;
+    if(progressoBar) progressoBar.value = itensPedido.length;
 
-    const plano = document.getElementById('plano-selecionado').value;
-    const pronto = (itensPedido.length === limitePratos && limitePratos > 0) || (plano === "Individual" && itensPedido.length > 0);
+    // Lógica do botão de finalizar (WhatsApp)
+    const plano = document.getElementById('plano-selecionado')?.value;
+    const pronto = (limitePratos > 0 && itensPedido.length === limitePratos) || (plano === "Individual" && itensPedido.length > 0);
+    
     const btnZap = document.getElementById('btn-whatsapp');
     if(btnZap) {
         btnZap.disabled = !pronto;
@@ -313,14 +338,49 @@ function renderizarCarrinho() {
     }
 }
 
-function removerPrato(i) {
-    itensPedido.splice(i, 1);
-    if (itensPedido.length === 0) {
-        linhaBloqueada = false;
-        document.getElementById('linha-escolhida').disabled = false;
+
+// ==========================================
+// 5. LOCALSTORAGE E ENVIO WHATSAPP
+// ==========================================
+
+function obterLocalizacaoEFrete() {
+    // Tenta encontrar o botão pelo ID ou pela Classe (garantindo que funcione)
+    const btn = document.getElementById('btn-calcular-frete') || document.querySelector('.btn-frete');
+    
+    if(btn) btn.innerText = "Obtendo localização...";
+
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            
+            // 1. Calcula o frete
+            const resultado = calcularFreteDistancia(lat, lon);
+            
+            // 2. Guarda nas variáveis globais (importante para o WhatsApp ler depois)
+            freteCalculado = `₲ ${resultado.preco.toLocaleString('es-PY')} (${resultado.distancia} km)`;
+            
+            // 3. CORREÇÃO DO LINK: Agora usando o padrão universal do Google Maps
+            linkMapsCliente = `https://www.google.com/maps?q=${lat},${lon}`;
+            
+            // 4. Atualiza a tela para o cliente
+            const display = document.getElementById('valor-frete-display');
+            if(display) {
+                display.innerText = freteCalculado;
+                display.style.color = "#2D5A27";
+                display.style.fontWeight = "bold";
+            }
+            
+            if(btn) btn.innerText = "Frete Calculado!";
+
+        }, function(error) {
+            console.error(error);
+            alert("Erro: Por favor, ative o GPS do seu celular/navegador para calcular o frete.");
+            if(btn) btn.innerText = "Tentar Novamente";
+        }, { enableHighAccuracy: true }); // Força maior precisão do GPS
+    } else {
+        alert("Seu navegador não suporta geolocalização.");
     }
-    renderizarCarrinho();
-    salvarDadosLocalmente();
 }
 
 function salvarDadosLocalmente() {
@@ -340,17 +400,14 @@ function carregarDadosSalvos() {
         const d = JSON.parse(salvos);
         const planoSel = document.getElementById('plano-selecionado');
         if(planoSel) planoSel.value = d.plano;
-        
         configurarPlano(true);
         itensPedido = d.itens;
         linhaBloqueada = d.linhaBloqueada;
-        
         const linhaSel = document.getElementById('linha-escolhida');
         if(linhaSel) {
             linhaSel.value = d.linha;
             linhaSel.disabled = linhaBloqueada;
         }
-        
         if(d.obs && document.getElementById('observacoes-gerais')) {
             document.getElementById('observacoes-gerais').value = d.obs;
         }
@@ -359,17 +416,65 @@ function carregarDadosSalvos() {
 }
 
 function enviarPedidoZap() {
-    const plano = document.getElementById('plano-selecionado').value;
-    const obs = document.getElementById('observacoes-gerais')?.value || "";
-    let msg = `*NOVO PEDIDO - DONA MARIA*\n*Plano:* ${plano}\n\n`;
-    itensPedido.forEach((p, i) => msg += `*${i+1}.* [${p.linha}] ${p.detalhe}\n`);
-    if(obs) msg += `\n*Obs:* ${obs}`;
+    const plano = document.getElementById('plano-selecionado')?.value || "Não selecionado";
+    const obs = document.getElementById('observacoes-gerais')?.value || "NENHUMA";
     
-    window.open(`https://wa.me/595991635604?text=${encodeURIComponent(msg)}`, '_blank');
-    localStorage.removeItem('donaMaria_pedido');
+    let msg = `*NOVO PEDIDO - DONA MARIA*\n`;
+    msg += `*Plano:* ${plano}\n\n`;
+    
+    msg += `*ITENS ESCOLHIDOS:*\n`;
+    if (typeof itensPedido !== 'undefined' && itensPedido.length > 0) {
+        itensPedido.forEach((p, i) => {
+            msg += `*${i+1}.* [${p.linha}] ${p.detalhe}\n`;
+        });
+    } else {
+        msg += `Nenhum item selecionado\n`;
+    }
+    
+    msg += `\n*ENTREGA E LOCALIZAÇÃO:*\n`;
+    msg += `*Valor do Frete:* ${freteCalculado}\n`;
+    msg += `*Mapa do Cliente:* ${linkMapsCliente}\n\n`;
+    
+    msg += `*Observações:* ${obs}`;
+
+    const url = `https://wa.me/595991635604?text=${encodeURIComponent(msg)}`;
+    window.open(url, '_blank');
 }
 
-// Mostrar aviso de sucesso
-const toast = $('<div class="toast-success">Prato adicionado ao seu plano!</div>');
-$('body').append(toast);
-toast.fadeIn().delay(2000).fadeOut(function() { $(this).remove(); });
+// Lógica FAQ
+$(document).ready(function(){
+    $('.faq .toggle').on('click', function(){
+        const parent = $(this).parent();
+        if (parent.hasClass('active')) {
+            parent.removeClass('active');
+        } else {
+            $('.faq .wrapper').removeClass('active');
+            parent.addClass('active');
+        }
+    });
+});
+
+// ==========================================
+// 6. CALCULADORA DE FRETE (MRA - Paraguay)
+// ==========================================
+function calcularFreteDistancia(latDest, lonDest) {
+    const R = 6371; // Raio da Terra em km
+    const dLat = (latDest - ORIGEM_COORD.lat) * Math.PI / 180;
+    const dLon = (lonDest - ORIGEM_COORD.lon) * Math.PI / 180;
+    
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+              Math.cos(ORIGEM_COORD.lat * Math.PI / 180) * Math.cos(latDest * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    const distancia = R * c;
+
+    let precoFrete = 0;
+    if (distancia <= 2) precoFrete = 8000;
+    else if (distancia <= 3) precoFrete = 10000;
+    else if (distancia <= 5) precoFrete = 15000;
+    else precoFrete = 15000 + (Math.ceil(distancia - 5) * 3000);
+
+    return { 
+        distancia: distancia.toFixed(1), 
+        preco: precoFrete 
+    };
+}
