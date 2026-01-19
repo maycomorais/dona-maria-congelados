@@ -104,7 +104,7 @@ section {
 .home {
   display: flex;
   background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-    url("img/header.png") no-repeat center;
+    url("img/header.webp") no-repeat center;
   height: 100vh;
   color: #faf9f6;
   min-height: 500px;
@@ -632,33 +632,33 @@ section .title::after {
   margin: 15px 0;
 }
 
+.nutri-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    font-size: 0.85rem;
+}
+
+.nutri-table th, .nutri-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.nutri-table th {
+    background-color: #2D5A27;
+    color: white;
+}
+
+.nutri-table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
 .allergens {
-  color: #d9534f;
-  font-size: 0.9rem;
-  font-weight: bold;
-}
-
-.nutritional-table table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 15px;
-}
-
-.nutritional-table th {
-  background: #2d5a27;
-  color: white;
-  padding: 10px;
-  text-align: left;
-}
-
-.nutritional-table td {
-  padding: 8px;
-  border-bottom: 1px solid #eee;
-  font-size: 14px;
-}
-
-.nutritional-table tr:nth-child(even) {
-  background: #f9f9f9;
+    margin-top: 15px;
+    font-weight: bold;
+    color: #d9534f; /* Cor de alerta para alérgenos */
+    font-size: 0.8rem;
 }
 
 .observation-field label {
@@ -710,36 +710,80 @@ section .title::after {
 
 /* --- Pratos (Carousel) --- */
 .projects .carousel .card {
-  background: #fff;
-  border-radius: 10px;
-  overflow: hidden;
-  border: 1px solid #ddd;
-  transition: 0.3s;
+    background: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid #ddd;
+    transition: 0.3s;
+    cursor: pointer;
+    position: relative; /* Necessário para posicionar a lupa */
 }
 
 .projects .carousel .card:hover {
-  transform: translateY(-8px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    transform: translateY(-8px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Container da Imagem para o efeito */
+.projects .carousel .card .box {
+    padding: 0; /* Ajustado para a imagem ocupar o topo */
+    text-align: center;
+    position: relative;
+    overflow: hidden;
 }
 
 .projects .carousel .card img {
-  width: 100% !important;
-  height: 250px !important;
-  object-fit: cover !important;
-  border-radius: 0 !important;
-  border: none !important;
+    width: 100% !important;
+    height: 250px !important;
+    object-fit: cover !important;
+    display: block;
+    transition: transform 0.5s ease, filter 0.3s ease;
 }
 
-.projects .carousel .card .box {
-  padding: 20px;
-  text-align: center;
+/* Criando o efeito da Lupa com Pseudo-elemento */
+.projects .carousel .card .box::after {
+    content: '\f00e  Ver Detalhes'; /* Ícone da lupa do FontAwesome */
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(45, 90, 39, 0.85); /* Verde do seu tema com transparência */
+    color: white;
+    padding: 10px 20px;
+    border-radius: 50px;
+    opacity: 0;
+    transition: 0.3s;
+    font-size: 14px;
+    white-space: nowrap;
+    z-index: 2;
 }
 
+/* Estados de Hover */
+.projects .carousel .card:hover .box img {
+    filter: brightness(0.7);
+    transform: scale(1.1); /* Dá um zoom leve na imagem */
+}
+
+.projects .carousel .card:hover .box::after {
+    opacity: 1;
+}
+
+/* Ajuste do texto abaixo da imagem */
 .projects .carousel .card .text {
-  font-size: 20px;
-  font-weight: 600;
-  color: #2a2a2a;
-  margin: 10px 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #2a2a2a;
+    margin: 15px 10px 5px;
+    padding: 0 15px;
+}
+
+.plate-line {
+    font-size: 14px;
+    color: #2D5A27;
+    font-weight: 500;
+    margin-bottom: 15px;
 }
 
 .projects .plate-line {
@@ -747,6 +791,28 @@ section .title::after {
   color: #2d5a27;
   font-weight: 600;
   text-transform: uppercase;
+}
+
+/* Container de informações do carrossel */
+.carousel-info {
+    margin-bottom: 15px;
+    padding-left: 10px;
+}
+
+/* Texto de instrução "Clique para detalhes" */
+.carousel-info span {
+    font-size: 0.9rem;
+    color: #2D5A27;
+    font-weight: 500;
+    display: block;
+    margin-bottom: 5px;
+}
+
+/* Aviso de imagem ilustrativa */
+.img-disclaimer {
+    font-size: 0.75rem;
+    color: #888;
+    font-style: italic;
 }
 
 /* --- Como Funciona --- */

@@ -76,55 +76,81 @@ function getNutri(tipo) {
     return [];
 }
 
+
 const detalhesPratos = {
-    "trad1": { titulo: "Carne Moída Refogada", desc: "Clássico caseiro, carne moída de primeira refogada com temperos naturais.", img: "https://images.unsplash.com/photo-1541518763669-27f70452fcc0?auto=format&fit=crop&w=500", cal350: 580, cal450: 750, alergenos: "CONTÉM DERIVADOS DE SOJA.", tabela: getNutri('bovina') },
-    "trad2": { titulo: "Macarrão com Almôndega", desc: "Massa al dente com almôndegas suculentas ao molho sugo.", img: "https://images.unsplash.com/photo-1515516969-d4008cc6241a?auto=format&fit=crop&w=500", cal350: 600, cal450: 780, alergenos: "CONTÉM GLÚTEN E OVOS.", tabela: getNutri('bovina') },
-    "trad3": { titulo: "Carne de Panela Desfiada", desc: "Carne cozida lentamente até desfiar, cheia de sabor.", img: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=500", cal350: 590, cal450: 760, alergenos: "NÃO CONTÉM GLÚTEN.", tabela: getNutri('bovina') },
-    "trad4": { titulo: "Carré Suíno", desc: "Corte suíno selecionado, grelhado e temperado com ervas.", img: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=500", cal350: 610, cal450: 790, alergenos: "NÃO CONTÉM GLÚTEN.", tabela: getNutri('suino') },
-    "trad5": { titulo: "Frango em Cubos Cremoso", desc: "Cubos de peito de frango em molho branco leve e cremoso.", img: "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=500", cal350: 550, cal450: 710, alergenos: "CONTÉM LACTOSE.", tabela: getNutri('frango') },
-    "trad6": { titulo: "Sobrecoxa Assada", desc: "Sobrecoxa dourada e suculenta, temperada com limão e ervas.", img: "https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=500", cal350: 633, cal450: 817, alergenos: "PODE CONTER SOJA.", tabela: getNutri('frango') },
-    "trad7": { titulo: "Frango Desfiado", desc: "Peito de frango cozido e desfiado, ideal para quem busca leveza.", img: "https://images.unsplash.com/photo-1606728035253-49e8a23146de?auto=format&fit=crop&w=500", cal350: 420, cal450: 550, alergenos: "NÃO CONTÉM GLÚTEN.", tabela: getNutri('frango') },
-    "trad8": { titulo: "Frango a Parmegiana", desc: "Empanado crocante coberto com molho de tomate e queijo derretido.", img: "https://images.unsplash.com/photo-1632778149955-e80f8ceca2e8?auto=format&fit=crop&w=500", cal350: 680, cal450: 850, alergenos: "CONTÉM GLÚTEN E LACTOSE.", tabela: getNutri('frango') },
-    "trad9": { titulo: "Frango Xadrez", desc: "Cubos de frango com pimentões, cebola e molho shoyu especial.", img: "https://images.unsplash.com/photo-1525385133512-2f3bdd039054?auto=format&fit=crop&w=500", cal350: 490, cal450: 640, alergenos: "CONTÉM SOJA.", tabela: getNutri('frango') },
-    "trad10": { titulo: "Strogonoff de Frango", desc: "O queridinho de todos: frango macio em molho cremoso com cogumelos.", img: "https://images.unsplash.com/photo-1555126634-323283e090fa?auto=format&fit=crop&w=500", cal350: 620, cal450: 800, alergenos: "CONTÉM LACTOSE.", tabela: getNutri('frango') },
-    "gourmet1": { titulo: "Frango Mostarda e Mel", desc: "Combinação agridoce sofisticada em cubos de frango.", img: "https://images.unsplash.com/photo-1607330207224-e676b47c0589?auto=format&fit=crop&w=500", cal350: 560, cal450: 720, alergenos: "CONTÉM MOSTARDA.", tabela: getNutri('frango') },
-    "gourmet2": { titulo: "Escalopinho ao Molho Madeira", desc: "Fatias finas de carne bovina em molho escuro e encorpado.", img: "https://images.unsplash.com/photo-1600891964092-4316c288032e?auto=format&fit=crop&w=500", cal350: 610, cal450: 790, alergenos: "CONTÉM GLÚTEN (MOLHO).", tabela: getNutri('bovina') },
-    "gourmet3": { titulo: "Bife Acebolado", desc: "Bife macio coberto com cebolas caramelizadas.", img: "https://images.unsplash.com/photo-1603073163308-9654c3fb70b9?auto=format&fit=crop&w=500", cal350: 590, cal450: 770, alergenos: "NÃO CONTÉM GLÚTEN.", tabela: getNutri('bovina') },
-    "gourmet4": { titulo: "Lombo Suíno Agridoce", desc: "Lombo assado com toque especial agridoce.", img: "https://images.unsplash.com/photo-1624726175512-19c9746903ce?auto=format&fit=crop&w=500", cal350: 600, cal450: 780, alergenos: "NÃO CONTÉM GLÚTEN.", tabela: getNutri('suino') },
-    "gourmet5": { titulo: "Costelinha BBQ", desc: "Costelinha suína desmanchando ao molho barbecue defumado.", img: "https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=500", cal350: 650, cal450: 840, alergenos: "CONTÉM SOJA.", tabela: getNutri('suino') },
-    "gourmet6": { titulo: "Rocambole de Frango", desc: "Frango moído e recheado, assado até dourar.", img: "https://images.unsplash.com/photo-1631515243349-e0603604305a?auto=format&fit=crop&w=500", cal350: 580, cal450: 750, alergenos: "CONTÉM LACTOSE.", tabela: getNutri('frango') },
-    "gourmet7": { titulo: "Escondidinho", desc: "Purê cremoso cobrindo recheio suculento de carne ou frango.", img: "https://images.unsplash.com/photo-1596797038530-2c107229654b?auto=format&fit=crop&w=500", cal350: 620, cal450: 810, alergenos: "CONTÉM LACTOSE.", tabela: getNutri('bovina') },
-    "gourmet8": { titulo: "Charuto de Repolho", desc: "Folhas de repolho recheadas com carne e arroz, cozidas em molho.", img: "https://images.unsplash.com/photo-1616509091215-57bbffe75a64?auto=format&fit=crop&w=500", cal350: 480, cal450: 620, alergenos: "NÃO CONTÉM GLÚTEN.", tabela: getNutri('bovina') },
-    "gourmet9": { titulo: "Strogonoff de Carne", desc: "Cubos de carne macia em molho cremoso com champignon.", img: "https://images.unsplash.com/photo-1555126634-323283e090fa?auto=format&fit=crop&w=500", cal350: 640, cal450: 830, alergenos: "CONTÉM LACTOSE.", tabela: getNutri('bovina') },
-    "gourmet10": { titulo: "Iscas ao Molho Mostarda", desc: "Tiras de frango grelhadas envolvidas em molho de mostarda suave.", img: "https://images.unsplash.com/photo-1598515214211-89d3c73ae83b?auto=format&fit=crop&w=500", cal350: 550, cal450: 710, alergenos: "CONTÉM MOSTARDA.", tabela: getNutri('frango') },
-    "fit1": { titulo: "Peito de Frango Grelhado", desc: "Grelhado simples com ervas finas, zero gordura adicionada.", img: "https://images.unsplash.com/photo-1532550907401-a500c9a57435?auto=format&fit=crop&w=500", cal350: 380, cal450: 490, alergenos: "NÃO CONTÉM GLÚTEN.", tabela: getNutri('frango') },
-    "fit2": { titulo: "Escondidinho Batata Doce", desc: "Versão leve do clássico, com purê de batata doce de baixo índice glicêmico.", img: "https://images.unsplash.com/photo-1505253304499-671c55fb57fe?auto=format&fit=crop&w=500", cal350: 410, cal450: 530, alergenos: "PODE CONTER LEITE.", tabela: getNutri('frango') },
-    "fit3": { titulo: "Panqueca de Frango Fit", desc: "Massa integral leve recheada com frango desfiado.", img: "https://images.unsplash.com/photo-1605493666579-08bfab87e838?auto=format&fit=crop&w=500", cal350: 400, cal450: 520, alergenos: "CONTÉM GLÚTEN E OVOS.", tabela: getNutri('frango') },
-    "fit4": { titulo: "Patinho Moído ao Sugo", desc: "Carne magra moída com molho de tomate caseiro natural.", img: "https://images.unsplash.com/photo-1594041680534-e8c8cdebd659?auto=format&fit=crop&w=500", cal350: 390, cal450: 510, alergenos: "NÃO CONTÉM GLÚTEN.", tabela: getNutri('bovina') },
-    "fit5": { titulo: "Frango em Cubos Grelhado", desc: "Cubos dourados na chapa sem óleo.", img: "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?auto=format&fit=crop&w=500", cal350: 380, cal450: 490, alergenos: "NÃO CONTÉM GLÚTEN.", tabela: getNutri('frango') },
-    "fit6": { titulo: "Picadinho de Patinho", desc: "Carne magra em cubos cozida com legumes.", img: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=500", cal350: 400, cal450: 520, alergenos: "NÃO CONTÉM GLÚTEN.", tabela: getNutri('bovina') },
-    "kids1": { titulo: "Nuggets Artesanais", desc: "Feitos à mão com peito de frango e legumes escondidos.", img: "https://images.unsplash.com/photo-1563805042-7684c019e1cb?auto=format&fit=crop&w=500", cal350: 450, cal450: 580, alergenos: "CONTÉM GLÚTEN.", tabela: getNutri('kids') },
-    "kids2": { titulo: "Hamburger Nutritivo", desc: "Blend de carne ou frango enriquecido com cenoura e abobrinha.", img: "https://images.unsplash.com/photo-1550547660-d9450f859349?auto=format&fit=crop&w=500", cal350: 480, cal450: 620, alergenos: "NÃO CONTÉM GLÚTEN.", tabela: getNutri('kids') },
-    "kids3": { titulo: "Almôndega Kids", desc: "Bolinhas de carne macias e fáceis de mastigar.", img: "https://images.unsplash.com/photo-1515516969-d4008cc6241a?auto=format&fit=crop&w=500", cal350: 460, cal450: 590, alergenos: "CONTÉM OVOS.", tabela: getNutri('kids') },
-    "kids4": { titulo: "Panqueca Colorida", desc: "Massa com beterraba ou espinafre recheada.", img: "https://images.unsplash.com/photo-1605493666579-08bfab87e838?auto=format&fit=crop&w=500", cal350: 440, cal450: 570, alergenos: "CONTÉM GLÚTEN E LACTOSE.", tabela: getNutri('kids') },
-    "kids5": { titulo: "Escondidinho Colorido", desc: "Purê misto (batata e cenoura) cobrindo carninha moída.", img: "https://images.unsplash.com/photo-1596797038530-2c107229654b?auto=format&fit=crop&w=500", cal350: 450, cal450: 580, alergenos: "CONTÉM LACTOSE.", tabela: getNutri('kids') }
+    // LINHA TRADICIONAL
+    "trad1": { titulo: "Carne Moída Refogada", ingredientes: "Patinho moído (200g), cebola, alho, tomate, cheiro verde e temperos naturais da casa.", img: "img/carne-moída.webp", cal400: 590, alergenos: "NÃO CONTÉM GLÚTEN.", tabela: getNutri('bovina') },
+    "trad2": { titulo: "Macarrão com Almôndega", ingredientes: "Massa de sêmola al dente, almôndegas de carne bovina (180g), molho de tomate artesanal e manjericão.", img: "img/macarrao-com-almondega.webp", cal400: 620, alergenos: "CONTÉM GLÚTEN E OVOS.", tabela: getNutri('bovina') },
+    "trad3": { titulo: "Carne de Panela Desfiada", ingredientes: "Carne bovina magra cozida lentamente, desfiada com cebola e pimentão.", img: "img/carne-desfiada.webp", cal400: 585, alergenos: "NÃO CONTÉM GLÚTEN.", tabela: getNutri('bovina') },
+    "trad4": { titulo: "Carré Suíno", ingredientes: "Corte de lombo suíno grelhado, marinado no limão, alho e ervas finas.", img: "img/carre-suino.webp", cal400: 615, alergenos: "NÃO CONTÉM GLÚTEN.", tabela: getNutri('suino') },
+    "trad5": { titulo: "Frango em Cubos Cremoso", ingredientes: "Peito de frango (200g), creme de leite leve, milho verde e temperos verdes.", img: "img/frango-cremoso.webp", cal400: 570, alergenos: "CONTÉM LACTOSE.", tabela: getNutri('frango') },
+    "trad6": { titulo: "Sobrecoxa Assada", ingredientes: "Sobrecoxa desossada e marinada, assada até dourar com toque de páprica e limão.", img: "img/sobrecoxa.webp", cal400: 640, alergenos: "PODE CONTER SOJA.", tabela: getNutri('frango') },
+    "trad7": { titulo: "Frango Desfiado", ingredientes: "Peito de frango (130g) cozido e desfiado, refogado com tomate, cebola e salsinha.", img: "img/frango-desfiado.webp", cal400: 460, alergenos: "NÃO CONTÉM GLÚTEN.", tabela: getNutri('frango') },
+    "trad8": { titulo: "Frango a Parmegiana", ingredientes: "Filé de frango empanado, coberto com molho de tomate natural e mussarela gratinada.", img: "img/parmegiana.webp", cal400: 710, alergenos: "CONTÉM GLÚTEN E LACTOSE.", tabela: getNutri('frango') },
+    "trad9": { titulo: "Frango Xadrez", ingredientes: "Cubos de frango, pimentões coloridos, cebola, amido de milho, molho à base de shoyu.", img: "img/Frango Xadrez.webp", cal400: 520, alergenos: "CONTÉM SOJA.", tabela: getNutri('frango') },
+    "trad10": { titulo: "Strogonoff de Frango", ingredientes: "Peito de frango em cubos (130g), molho cremoso, champignon e um toque de ketchup artesanal.", img: "img/strogonoff.webp", cal400: 680, alergenos: "CONTÉM LACTOSE.", tabela: getNutri('frango') },
+
+    // LINHA GOURMET
+    "gourmet1": { titulo: "Frango Mostarda e Mel", ingredientes: "Filé de frango grelhado ao molho de mostarda dijon e mel silvestre.", img: "img/mostarda-e-mel.webp", cal400: 580, alergenos: "CONTÉM MOSTARDA.", tabela: getNutri('frango') },
+    "gourmet2": { titulo: "Escalopinho ao Molho Madeira", ingredientes: "Iscas de carne bovina, molho madeira artesanal e cogumelos frescos.", img: "img/escalopinho.webp", cal400: 630, alergenos: "CONTÉM GLÚTEN (MOLHO).", tabela: getNutri('bovina') },
+    "gourmet3": { titulo: "Bife Acebolado", ingredientes: "Bife de alcatra ou patinho grelhado com camadas de cebola caramelizada.", img: "img/bife acebolado.webp", cal400: 610, alergenos: "NÃO CONTÉM GLÚTEN.", tabela: getNutri('bovina') },
+    "gourmet4": { titulo: "Lombo Suíno Agridoce", ingredientes: "Lombo fatiado ao molho de abacaxi e especiarias agridoces.", img: "img/lombo-suino.webp", cal400: 595, alergenos: "NÃO CONTÉM GLÚTEN.", tabela: getNutri('suino') },
+    "gourmet5": { titulo: "Costelinha BBQ", ingredientes: "Costelinha suína cozida lentamente ao molho barbecue defumado.", img: "img/costelinha-barbecue.webp", cal400: 720, alergenos: "CONTÉM SOJA E CANELA.", tabela: getNutri('suino') },
+    "gourmet6": { titulo: "Rocambole de Frango", ingredientes: "Frango moído temperado, recheado com queijo e presunto, assado ao forno.", img: "img/rocambole.webp", cal400: 600, alergenos: "CONTÉM LACTOSE.", tabela: getNutri('frango') },
+    "gourmet7": { titulo: "Escondidinho", ingredientes: "Purê de batata inglesa cremosa com recheio de carne seca ou bovina refogada.", img: "img/escondidinho.webp", cal400: 650, alergenos: "CONTÉM LACTOSE.", tabela: getNutri('bovina') },
+    "gourmet8": { titulo: "Charuto de Repolho", ingredientes: "Folhas de repolho recheadas com blend de carne bovina, arroz e temperos árabes.", img: "img/charuto.webp", cal400: 490, alergenos: "NÃO CONTÉM GLÚTEN.", tabela: getNutri('bovina') },
+    "gourmet9": { titulo: "Strogonoff de Carne", ingredientes: "Tiras de carne bovina, molho de creme de leite, champignon e temperos.", img: "img/strogonoff-de-carne.webp", cal400: 730, alergenos: "CONTÉM LACTOSE.", tabela: getNutri('bovina') },
+    "gourmet10": { titulo: "Iscas ao Molho Mostarda", ingredientes: "Iscas de frango ou carne ao molho de mostarda suave e creme.", img: "img/iscas-de-frango.webp", cal400: 580, alergenos: "CONTÉM MOSTARDA.", tabela: getNutri('frango') },
+
+    // LINHA FIT
+    "fit1": { titulo: "Peito de Frango Grelhado", ingredientes: "Peito de frango (200g) grelhado no azeite de oliva e ervas finas.", img: "img/frango-grelhado.webp", cal400: 410, alergenos: "NÃO CONTÉM GLÚTEN.", tabela: getNutri('frango') },
+    "fit2": { titulo: "Escondidinho Batata Doce", ingredientes: "Purê de batata doce (baixo IG) com frango desfiado temperado com cúrcuma.", img: "img/escondidinho-batata-doce.webp", cal400: 440, alergenos: "NÃO CONTÉM GLÚTEN.", tabela: getNutri('frango') },
+    "fit3": { titulo: "Panqueca de Frango Fit", ingredientes: "Massa integral (aveia e ovos) recheada com frango desfiado e molho de tomate natural.", img: "img/panqueca-frango.webp", cal400: 430, alergenos: "CONTÉM GLÚTEN E OVOS.", tabela: getNutri('frango') },
+    "fit4": { titulo: "Patinho Moído ao Sugo", ingredientes: "Patinho extra magro (200g) com molho de tomate caseiro e manjericão.", img: "img/patinho-sugo.webp", cal400: 420, alergenos: "NÃO CONTÉM GLÚTEN.", tabela: getNutri('bovina') },
+    "fit5": { titulo: "Frango em Cubos Grelhado", ingredientes: "Cubos de peito de frango dourados sem óleo com tempero lemon pepper.", img: "img/frango-em-cubos-grelhado.webp", cal400: 410, alergenos: "NÃO CONTÉM GLÚTEN.", tabela: getNutri('frango') },
+    "fit6": { titulo: "Picadinho de Patinho", ingredientes: "Patinho magro em cubos cozido com cenoura, vagem e chuchu.", img: "img/picadinho-patinho.webp", cal400: 435, alergenos: "NÃO CONTÉM GLÚTEN.", tabela: getNutri('bovina') },
+
+    // LINHA KIDS
+    "kids1": { titulo: "Nuggets Artesanais", ingredientes: "Peito de frango moído com cenoura ralada, empanado na farinha de milho e assado.", img: "img/nuggets.webp", cal400: 480, alergenos: "CONTÉM MILHO.", tabela: getNutri('kids') },
+    "kids2": { titulo: "Hamburger Nutritivo", ingredientes: "Mini hambúrguer bovino caseiro com beterraba batida na massa para mais nutrientes.", img: "img/hamburger.webp", cal400: 510, alergenos: "NÃO CONTÉM GLÚTEN.", tabela: getNutri('kids') },
+    "kids3": { titulo: "Almôndega Kids", ingredientes: "Almôndegas bovinas pequenas ao molho de tomate docinho (com cenoura batida).", img: "img/almondega.webp", cal400: 495, alergenos: "CONTÉM OVOS.", tabela: getNutri('kids') },
+    "kids4": { titulo: "Panqueca Colorida", ingredientes: "Massa de panqueca colorida naturalmente com espinafre, recheada com frango.", img: "img/panqueca-kids.webp", cal400: 470, alergenos: "CONTÉM GLÚTEN E LACTOSE.", tabela: getNutri('kids') },
+    "kids5": { titulo: "Escondidinho Colorido", ingredientes: "Purê de batata baroa (mandioquinha) com carne moída bem suave.", img: "img/escondidinho-kids.webp", cal400: 485, alergenos: "CONTÉM LACTOSE.", tabela: getNutri('kids') }
 };
 
-function abrirDetalhes(idPrato) {
-    const dados = detalhesPratos[idPrato];
-    if (!dados) return;
-    document.getElementById('modal-titulo').innerText = dados.titulo;
-    document.getElementById('modal-descricao').innerText = dados.desc;
-    document.getElementById('cal-350').innerText = dados.cal350;
-    document.getElementById('cal-450').innerText = dados.cal450;
-    document.getElementById('modal-alergenos').innerText = dados.alergenos;
-    const modalImg = document.getElementById('modal-img');
-    if(modalImg) modalImg.src = dados.img;
-    const tbody = document.getElementById('tabela-nutri');
-    if(tbody) {
-        tbody.innerHTML = dados.tabela.map(row => `<tr><td>${row.item}</td><td>${row.qtd}</td><td>${row.vd}</td></tr>`).join('');
+function abrirDetalhes(id) {
+    const prato = detalhesPratos[id];
+    if (!prato) return;
+
+    document.getElementById('modal-titulo').innerText = prato.titulo;
+    // Trocamos a descrição fixa pela lista de ingredientes detalhada
+    document.getElementById('modal-ingredientes').innerText = prato.ingredientes;
+    
+    // Atualiza para 400g
+    const calSpan = document.getElementById('cal-400');
+    if(calSpan) calSpan.innerText = prato.cal400;
+
+    document.getElementById('modal-alergenos').innerText = prato.alergenos;
+
+    const imgModal = document.getElementById('modal-img');
+    if (imgModal) {
+        imgModal.src = prato.img;
+        imgModal.alt = prato.titulo;
     }
-    document.getElementById('dish-modal').style.display = "block";
+
+    // Tabela nutricional (mantém o padrão)
+    const tbody = document.getElementById('tabela-nutricional');
+    if (tbody) {
+        tbody.innerHTML = prato.tabela.map(linha => `
+            <tr>
+                <td>${linha.item}</td>
+                <td>${linha.qtd}</td>
+                <td>${linha.vd}</td>
+            </tr>
+        `).join('');
+    }
+
+    document.getElementById('dish-modal').style.display = 'flex';
 }
 
 function fecharModal() {
