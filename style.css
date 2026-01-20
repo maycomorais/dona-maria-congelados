@@ -930,61 +930,41 @@ section .title::after {
   margin-bottom: 10px;
 }
 
-/* --- Depoimentos --- */
-.testimonials .carousel .card {
-  background: #fff;
-  border-radius: 12px;
-  padding: 30px;
-  text-align: left;
-  border: 1px solid #eee;
+/* --- Seção de Prints de Depoimentos --- */
+.testimonials {
+    background: #fff;
 }
 
-.testimonials .carousel .card i {
-  font-size: 30px;
-  color: #2d5a27;
-  margin-bottom: 15px;
+.testimonial-card {
+    background: transparent !important;
+    border: none !important;
+    padding: 10px;
 }
 
-.testimonials .stars i {
-  font-size: 14px;
-  color: #ffd700;
-  margin-right: 2px;
+.img-container-print {
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    border: 5px solid #f1f1f1; /* Moldura leve para parecer um celular */
+    transition: transform 0.3s ease;
 }
 
-.testimonials .client-info {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  margin-top: 20px;
-  border-top: 1px solid #f0f0f0;
-  padding-top: 15px;
+.img-container-print img {
+    width: 100% !important;
+    height: auto !important; /* Mantém a proporção do print do WhatsApp */
+    display: block;
 }
 
-.testimonials .client-info img {
-  width: 50px !important;
-  height: 50px !important;
-  border-radius: 50% !important;
-  object-fit: cover;
+.testimonial-card:hover .img-container-print {
+    transform: translateY(-5px);
+    border-color: #2D5A27; /* Destaca com o verde da marca ao passar o mouse */
 }
 
-/* Estrelas nos Depoimentos */
-.testimonials .stars {
-  margin-bottom: 15px;
-  color: #ffd700; /* Cor Dourada */
-  font-size: 0.9rem;
-}
-
-.testimonials .stars i {
-  color: #ffd700 !important; /* Força o dourado para não herdar o verde */
-  margin-right: 2px;
-  font-size: 14px !important; /* Tamanho menor e elegante */
-}
-
-/* Ajuste no padding do card para acomodar as estrelas */
-.testimonials .carousel .card .box {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start; /* Alinha tudo à esquerda como um review real */
+/* Ajuste específico para o carrossel de depoimentos no mobile */
+@media (max-width: 600px) {
+    .testimonial-card {
+        padding: 5px;
+    }
 }
 
 /* --- Contato --- */
