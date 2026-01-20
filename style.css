@@ -146,6 +146,7 @@ section {
   border-radius: 6px;
   border: 2px solid #a62626;
   transition: all 0.3s ease;
+  text-align: center;
 }
 
 .home .home-content a:hover {
@@ -455,6 +456,20 @@ section .title::after {
   padding: 80px 0;
   background: #fdfdfd;
 }
+
+.menu-selection .title {
+    text-align: center;
+  font-size: 40px;
+  font-weight: 500;
+  margin-bottom: 60px;
+  padding-bottom: 25px;
+  position: relative;
+  color: #2a2a2a;
+}
+
+.menu-selection .title::after{
+  content: "É bem fácil";
+}
 .menu-box {
   background: #fff;
   padding: 30px;
@@ -590,14 +605,49 @@ section .title::after {
 }
 
 .modal-content {
-  background-color: #fff;
-  margin: 5% auto;
-  padding: 30px;
-  border-radius: 15px;
-  width: 90%;
-  max-width: 600px;
-  position: relative;
-  animation: zoomIn 0.3s;
+  background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%; /* No desktop */
+    max-width: 900px;
+    border-radius: 10px;
+    position: relative;
+    display: flex !important;
+    flex-direction: row; /* Lado a lado no desktop */
+    flex-wrap: nowrap;
+    gap: 20px;
+    box-sizing: border-box;
+}
+
+@media (max-width: 600px) {
+    .modal-content {
+        flex-direction: column !important; /* FORÇA O CONTEÚDO A DESCER */
+        width: 95% !important;
+        padding: 10px !important;
+        max-height: 90vh;
+        overflow-y: auto !important; /* Permite rolar se o texto for grande */
+    }
+
+    .modal-img-container, .modal-body {
+        width: 100% !important; /* Ocupa a largura toda da tela */
+        min-width: 100% !important;
+    }
+
+    #modal-img {
+        height: 200px !important; /* Reduz a foto para sobrar espaço para a tabela */
+    }
+
+    .nutri-table {
+        display: table !important;
+        width: 100% !important; /* Força a tabela a respeitar o card */
+        table-layout: fixed; /* Impede que colunas empurrem a largura */
+    }
+
+    .nutri-table td, .nutri-table th {
+        font-size: 12px !important;
+        padding: 5px 2px !important;
+    }
 }
 
 @keyframes zoomIn {
@@ -611,13 +661,31 @@ section .title::after {
   }
 }
 
+/* Estilo do botão de fechar */
 .close-modal {
-  position: absolute;
-  right: 20px;
-  top: 10px;
-  font-size: 35px;
-  cursor: pointer;
-  color: #888;
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 30px;
+    width: 40px;
+    height: 40px;
+    background: rgba(0,0,0,0.6);
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10002;
+    cursor: pointer;
+    line-height: 1;
+}
+
+@media (max-width: 600px) {
+    .close-modal {
+        top: 10px;
+        right: 10px;
+        background: #2D5A27; /* Verde no mobile para ficar bem visível */
+    }
 }
 
 #modal-titulo {
@@ -632,17 +700,20 @@ section .title::after {
   margin: 15px 0;
 }
 
+
 .nutri-table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 15px;
-    font-size: 0.85rem;
+    background: #fff;
+    box-sizing: border-box; 
 }
 
 .nutri-table th, .nutri-table td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
+    padding: 8px 4px; 
+    font-size: 0.8rem; 
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .nutri-table th {
@@ -716,74 +787,73 @@ section .title::after {
     border: 1px solid #ddd;
     transition: 0.3s;
     cursor: pointer;
-    position: relative; /* Necessário para posicionar a lupa */
-}
-
-.projects .carousel .card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-}
-
-/* Container da Imagem para o efeito */
-.projects .carousel .card .box {
-    padding: 0; /* Ajustado para a imagem ocupar o topo */
-    text-align: center;
     position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Novo container para controlar a imagem e a lupa separadamente */
+.projects .carousel .card .img-container {
+    position: relative;
+    width: 100%;
+    height: 200px;
     overflow: hidden;
 }
 
-.projects .carousel .card img {
+.projects .carousel .card .img-container img {
     width: 100% !important;
-    height: 250px !important;
+    height: 100% !important;
     object-fit: cover !important;
-    display: block;
     transition: transform 0.5s ease, filter 0.3s ease;
 }
 
-/* Criando o efeito da Lupa com Pseudo-elemento */
-.projects .carousel .card .box::after {
-    content: '\f00e  Ver Detalhes'; /* Ícone da lupa do FontAwesome */
+/* Efeito Lupa */
+.projects .carousel .card .img-container::after {
+    content: '\f00e  Ver Detalhes';
     font-family: "Font Awesome 5 Free";
     font-weight: 900;
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: rgba(45, 90, 39, 0.85); /* Verde do seu tema com transparência */
+    background: rgba(45, 90, 39, 0.85);
     color: white;
-    padding: 10px 20px;
+    padding: 8px 15px;
     border-radius: 50px;
     opacity: 0;
     transition: 0.3s;
-    font-size: 14px;
-    white-space: nowrap;
+    font-size: 13px;
     z-index: 2;
 }
 
-/* Estados de Hover */
-.projects .carousel .card:hover .box img {
+.projects .carousel .card:hover .img-container img {
     filter: brightness(0.7);
-    transform: scale(1.1); /* Dá um zoom leve na imagem */
+    transform: scale(1.1);
 }
 
-.projects .carousel .card:hover .box::after {
+.projects .carousel .card:hover .img-container::after {
     opacity: 1;
 }
 
-/* Ajuste do texto abaixo da imagem */
+/* A caixa de texto volta a ter padding sem ser afetada pela lupa */
+.projects .carousel .card .box {
+    padding: 15px !important;
+    text-align: center;
+    background: #fff;
+}
+
 .projects .carousel .card .text {
     font-size: 18px;
     font-weight: 600;
     color: #2a2a2a;
-    margin: 15px 10px 5px;
-    padding: 0 15px;
+    margin: 5px 0;
 }
 
 .plate-line {
-    font-size: 14px;
+    font-size: 13px;
     color: #2D5A27;
     font-weight: 500;
-    margin-bottom: 15px;
+    margin: 0;
 }
 
 .projects .plate-line {
@@ -1168,9 +1238,11 @@ footer a {
 .price-banner {
   display: flex;
   justify-content: center;
-  gap: 15px;
-  margin-bottom: 40px;
+  align-items: center;
   flex-wrap: wrap;
+  gap: 20px;
+  margin: 30px 0;
+  width: 100%;
 }
 
 .price-tag {
@@ -1179,6 +1251,11 @@ footer a {
   padding: 10px 20px;
   border-radius: 15px;
   box-shadow: 4px 4px 0px #2d5a27;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
 
 .price-tag span {

@@ -42,6 +42,11 @@ $(document).ready(function(){
         typeSpeed: 100, backSpeed: 60, loop: true
     });
 
+    new Typed(".typing-2", {
+        strings: ["Descanse", "Estude", "Divirta-se", "Veja Séries", "Estude +"],
+        typeSpeed: 100, backSpeed: 60, loop: true
+    });
+
     // Evento de troca de planos para atualizar valores
     $('.planos-btn').click(function(){
         const categoria = $(this).attr('id'); 
