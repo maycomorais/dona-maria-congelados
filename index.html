@@ -293,92 +293,159 @@
     </section>
 
     <section class="menu-selection" id="montar-prato">
-        <div class="max-width">
-            <h2 class="title">Monte seu Pedido</h2>
-            <div class="menu-box">
-                <div class="selection-header" id="container-linha">
-                    <div class="field">
-                        <label>1. Escolha seu Plano:</label>
-                        <select id="plano-selecionado" onchange="configurarPlano()">
-                            <option value="">Selecione o plano...</option>
-                            <option value="Individual">Individual / Degustação</option>
-                            <option value="Semanal">Semanal (14 pratos)</option>
-                            <option value="FDS">Fins de Semana Livres (10 pratos semanais)</option>
-                            <option value="Mensal">Mensal (14 pratos semanais)</option>
-                        </select>
-                        <small id="aviso-linha" style="display:none; color: #666; font-style: italic;">
-                            *Para este plano, recomenda-se escolher pratos da mesma linha (ex: só Fit).
-                        </small>
-                    </div>
-                    <p id="counter">Pratos Selecionados: <span id="atual">0</span> / <span id="limite-txt">0</span></p>
-                    <progress id="progresso" value="0" max="14"></progress>
+    <div class="max-width">
+        <h2 class="title">Monte seu Pedido</h2>
+        <div class="menu-box">
+            <div class="selection-header" id="container-linha">
+                <div class="field">
+                    <label>1. Escolha seu Plano:</label>
+                    <select id="plano-selecionado" onchange="configurarPlano()">
+                        <option value="">Selecione o plano...</option>
+                        <option value="Individual">Individual / Degustação</option>
+                        <option value="Semanal">Semanal (14 pratos)</option>
+                        <option value="FDS">Fins de Semana Livres (10 pratos semanais)</option>
+                        <option value="Mensal">Mensal (14 pratos semanais)</option>
+                    </select>
+                    <small id="aviso-linha" style="display:none; color: #666; font-style: italic;">
+                        *Para este plano, recomenda-se escolher pratos da mesma linha (ex: só Fit).
+                    </small>
                 </div>
-
-                <div id="controles-prato" style="display:none;">
-                    <div class="field">
-                        <label>2. Escolha a Linha:</label>
-                        <select id="linha-escolhida" onchange="atualizarOpcoesItens()">
-                            <option value="Tradicional">Linha Tradicional</option>
-                            <option value="Gourmet">Linha Gourmet</option>
-                            <option value="Kids">Linha Kids</option>
-                            <option value="Fit">Linha Fit</option>
-                        </select>
-                    </div>
-
-                    <div class="field checkbox-personalizado">
-                        <input type="checkbox" id="is-personalizado" onchange="togglePersonalizado()">
-                        <label for="is-personalizado">Desejo personalizar as gramas deste prato</label>
-                    </div>
-
-                    <div class="field">
-                        <label>3. Proteína (Escolha 1):</label>
-                        <select id="select-proteina"></select>
-                        <div id="g-prot-container" style="display:none; margin-top:5px;">
-                            <input type="number" id="g-prot" placeholder="Gramas da Proteína (ex: 150g)">
-                        </div>
-                    </div>
-
-                    <div class="field">
-                        <label>4. Acompanhamentos (Escolha até 3):</label>
-                        <div id="lista-acompanhamentos" class="acomp-grid"></div>
-                    </div>
-
-                    <button type="button" onclick="adicionarPratoLista()" class="btn-add">Adicionar Prato ao Carrinho</button>
-                </div>
-
-                <div class="selected-list">
-                    <h4>Itens no Carrinho:</h4>
-                    <ul id="carrinho-itens"></ul>
-                </div>
-
-                <div class="field observation-field" style="margin-top: 20px;">
-                    <label>Alguma observação para o seu pedido?</label>
-                    <textarea id="observacoes-gerais" placeholder="Ex: Não colocar cebola, etc." rows="3"></textarea>
-                </div>
-
-                <div class="shipping-box" style="margin-top: 30px; background: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px dashed #2D5A27;">
-                    <h4 style="color: #2D5A27; margin-bottom: 10px;"><i class="fas fa-motorcycle"></i> Calcule seu Frete</h4>
-                    <p style="font-size: 0.9rem; color: #555; margin-bottom: 10px;">Clique abaixo para usar sua localização e ver a taxa de entrega.</p>
-
-                    <div class="frete-container">
-                        <button onclick="obterLocalizacaoEFrete()" id="btn-calcular-frete" class="btn-frete" style="background: #555; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">
-                            <i class="fas fa-location-arrow"></i> Calcular Entrega
-                        </button>
-                        <p>Valor do Frete: <span id="valor-frete-display">Aguardando...</span></p>
-                    </div>
-                    
-                    <div id="resultado-frete" style="margin-top: 10px; display: none;">
-                        <p><strong>Distância:</strong> <span id="distancia-km"></span> km | <strong>Taxa:</strong> <span id="valor-frete" style="font-weight: bold; color: #2D5A27;"></span></p>
-                    </div>
-                    <div id="erro-frete" style="color: red; font-size: 12px; margin-top: 5px; display: none;"></div>
-                </div>
-
-                <button id="btn-whatsapp" class="disabled" onclick="enviarPedidoZap()" disabled>
-                    Finalizar e Enviar via WhatsApp
-                </button>
+                <p id="counter">Pratos Selecionados: <span id="atual">0</span> / <span id="limite-txt">0</span></p>
+                <progress id="progresso" value="0" max="14"></progress>
             </div>
+
+            <div id="controles-prato" style="display:none;">
+                <div class="field">
+                    <label>2. Escolha a Linha:</label>
+                    <select id="linha-escolhida" onchange="atualizarOpcoesItens()">
+                        <option value="Tradicional">Linha Tradicional</option>
+                        <option value="Gourmet">Linha Gourmet</option>
+                        <option value="Kids">Linha Kids</option>
+                        <option value="Fit">Linha Fit</option>
+                    </select>
+                </div>
+
+                <div class="field checkbox-personalizado">
+                    <input type="checkbox" id="is-personalizado" onchange="togglePersonalizado()">
+                    <label for="is-personalizado">Desejo personalizar as gramas deste prato</label>
+                </div>
+
+                <div class="field">
+                    <label>3. Proteína (Escolha 1):</label>
+                    <select id="select-proteina"></select>
+                    <div id="g-prot-container" style="display:none; margin-top:5px;">
+                        <input type="number" id="g-prot" placeholder="Gramas da Proteína (ex: 150)">
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label style="font-weight:bold;">4. Acompanhamentos Base (Escolha até 2):</label>
+                    <div class="options-container" id="base-sides" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px;">
+                        
+                        <div class="acomp-item-wrapper">
+                            <label class="option-item">
+                                <input type="checkbox" name="acomp_base" value="Arroz Branco"> <span>Arroz Branco</span>
+                            </label>
+                            <input type="number" class="g-acomp" placeholder="Gramas" style="display:none; width: 80px; margin-top: 5px; margin-left: 25px;">
+                        </div>
+
+                        <div class="acomp-item-wrapper">
+                            <label class="option-item">
+                                <input type="checkbox" name="acomp_base" value="Purê de Batata"> <span>Purê de Batata</span>
+                            </label>
+                            <input type="number" class="g-acomp" placeholder="Gramas" style="display:none; width: 80px; margin-top: 5px; margin-left: 25px;">
+                        </div>
+
+                        <div class="acomp-item-wrapper">
+                            <label class="option-item">
+                                <input type="checkbox" name="acomp_base" value="Feijão Preto"> <span>Feijão Preto</span>
+                            </label>
+                            <input type="number" class="g-acomp" placeholder="Gramas" style="display:none; width: 80px; margin-top: 5px; margin-left: 25px;">
+                        </div>
+
+                        <div class="acomp-item-wrapper">
+                            <label class="option-item">
+                                <input type="checkbox" name="acomp_base" value="Purê de Batata Doce"> <span>Purê de Batata Doce</span>
+                            </label>
+                            <input type="number" class="g-acomp" placeholder="Gramas" style="display:none; width: 80px; margin-top: 5px; margin-left: 25px;">
+                        </div>
+
+                        <div class="acomp-item-wrapper">
+                            <label class="option-item">
+                                <input type="checkbox" name="acomp_base" value="Macarrão"> <span>Macarrão</span>
+                            </label>
+                            <input type="number" class="g-acomp" placeholder="Gramas" style="display:none; width: 80px; margin-top: 5px; margin-left: 25px;">
+                        </div>
+
+                        <div class="acomp-item-wrapper">
+                            <label class="option-item">
+                                <input type="checkbox" name="acomp_base" value="Purê de Abóbora"> <span>Purê de Abóbora</span>
+                            </label>
+                            <input type="number" class="g-acomp" placeholder="Gramas" style="display:none; width: 80px; margin-top: 5px; margin-left: 25px;">
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="field seleta-container" style="margin-top: 20px; padding: 15px; background: #fdfdfd; border: 1px solid #ddd; border-radius: 8px;">
+                    <label style="font-weight: bold; color: #2D5A27; display: block; margin-bottom: 10px;">
+                        5. Deseja adicionar a Seleta de Legumes?
+                    </label>
+                    
+                    <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 10px;">
+                        <label class="option-item" style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                            <input type="radio" name="escolha_seleta" value="Sim" checked>
+                            <span>Sim, adicionar</span>
+                        </label>
+                        
+                        <input type="number" id="g-seleta" class="g-acomp" placeholder="Gramas" style="display:none; width: 80px;">
+
+                        <label class="option-item" style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+                            <input type="radio" name="escolha_seleta" value="Não">
+                            <span>Não, obrigado</span>
+                        </label>
+                    </div>
+
+                    <div class="legumes-warning" style="font-size: 13px; color: #555; background: #fffbe6; padding: 10px; border-left: 4px solid #f0ad4e; border-radius: 4px;">
+                        <strong><i class="fas fa-exclamation-triangle"></i> Composição:</strong>
+                        A seleta contém 2 ou mais itens (Cenoura, Brócolis, etc).
+                        <br>
+                        <em>*Restrições? Informe nas observações abaixo.</em>
+                    </div>
+                </div>
+
+                <button type="button" onclick="adicionarPratoLista()" class="btn-add">Adicionar Prato ao Carrinho</button>
+            </div>
+
+            <div class="selected-list">
+                <h4>Itens no Carrinho:</h4>
+                <ul id="carrinho-itens"></ul>
+            </div>
+
+            <div class="field observation-field" style="margin-top: 20px;">
+                <label>Alguma observação para o seu pedido?</label>
+                <textarea id="observacoes-gerais" placeholder="Ex: Não colocar cebola, etc." rows="3"></textarea>
+            </div>
+
+            <div class="shipping-box" style="margin-top: 30px; background: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px dashed #2D5A27;">
+                <h4 style="color: #2D5A27; margin-bottom: 10px;"><i class="fas fa-motorcycle"></i> Calcule seu Frete</h4>
+                <div class="frete-container">
+                    <button onclick="obterLocalizacaoEFrete()" id="btn-calcular-frete" class="btn-frete" style="background: #555; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">
+                        <i class="fas fa-location-arrow"></i> Calcular Entrega
+                    </button>
+                    <p>Valor do Frete: <span id="valor-frete-display">Aguardando...</span></p>
+                </div>
+                <div id="resultado-frete" style="margin-top: 10px; display: none;">
+                    <p><strong>Distância:</strong> <span id="distancia-km"></span> km | <strong>Taxa:</strong> <span id="valor-frete" style="font-weight: bold; color: #2D5A27;"></span></p>
+                </div>
+            </div>
+
+            <button id="btn-whatsapp" class="disabled" onclick="enviarPedidoZap()" disabled>
+                Finalizar e Enviar via WhatsApp
+            </button>
         </div>
-    </section>
+    </div>
+</section>
 
     <section class="about" id="about">
         <div class="max-width">

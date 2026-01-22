@@ -3,8 +3,8 @@ let itensPedido = [];
 let limitePratos = 0;
 let linhaBloqueada = false;
 let freteCalculado = "Não calculado";
-let linkMapsCliente = "Não fornecido";
-const ORIGEM_COORD = { lat: -25.2155, lon: -57.5358 };
+let linkMapsCliente = "";
+const ORIGEM_COORD = { lat: -25.240629, lon: -57.541956 }; // Palo Santo, Asunción
 
 $(document).ready(function(){
     // ==========================================
@@ -53,6 +53,20 @@ $(document).ready(function(){
         $('.planos-btn').removeClass('active');
         $(this).addClass('active');
         updatePrices(categoria); 
+    });
+
+    // Monitora quando alguém clica nos acompanhamentos base
+    $(document).on('change', 'input[name="acomp_base"]', function() {
+        var limite = 2;
+        var quantidadeMarcada = $('input[name="acomp_base"]:checked').length;
+
+        // Se já marcou 2, desabilita (deixa cinza) os que não estão marcados
+        if (quantidadeMarcada >= limite) {
+            $('input[name="acomp_base"]:not(:checked)').prop('disabled', true).parent().css('opacity', '0.5');
+        } else {
+            // Se tem menos de 2 marcados, libera tudo novamente
+            $('input[name="acomp_base"]').prop('disabled', false).parent().css('opacity', '1');
+        }
     });
 
     carregarDadosSalvos();
@@ -205,10 +219,23 @@ function updatePrices(linha, elemento) {
 function togglePersonalizado() {
     const chk = document.getElementById('is-personalizado');
     const isPerso = chk ? chk.checked : false;
+
+    // 1. Gramas da Proteína
     const gProtContainer = document.getElementById('g-prot-container');
-    if(gProtContainer) gProtContainer.style.display = isPerso ? 'block' : 'none';
-    const containersG = document.querySelectorAll('.g-acomp-container');
-    containersG.forEach(div => div.style.display = isPerso ? 'block' : 'none');
+    if (gProtContainer) gProtContainer.style.display = isPerso ? 'block' : 'none';
+
+    // 2. Gramas de todos os acompanhamentos (Arroz, Feijão, etc)
+    const camposGrama = document.querySelectorAll('.g-acomp');
+    camposGrama.forEach(input => {
+        input.style.display = isPerso ? 'inline-block' : 'none';
+    });
+    
+    // 3. Ajuste específico para a Seleta
+    const gSeleta = document.getElementById('g-seleta');
+    if (gSeleta) {
+        const seletaSim = document.querySelector('input[name="escolha_seleta"][value="Sim"]').checked;
+        gSeleta.style.display = (isPerso && seletaSim) ? 'inline-block' : 'none';
+    }
 }
 
 const cardapios = {
@@ -241,63 +268,102 @@ function configurarPlano(isLoading = false) {
 function atualizarOpcoesItens() {
     const linhaSelect = document.getElementById('linha-escolhida');
     const protSelect = document.getElementById('select-proteina');
-    const acompDiv = document.getElementById('lista-acompanhamentos');
-    const isPerso = document.getElementById('is-personalizado') ? document.getElementById('is-personalizado').checked : false;
-    if (!cardapios[linhaSelect.value]) return;
-    protSelect.innerHTML = cardapios[linhaSelect.value].map(p => `<option value="${p}">${p}</option>`).join('');
+    const acompDiv = document.getElementById('base-sides'); // Corrigido para o seu HTML
+    
+    if (!linhaSelect || !protSelect || !acompDiv) return;
+
+    const linha = linhaSelect.value;
+    if (!cardapios[linha]) return;
+
+    protSelect.innerHTML = cardapios[linha].map(p => `<option value="${p}">${p}</option>`).join('');
+
+    const isPerso = document.getElementById('is-personalizado')?.checked;
     acompDiv.innerHTML = cardapios.acompanhamentos_base.map(a => `
-        <div class="acomp-item">
-            <div class="acomp-check">
-                <input type="checkbox" name="acomp" value="${a}" id="ac-${a}" onchange="limitarAcompanhamentos()">
-                <label for="ac-${a}">${a}</label>
-            </div>
-            <div class="g-acomp-container" style="display:${isPerso ? 'block' : 'none'}; margin-left: 20px;">
-                <input type="number" class="g-acomp" placeholder="Qtd (g)" style="width:70px; padding:3px;">
-            </div>
+        <div class="acomp-item-wrapper">
+            <label class="option-item">
+                <input type="checkbox" name="acomp_base" value="${a}"> <span>${a}</span>
+            </label>
+            <input type="number" class="g-acomp" placeholder="Gramas" style="display:${isPerso ? 'block' : 'none'}; width: 80px; margin-top: 5px; margin-left: 25px;">
         </div>`).join('');
 }
 
-function limitarAcompanhamentos() {
-    const checks = document.querySelectorAll('input[name="acomp"]');
-    const selecionados = document.querySelectorAll('input[name="acomp"]:checked');
-    checks.forEach(check => {
-        if (selecionados.length >= 3 && !check.checked) {
-            check.disabled = true;
-            check.parentElement.style.opacity = "0.5";
-        } else {
-            check.disabled = false;
-            check.parentElement.style.opacity = "1";
-        }
-    });
-}
 
 function adicionarPratoLista() {
-    if (itensPedido.length >= limitePratos && limitePratos > 0) return;
+    // 1. Validação de Limite de Pratos
+    if (itensPedido.length >= limitePratos && limitePratos > 0) {
+        alert("Você já atingiu o limite de pratos do seu plano!");
+        return;
+    }
+
     const linha = document.getElementById('linha-escolhida').value;
     const prot = document.getElementById('select-proteina').value;
     const isPerso = document.getElementById('is-personalizado') ? document.getElementById('is-personalizado').checked : false;
     const gProt = document.getElementById('g-prot')?.value || ""; 
-    const checks = document.querySelectorAll('input[name="acomp"]:checked');
-    if (checks.length === 0) { alert("Escolha os acompanhamentos!"); return; }
-    if (document.getElementById('plano-selecionado').value !== "Individual" && !linhaBloqueada) {
-        linhaBloqueada = true;
-        document.getElementById('linha-escolhida').disabled = true;
+
+    // 2. Coleta Acompanhamentos Base (checkboxes)
+    const checksBase = document.querySelectorAll('input[name="acomp_base"]:checked');
+    if (checksBase.length === 0) { 
+        alert("Escolha pelo menos 1 acompanhamento base!"); 
+        return; 
     }
+
+    // 3. Coleta Seleta de Legumes (radio)
+    const escolhaSeleta = document.querySelector('input[name="escolha_seleta"]:checked').value;
+    let textoSeleta = "";
+
+    // 4. Montagem do texto dos Acompanhamentos com Gramas
     let acompTexto = [];
-    checks.forEach(c => {
+    checksBase.forEach(c => {
         let txt = c.value;
         if (isPerso) {
-            const gInput = c.closest('.acomp-item').querySelector('.g-acomp');
+            // Busca o input de grama que está dentro do mesmo wrapper do checkbox
+            const gInput = c.closest('.acomp-item-wrapper').querySelector('.g-acomp');
             const gVal = gInput && gInput.value ? gInput.value : '0';
             txt += ` (${gVal}g)`;
         }
         acompTexto.push(txt);
     });
-    const infoProt = isPerso && gProt ? ` (${gProt}g)` : "";
-    const detalheFinal = `${prot}${infoProt} + ${acompTexto.join(', ')}`;
-    itensPedido.push({ linha: isPerso ? `${linha} (Personalizado)` : linha, detalhe: detalheFinal });
+
+    // 5. Montagem do texto da Seleta com Gramas
+    if (escolhaSeleta === "Sim") {
+        const gSeletaVal = document.getElementById('g-seleta')?.value || "0";
+        textoSeleta = isPerso ? `+ Seleta (${gSeletaVal}g)` : "+ Seleta";
+    } else {
+        textoSeleta = "(sem seleta)";
+    }
+
+    // 6. Bloqueio de Linha para planos fixos
+    if (document.getElementById('plano-selecionado').value !== "Individual" && !linhaBloqueada) {
+        linhaBloqueada = true;
+        document.getElementById('linha-escolhida').disabled = true;
+    }
+
+    // 7. Formatação Final da Mensagem
+    const infoProt = (isPerso && gProt) ? ` (${gProt}g)` : "";
+    const detalheFinal = `${prot}${infoProt} + ${acompTexto.join(', ')} ${textoSeleta}`;
+
+    // 8. Salva e Renderiza
+    itensPedido.push({ 
+        linha: isPerso ? `${linha} (Personalizado)` : linha, 
+        detalhe: detalheFinal 
+    });
+
     renderizarCarrinho();
     salvarDadosLocalmente();
+
+    // 9. Reset do Formulário para o próximo prato
+    document.querySelectorAll('input[name="acomp_base"]').forEach(i => i.checked = false);
+    document.querySelectorAll('.g-acomp').forEach(i => i.value = ""); // Limpa gramas
+    document.getElementById('g-prot').value = ""; // Limpa grama proteína
+    document.querySelector('input[name="escolha_seleta"][value="Sim"]').checked = true; // Volta seleta para SIM
+    
+    // Se tiver a função de opacidade/limitador de 2, reseta ela também:
+    document.querySelectorAll('input[name="acomp_base"]').forEach(i => {
+        i.disabled = false;
+        i.parentElement.style.opacity = "1";
+    });
+
+    // Feedback Visual (Toast)
     const toast = $('<div class="toast-success">Prato adicionado ao seu plano!</div>');
     $('body').append(toast);
     toast.fadeIn().delay(1500).fadeOut(function() { $(this).remove(); });
@@ -375,9 +441,12 @@ function renderizarCarrinho() {
 // ==========================================
 
 function obterLocalizacaoEFrete() {
-    // Tenta encontrar o botão pelo ID ou pela Classe (garantindo que funcione)
-    const btn = document.getElementById('btn-calcular-frete') || document.querySelector('.btn-frete');
-    
+    const btn = document.getElementById('btn-calcular-frete');
+    const displayValor = document.getElementById('valor-frete-display');
+    const displayInfo = document.getElementById('resultado-frete');
+    const spanDistancia = document.getElementById('distancia-km');
+    const spanValor = document.getElementById('valor-frete');
+
     if(btn) btn.innerText = "Obtendo localização...";
 
     if (navigator.geolocation) {
@@ -385,30 +454,31 @@ function obterLocalizacaoEFrete() {
             const lat = position.coords.latitude;
             const lon = position.coords.longitude;
             
-            // 1. Calcula o frete
             const resultado = calcularFreteDistancia(lat, lon);
             
-            // 2. Guarda nas variáveis globais (importante para o WhatsApp ler depois)
+            // 1. Atualiza variáveis globais para o WhatsApp
             freteCalculado = `₲ ${resultado.preco.toLocaleString('es-PY')} (${resultado.distancia} km)`;
-            
-            // 3. CORREÇÃO DO LINK: Agora usando o padrão universal do Google Maps
             linkMapsCliente = `https://www.google.com/maps?q=${lat},${lon}`;
             
-            // 4. Atualiza a tela para o cliente
-            const display = document.getElementById('valor-frete-display');
-            if(display) {
-                display.innerText = freteCalculado;
-                display.style.color = "#2D5A27";
-                display.style.fontWeight = "bold";
-            }
+            // 2. Atualiza a Interface (HTML)
+            if(displayValor) displayValor.innerText = freteCalculado;
+            if(spanDistancia) spanDistancia.innerText = resultado.distancia;
+            if(spanValor) spanValor.innerText = `₲ ${resultado.preco.toLocaleString('es-PY')}`;
+            if(displayInfo) displayInfo.style.display = 'block';
             
-            if(btn) btn.innerText = "Frete Calculado!";
+            if(btn) {
+                btn.innerText = "Frete Calculado!";
+                btn.style.background = "#2D5A27";
+            }
 
         }, function(error) {
             console.error(error);
-            alert("Erro: Por favor, ative o GPS do seu celular/navegador para calcular o frete.");
+            alert("Erro: Por favor, permita o acesso ao GPS nas configurações do seu navegador.");
             if(btn) btn.innerText = "Tentar Novamente";
-        }, { enableHighAccuracy: true }); // Força maior precisão do GPS
+        }, { 
+            enableHighAccuracy: true,
+            timeout: 10000 
+        });
     } else {
         alert("Seu navegador não suporta geolocalização.");
     }
@@ -446,27 +516,31 @@ function carregarDadosSalvos() {
     }
 }
 
-function enviarPedidoZap() {
-    const plano = document.getElementById('plano-selecionado')?.value || "Não selecionado";
-    const obs = document.getElementById('observacoes-gerais')?.value || "NENHUMA";
-    
-    let msg = `*NOVO PEDIDO - DONA MARIA*\n`;
-    msg += `*Plano:* ${plano}\n\n`;
-    
-    msg += `*ITENS ESCOLHIDOS:*\n`;
-    if (typeof itensPedido !== 'undefined' && itensPedido.length > 0) {
-        itensPedido.forEach((p, i) => {
-            msg += `*${i+1}.* [${p.linha}] ${p.detalhe}\n`;
-        });
-    } else {
-        msg += `Nenhum item selecionado\n`;
+function enviarPedidoZap() { // Mudei o nome para bater com o HTML
+    if (itensPedido.length === 0) {
+        alert("Seu carrinho está vazio!");
+        return;
     }
+
+    const plano = document.getElementById('plano-selecionado')?.value || "Não informado";
+    const obsGerais = document.getElementById('observacoes-gerais')?.value || "";
+
+    // Monta a Mensagem
+    let msg = `Olá! Gostaria de fazer um pedido:\n\n`;
+    msg += `*Plano:* ${plano}\n`;
+    msg += `*Maps:* ${linkMapsCliente}\n\n`; 
     
-    msg += `\n*ENTREGA E LOCALIZAÇÃO:*\n`;
-    msg += `*Valor do Frete:* ${freteCalculado}\n`;
-    msg += `*Mapa do Cliente:* ${linkMapsCliente}\n\n`;
-    
-    msg += `*Observações:* ${obs}`;
+    msg += `*--- PRATOS ESCOLHIDOS ---*\n`;
+    itensPedido.forEach((item, index) => {
+        // Como itensPedido agora guarda objetos {linha, detalhe}
+        msg += `${index + 1}. [${item.linha}] ${item.detalhe}\n`;
+    });
+
+    if (obsGerais) {
+        msg += `\n*--- OBSERVAÇÕES ---*\n${obsGerais}`;
+    }
+
+    msg += `\n\n*Frete:* ${freteCalculado}`;
 
     const url = `https://wa.me/595991635604?text=${encodeURIComponent(msg)}`;
     window.open(url, '_blank');
@@ -489,12 +563,13 @@ $(document).ready(function(){
 // 6. CALCULADORA DE FRETE (MRA - Paraguay)
 // ==========================================
 function calcularFreteDistancia(latDest, lonDest) {
-    const R = 6371; // Raio da Terra em km
+    const R = 6371; 
     const dLat = (latDest - ORIGEM_COORD.lat) * Math.PI / 180;
     const dLon = (lonDest - ORIGEM_COORD.lon) * Math.PI / 180;
     
     const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
               Math.cos(ORIGEM_COORD.lat * Math.PI / 180) * Math.cos(latDest * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+              
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
     const distancia = R * c;
 
