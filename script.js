@@ -1,10 +1,11 @@
-// VARIÁVEIS GLOBAIS DE ESTADO (Preserva dados entre funções)
+// VARIÁVEIS GLOBAIS DE ESTADO 
 let itensPedido = [];
 let limitePratos = 0;
 let linhaBloqueada = false;
 let freteCalculado = "Não calculado";
+let valorFreteNumerico = 0;
 let linkMapsCliente = "";
-const ORIGEM_COORD = { lat: -25.240629, lon: -57.541956 }; // Palo Santo, Asunción
+const ORIGEM_COORD = { lat: -25.240629, lon: -57.541956 };
 
 $(document).ready(function(){
     // ==========================================
@@ -300,45 +301,45 @@ function adicionarPratoLista() {
     const isPerso = document.getElementById('is-personalizado') ? document.getElementById('is-personalizado').checked : false;
     const gProt = document.getElementById('g-prot')?.value || ""; 
 
-    // 2. Coleta Acompanhamentos Base (checkboxes)
+    // 2. Coleta Acompanhamentos Base
     const checksBase = document.querySelectorAll('input[name="acomp_base"]:checked');
     if (checksBase.length === 0) { 
         alert("Escolha pelo menos 1 acompanhamento base!"); 
         return; 
     }
 
-    // 3. Coleta Seleta de Legumes (radio)
+    // 3. Coleta Seleta de Legumes
     const escolhaSeleta = document.querySelector('input[name="escolha_seleta"]:checked').value;
-    let textoSeleta = "";
-
-    // 4. Montagem do texto dos Acompanhamentos com Gramas
+    
+    // 4. Montagem do texto dos Acompanhamentos com Gramas (Padrão para o Cálculo)
     let acompTexto = [];
     checksBase.forEach(c => {
         let txt = c.value;
         if (isPerso) {
-            // Busca o input de grama que está dentro do mesmo wrapper do checkbox
             const gInput = c.closest('.acomp-item-wrapper').querySelector('.g-acomp');
             const gVal = gInput && gInput.value ? gInput.value : '0';
+            // Importante: Mantemos o nome do item colado no parênteses para o Regex
             txt += ` (${gVal}g)`;
         }
         acompTexto.push(txt);
     });
 
-    // 5. Montagem do texto da Seleta com Gramas
+    // 5. Montagem da Seleta (Padrão para o Cálculo)
+    let textoSeleta = "";
     if (escolhaSeleta === "Sim") {
         const gSeletaVal = document.getElementById('g-seleta')?.value || "0";
-        textoSeleta = isPerso ? `+ Seleta (${gSeletaVal}g)` : "+ Seleta";
+        textoSeleta = isPerso ? `+ Seleta de Legumes (${gSeletaVal}g)` : "+ Seleta de Legumes";
     } else {
         textoSeleta = "(sem seleta)";
     }
 
-    // 6. Bloqueio de Linha para planos fixos
+    // 6. Bloqueio de Linha para planos fixos (Exceto Individual)
     if (document.getElementById('plano-selecionado').value !== "Individual" && !linhaBloqueada) {
         linhaBloqueada = true;
         document.getElementById('linha-escolhida').disabled = true;
     }
 
-    // 7. Formatação Final da Mensagem
+    // 7. Formatação Final (Garante que a Proteína seja o primeiro item para o cálculo)
     const infoProt = (isPerso && gProt) ? ` (${gProt}g)` : "";
     const detalheFinal = `${prot}${infoProt} + ${acompTexto.join(', ')} ${textoSeleta}`;
 
@@ -351,20 +352,19 @@ function adicionarPratoLista() {
     renderizarCarrinho();
     salvarDadosLocalmente();
 
-    // 9. Reset do Formulário para o próximo prato
+    // 9. Reset do Formulário
     document.querySelectorAll('input[name="acomp_base"]').forEach(i => i.checked = false);
-    document.querySelectorAll('.g-acomp').forEach(i => i.value = ""); // Limpa gramas
-    document.getElementById('g-prot').value = ""; // Limpa grama proteína
-    document.querySelector('input[name="escolha_seleta"][value="Sim"]').checked = true; // Volta seleta para SIM
+    document.querySelectorAll('.g-acomp').forEach(i => i.value = ""); 
+    if(document.getElementById('g-prot')) document.getElementById('g-prot').value = ""; 
+    document.querySelector('input[name="escolha_seleta"][value="Sim"]').checked = true; 
     
-    // Se tiver a função de opacidade/limitador de 2, reseta ela também:
     document.querySelectorAll('input[name="acomp_base"]').forEach(i => {
         i.disabled = false;
-        i.parentElement.style.opacity = "1";
+        if(i.parentElement) i.parentElement.style.opacity = "1";
     });
 
     // Feedback Visual (Toast)
-    const toast = $('<div class="toast-success">Prato adicionado ao seu plano!</div>');
+    const toast = $('<div class="toast-success" style="position:fixed; bottom:20px; right:20px; background:#2D5A27; color:white; padding:15px; border-radius:5px; z-index:9999;">Prato adicionado ao seu plano!</div>');
     $('body').append(toast);
     toast.fadeIn().delay(1500).fadeOut(function() { $(this).remove(); });
 }
@@ -455,15 +455,14 @@ function obterLocalizacaoEFrete() {
             const lon = position.coords.longitude;
             
             const resultado = calcularFreteDistancia(lat, lon);
-            
-            // 1. Atualiza variáveis globais para o WhatsApp
-            freteCalculado = `₲ ${resultado.preco.toLocaleString('es-PY')} (${resultado.distancia} km)`;
-            linkMapsCliente = `https://www.google.com/maps?q=${lat},${lon}`;
-            
-            // 2. Atualiza a Interface (HTML)
+        
+            valorFreteNumerico = resultado.preco; 
+            freteCalculado = `Gs ${resultado.preco.toLocaleString('es-PY')} (${resultado.distancia} km)`;
+            linkMapsCliente = `http://googleusercontent.com/maps.google.com/?q=${lat},${lon}`;
+
             if(displayValor) displayValor.innerText = freteCalculado;
             if(spanDistancia) spanDistancia.innerText = resultado.distancia;
-            if(spanValor) spanValor.innerText = `₲ ${resultado.preco.toLocaleString('es-PY')}`;
+            if(spanValor) spanValor.innerText = `Gs ${resultado.preco.toLocaleString('es-PY')}`;
             if(displayInfo) displayInfo.style.display = 'block';
             
             if(btn) {
@@ -473,12 +472,9 @@ function obterLocalizacaoEFrete() {
 
         }, function(error) {
             console.error(error);
-            alert("Erro: Por favor, permita o acesso ao GPS nas configurações do seu navegador.");
+            alert("Erro ao obter GPS. Verifique a permissão.");
             if(btn) btn.innerText = "Tentar Novamente";
-        }, { 
-            enableHighAccuracy: true,
-            timeout: 10000 
-        });
+        }, { enableHighAccuracy: true, timeout: 10000 });
     } else {
         alert("Seu navegador não suporta geolocalização.");
     }
@@ -516,34 +512,259 @@ function carregarDadosSalvos() {
     }
 }
 
-function enviarPedidoZap() { // Mudei o nome para bater com o HTML
-    if (itensPedido.length === 0) {
-        alert("Seu carrinho está vazio!");
+async function enviarPedidoZap() {
+    const nome = document.getElementById('cliente-nome')?.value;
+    const ddi = document.getElementById('cliente-ddi')?.value;
+    const tel = document.getElementById('cliente-tel')?.value;
+    const pag = document.getElementById('forma-pagamento')?.value;
+    const planoNome = document.getElementById('plano-selecionado')?.value;
+    const linhaSelecionada = document.getElementById('linha-escolhida')?.value; // Necessário para cálculo do pacote
+    const obsGerais = document.getElementById('observacoes-gerais')?.value || "Nenhuma";
+
+    // 1. Tabela de Preços Unitários
+    const precosLinha = { 
+        "Tradicional": 30000, 
+        "Gourmet": 35000, 
+        "Fit": 35000, 
+        "Kids": 28000 
+    };
+
+    // 2. Validações
+    let erros = [];
+    if (!nome) erros.push("Seu Nome");
+    if (!tel) erros.push("Telefone");
+    if (!pag) erros.push("Forma de Pagamento");
+    if (!linkMapsCliente) erros.push("Localização (Calcule o Frete)");
+    if (itensPedido.length < limitePratos) erros.push(`Faltam pratos (Carrinho tem ${itensPedido.length})`);
+
+    if (erros.length > 0) {
+        alert("Corrija os erros:\n- " + erros.join("\n- "));
         return;
     }
 
-    const plano = document.getElementById('plano-selecionado')?.value || "Não informado";
-    const obsGerais = document.getElementById('observacoes-gerais')?.value || "";
+    // 3. Processamento do Carrinho (Agrupamento e Extras)
+    let somaPratosCarrinho = 0; // Usado apenas para Individual/Semanal
+    let totalPersonalizacao = 0;
+    const pedidosAgrupados = {};
 
-    // Monta a Mensagem
-    let msg = `Olá! Gostaria de fazer um pedido:\n\n`;
-    msg += `*Plano:* ${plano}\n`;
-    msg += `*Maps:* ${linkMapsCliente}\n\n`; 
-    
-    msg += `*--- PRATOS ESCOLHIDOS ---*\n`;
-    itensPedido.forEach((item, index) => {
-        // Como itensPedido agora guarda objetos {linha, detalhe}
-        msg += `${index + 1}. [${item.linha}] ${item.detalhe}\n`;
+    itensPedido.forEach(item => {
+        // Limpa o nome para pegar preço unitário
+        const nomeLinhaLimpa = item.linha.replace(" (Personalizado)", "").trim();
+        somaPratosCarrinho += precosLinha[nomeLinhaLimpa] || 0;
+
+        // Calcula gramas extras (Personalização sempre se paga a parte, referente ao que escolheu agora)
+        if (item.linha.includes("Personalizado")) {
+            totalPersonalizacao += calcularTaxaGrama(item.detalhe);
+        }
+
+        // Agrupa para visualização
+        const chave = `${item.linha}|${item.detalhe}`;
+        if (pedidosAgrupados[chave]) {
+            pedidosAgrupados[chave].qtd += 1;
+        } else {
+            let partes = item.detalhe.split(' + ');
+            let proteinaTexto = partes[0]; 
+            let acompTexto = partes.length > 1 ? partes.slice(1).join(' + ') : "Sem acompanhamentos";
+
+            pedidosAgrupados[chave] = { 
+                textoCompleto: item.detalhe, 
+                linha: item.linha, 
+                qtd: 1,
+                proteina: proteinaTexto,      
+                acompanhamentos: acompTexto   
+            };
+        }
     });
 
-    if (obsGerais) {
-        msg += `\n*--- OBSERVAÇÕES ---*\n${obsGerais}`;
+    // 4. LÓGICA DE PREÇIFICAÇÃO (Regra de Negócio Corrigida)
+    let valorFinalRefeicoes = 0;
+    let descricaoPreco = ""; // Para mostrar no Zap como foi calculado
+
+    // Preço base da linha principal escolhida no dropdown
+    const precoUnitarioBase = precosLinha[linhaSelecionada] || 30000; 
+
+    if (planoNome === "Mensal") {
+        // MENSAL: Cobra 56 marmitas com 10% de desconto
+        const totalSemDesconto = precoUnitarioBase * 56;
+        valorFinalRefeicoes = totalSemDesconto * 0.90; // Aplica 10%
+        descricaoPreco = `Plano Mensal (56 un. x Gs ${precoUnitarioBase/1000}k) - 10%`;
+    } 
+    else if (planoNome === "FDS") {
+        // FDS: Cobra 40 marmitas com 5% de desconto
+        const totalSemDesconto = precoUnitarioBase * 40;
+        valorFinalRefeicoes = totalSemDesconto * 0.95; // Aplica 5%
+        descricaoPreco = `Plano FDS (40 un. x Gs ${precoUnitarioBase/1000}k) - 5%`;
+    } 
+    else if (planoNome === "Semanal") {
+        // SEMANAL: Soma do carrinho (14 un.) com 5% de desconto
+        valorFinalRefeicoes = somaPratosCarrinho * 0.95;
+        descricaoPreco = `Plano Semanal (14 un.) - 5%`;
+    } 
+    else {
+        // INDIVIDUAL: Soma pura do carrinho
+        valorFinalRefeicoes = somaPratosCarrinho;
+        descricaoPreco = `Pedidos Avulsos`;
     }
 
-    msg += `\n\n*Frete:* ${freteCalculado}`;
+    // Soma Final (Plano + Extras + Frete)
+    const totalGeral = valorFinalRefeicoes + totalPersonalizacao + valorFreteNumerico;
 
-    const url = `https://wa.me/595991635604?text=${encodeURIComponent(msg)}`;
-    window.open(url, '_blank');
+    // 5. Prepara Lista para Planilha
+    let listaParaPlanilha = [];
+    for (const k in pedidosAgrupados) {
+        listaParaPlanilha.push({
+            linha: pedidosAgrupados[k].linha,
+            qtd: pedidosAgrupados[k].qtd,
+            proteina: pedidosAgrupados[k].proteina,
+            acompanhamentos: pedidosAgrupados[k].acompanhamentos
+        });
+    }
+
+    // 6. Envia para Planilha
+    salvarNoSheets(nome, ddi+tel, planoNome, totalGeral, listaParaPlanilha);
+
+    // 7. Monta Mensagem WhatsApp
+    let msg = `Olá! Gostaria de fazer um pedido:\n\n*Cliente:* ${nome}\n*Plano:* ${planoNome}\n*Linha:* ${linhaSelecionada}\n*Telefone:* ${ddi}${tel}\n*Maps:* ${linkMapsCliente}\n\n*--- PRATOS DA SEMANA ---*\n`;
+
+    for (const k in pedidosAgrupados) {
+        const i = pedidosAgrupados[k];
+        msg += `*[${i.linha}] ${i.textoCompleto}*\nQtd: ${i.qtd}\n-------------------\n`;
+    }
+
+    // Seção Financeira Detalhada
+    msg += `\n*RESUMO FINANCEIRO:*`;
+    msg += `\n${descricaoPreco}`;
+    msg += `\nValor Refeições: Gs ${valorFinalRefeicoes.toLocaleString('es-PY')}`;
+    
+    if(totalPersonalizacao > 0) {
+        msg += `\nPersonalização (Desta semana): Gs ${totalPersonalizacao.toLocaleString('es-PY')}`;
+    }
+    
+    msg += `\nFrete: Gs ${valorFreteNumerico.toLocaleString('es-PY')}`;
+    msg += `\n*TOTAL A PAGAR:* Gs ${totalGeral.toLocaleString('es-PY')}`;
+    
+    msg += `\n\nPagamento: ${pag}`;
+    if(obsGerais !== "Nenhuma") msg += `\nObs: ${obsGerais}`;
+
+    setTimeout(() => {
+        window.open(`https://wa.me/595991635604?text=${encodeURIComponent(msg)}`, '_blank');
+    }, 800);
+}
+
+function salvarNoSheets(nome, tel, plano, total, listaItens) {
+    // URL DO SEU APP SCRIPT
+    const urlPlanilha = "https://script.google.com/macros/s/AKfycbwQWmSVITTyLqcuAbVXpbpTP6W_4yVpCfJCLXTK6zSMoosDR1HDuMXru6-J7VlpUOcv/exec"; 
+    
+    fetch(urlPlanilha, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            nome: nome,
+            telefone: tel,
+            plano: plano,
+            total: total,
+            itens: listaItens // Enviando a lista estruturada corretamente
+        })
+    }).catch(err => console.error("Erro Planilha:", err));
+}
+
+function salvarNoSheets(nome, tel, plano, total, listaItens) {
+    const urlPlanilha = "https://script.google.com/macros/s/AKfycbwQWmSVITTyLqcuAbVXpbpTP6W_4yVpCfJCLXTK6zSMoosDR1HDuMXru6-J7VlpUOcv/exec"; 
+    
+    fetch(urlPlanilha, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            nome: nome,
+            telefone: tel,
+            plano: plano,
+            total: total,
+            itens: listaItens
+        })
+    }).catch(err => console.error("Erro Planilha:", err));
+}
+
+// Função para enviar LISTA para o Google
+function salvarNoSheets(nome, plano, listaItens) {
+    const urlPlanilha = "https://script.google.com/macros/s/AKfycbwQWmSVITTyLqcuAbVXpbpTP6W_4yVpCfJCLXTK6zSMoosDR1HDuMXru6-J7VlpUOcv/exec"; 
+    
+    fetch(urlPlanilha, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            nome: nome,
+            plano: plano,
+            itens: listaItens // Enviamos o Array processado
+        })
+    }).then(() => {
+        console.log("Enviado para planilha!");
+    }).catch(err => console.error("Erro Planilha:", err));
+}
+
+// Função auxiliar para calcular as gramas extras
+function calcularTaxaGrama(detalhe) {
+    let extraTotal = 0;
+
+    // Função interna para extrair o número dentro de ( )
+    const extrair = (termo) => {
+        const regex = new RegExp(termo + '.*?\\((\\d+)g\\)', 'i');
+        const match = detalhe.match(regex);
+        return match ? parseInt(match[1]) : null;
+    };
+
+    // 1. Proteína (Base 130g | +500 Gs por 10g)
+    // Pega o valor antes do primeiro "+" que é sempre a proteína
+    const regexProt = detalhe.match(/^[^+]+?\((\d+)g\)/);
+    const gProt = regexProt ? parseInt(regexProt[1]) : 130;
+    if (gProt > 130) extraTotal += Math.ceil((gProt - 130) / 10) * 500;
+
+    // 2. Arroz (Base 80g | +150 Gs por 10g)
+    const gArroz = extrair('Arroz');
+    if (gArroz !== null && gArroz > 80) extraTotal += Math.ceil((gArroz - 80) / 10) * 150;
+
+    // 3. Feijão (Base 90g | +200 Gs por 10g)
+    const gFeijao = extrair('Feijão');
+    if (gFeijao !== null && gFeijao > 90) extraTotal += Math.ceil((gFeijao - 90) / 10) * 200;
+
+    // 4. Purês (Base 120g | +200 Gs por 10g)
+    const gPure = extrair('Purê');
+    if (gPure !== null && gPure > 120) extraTotal += Math.ceil((gPure - 120) / 10) * 200;
+
+    // 5. Seleta de Legumes (Base 80g | +250 Gs por 10g)
+    const gSeleta = extrair('Seleta');
+    if (gSeleta !== null && gSeleta > 80) extraTotal += Math.ceil((gSeleta - 80) / 10) * 250;
+
+    return extraTotal;
+}
+
+function salvarNoSheets(nome, tel, plano, total, listaItens) {
+    // CERTIFIQUE-SE QUE ESTA URL É A DA SUA IMPLANTAÇÃO
+    const urlPlanilha = "https://script.google.com/macros/s/AKfycbwQWmSVITTyLqcuAbVXpbpTP6W_4yVpCfJCLXTK6zSMoosDR1HDuMXru6-J7VlpUOcv/exec"; 
+    
+    // Preparando os dados
+    const dados = {
+        nome: nome,
+        telefone: tel,
+        plano: plano,
+        total: total,
+        itens: listaItens
+    };
+
+    fetch(urlPlanilha, {
+        method: 'POST',
+        mode: 'no-cors', // Envia sem esperar resposta (para evitar erro de CORS)
+        headers: {
+            'Content-Type': 'text/plain;charset=utf-8', // Mudança aqui: text/plain passa melhor pelos bloqueios
+        },
+        body: JSON.stringify(dados)
+    }).then(() => {
+        console.log("Tentativa de envio para planilha realizada.");
+    }).catch(err => {
+        console.error("Erro ao conectar com planilha:", err);
+    });
 }
 
 // Lógica FAQ
@@ -563,7 +784,7 @@ $(document).ready(function(){
 // 6. CALCULADORA DE FRETE (MRA - Paraguay)
 // ==========================================
 function calcularFreteDistancia(latDest, lonDest) {
-    const R = 6371; 
+    const R = 6371; // Raio da Terra em km
     const dLat = (latDest - ORIGEM_COORD.lat) * Math.PI / 180;
     const dLon = (lonDest - ORIGEM_COORD.lon) * Math.PI / 180;
     
@@ -574,10 +795,11 @@ function calcularFreteDistancia(latDest, lonDest) {
     const distancia = R * c;
 
     let precoFrete = 0;
-    if (distancia <= 2) precoFrete = 8000;
-    else if (distancia <= 3) precoFrete = 10000;
-    else if (distancia <= 5) precoFrete = 15000;
-    else precoFrete = 15000 + (Math.ceil(distancia - 5) * 3000);
+    if (distancia <= 3) precoFrete = 8000;
+    else if (distancia <= 5) precoFrete = 10000;
+    else if (distancia <= 7) precoFrete = 15000;
+    else if (distancia <= 10) precoFrete = 20000;
+    else precoFrete = 25000;
 
     return { 
         distancia: distancia.toFixed(1), 
