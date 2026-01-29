@@ -535,8 +535,19 @@ async function enviarPedidoZap() {
     if (!tel) erros.push("Telefone");
     if (!pag) erros.push("Forma de Pagamento");
     if (!linkMapsCliente) erros.push("Localização (Calcule o Frete)");
-    if (itensPedido.length < limitePratos) erros.push(`Faltam pratos (Carrinho tem ${itensPedido.length})`);
-
+   // --- ALTERAÇÃO AQUI: Validação de Quantidade ---
+    if (planoNome === "Individual") {
+        // Regra para Individual: Mínimo 5, Máximo 13 (o máximo já é travado na adição)
+        if (itensPedido.length < 5) {
+            erros.push(`Plano Individual: Mínimo de 5 pratos. (Você escolheu ${itensPedido.length})`);
+        }
+    } else {
+        // Regra para Mensal, Semanal, FDS: Deve atingir a meta exata
+        if (itensPedido.length < limitePratos) {
+            erros.push(`Faltam pratos para fechar o plano (Selecionados ${itensPedido.length} de ${limitePratos})`);
+        }
+    }
+    // ------------------------------------------------
     if (erros.length > 0) {
         alert("Corrija os erros:\n- " + erros.join("\n- "));
         return;
