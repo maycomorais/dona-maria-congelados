@@ -1,663 +1,564 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Doña Maria Congelados: Comida caseira, saudável e prática em Ciudad del Este. Planos semanais e mensais para facilitar sua rotina.">
-    <meta name="keywords" content="marmita congelada, comida saudavel, Ciudad del Este, Paraguay, Doña Maria, planos de alimentação">
-    <meta name="author" content="Doña Maria Congelados">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://maycomorais.github.io/Doña-maria-congelados/"> <meta property="og:title" content="Doña Maria Congelados | Sabor de Casa pronto quando você quiser">
-    <meta property="og:description" content="Escolha seu plano, monte seu cardápio e receba suas refeições prontas em casa.">
-    <meta property="og:image" content="https://maycomorais.github.io/Doña-maria-congelados/img/logo_2.png"> <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:title" content="Doña Maria Congelados">
-    <meta property="twitter:description" content="Marmitas congeladas saudáveis e deliciosas.">
-    <title>Doña Maria Congelados</title>
-    
-    <link rel="shortcut icon" href="img/favicon.webp" type="image/x-icon">
-    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/typed.js/2.0.11/typed.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css">
-    <script src="https://kit.fontawesome.com/c08d346443.js" crossorigin="anonymous"></script>
-    
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doña Maria Congelados — Refecciones Caseras</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,300;1,9..144,500&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="scroll-up-btn">
-        <i class="fas fa-angle-up"></i>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-container">
+      <a href="#" class="logo">
+        <img src="img/Logo_3.webp" alt="Doña Maria" class="logo-img">
+        <span>Doña<strong>Maria</strong></span>
+      </a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Abrir menu" aria-expanded="false">
+        <i class="fas fa-bars"></i>
+      </button>
+      <ul class="nav-menu" id="nav-menu">
+        <li><a href="#inicio">Início</a></li>
+        <li><a href="#cardapio">Carta</a></li>
+        <li><a href="#pedido">Haz tu pedido</a></li>
+        <li><a href="#rastrear">Seguimiento de la entrega</a></li>
+        <li><a href="#faq">Dudas</a></li>
+        <li><a href="#contato">Contacto</a></li>
+      </ul>
     </div>
+    <div class="nav-overlay" id="nav-overlay" hidden></div>
+  </nav>
 
-    <a href="#montar-prato" class="float-btn-order">
-        <i class="fas fa-utensils"></i> Monte Seu Pedido
-    </a>
-
-    <div class="navbar">
-        <div class="max-width">
-            <div class="logo">
-                <a href="#">
-                    <img src="img/Logo_3.webp" alt="Dona Maria Logo">Doña<span>Maria</span></a></div>
-            <ul class="menu">
-                <li><a href="#home" class="menu-btn">Início</a></li>
-                <li><a href="#how-it-works" class="menu-btn">Como Funciona</a></li>
-                <li><a href="#projects" class="menu-btn">Pratos</a></li>
-                <li><a href="#skills" class="menu-btn">Planos</a></li>
-                <li><a href="#montar-prato" class="menu-btn" style="color:#A62626; font-weight:bold;">Fazer Pedido</a></li>
-                <li><a href="#about" class="menu-btn">Sobre</a></li>
-                <li><a href="#contact" class="menu-btn">Contato</a></li>
-            </ul>
-            <div class="menu-btn">
-                <i class="fas fa-bars"></i>
-            </div>
-        </div>
+  <!-- HERO -->
+  <section class="hero" id="inicio">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+      <div class="hero-eyebrow"><i class="fas fa-fire-alt"></i> Comidas caseras desde 2025</div>
+      <h1 class="hero-title">Refecciones <br><span class="typing-text"></span></h1>
+      <p class="hero-subtitle">Comodidad, sabor y nutrición en tu mesa. ¡Elige tu plan y arma tu pedido!</p>
+      <div class="hero-cta-row">
+        <a href="#pedido" class="btn btn-primary btn-lg">
+          <i class="fas fa-shopping-basket"></i> Arma tu Pedido
+        </a>
+        <a href="#cardapio" class="btn btn-ghost btn-lg">
+          <i class="fas fa-utensils"></i> Ver Menu
+        </a>
+      </div>
+      <div class="hero-stats">
+        <div><span class="hero-stat-val">4</span><span class="hero-stat-label">Líneas</span></div>
+        <div><span class="hero-stat-val">30+</span><span class="hero-stat-label">Platos</span></div>
+        <div><span class="hero-stat-val">90d</span><span class="hero-stat-label">Validez</span></div>
+        <div><span class="hero-stat-val">5★</span><span class="hero-stat-label">Reseñas</span></div>
+      </div>
     </div>
-    
-    <section class="home" id="home">
-        <div class="max-width">
-            <div class="home-content">
-                <div class="text1">O sabor de casa na sua mesa,</div>
-                <div class="text2">Refeições Saudáveis</div>
-                <div class="text3">Congeladas e <br><span class="typing"></span></div>
-                <a href="#montar-prato">Montar Meu Pedido</a>
-            </div>
+  </section>
+
+  <!-- CARDÁPIO -->
+  <section class="section" id="cardapio">
+    <div class="container">
+      <h2 class="section-title">Nuestra Carta</h2>
+      <p class="section-subtitle">Elija entre 4 líneas de deliciosas comidas.</p>
+      <div class="linha-card">
+        <div class="linha-header">
+          <h3><span class="line-indicator li-trad"></span> Tradicional</h3>
+          <span class="preco-tag">₲ 30.000/un</span>
         </div>
-    </section>    
-
-    <section class="services" id="how-it-works" style="background:#fff;">
-        <div class="max-width">
-            <h2 class="title">Como Funciona</h2>
-            <div class="serv-content" style="justify-content: center; text-align: center; display: flex; flex-wrap: wrap; gap: 20px;">
-                
-                <div class="card" style="flex: 1; min-width: 200px; padding: 20px;">
-                    <div class="box">
-                        <i class="fas fa-list-alt" style="font-size: 40px; color: #2D5A27; margin-bottom:15px;"></i>
-                        <div class="text" style="font-size:20px;">1. Escolha o Plano</div>
-                        <p>Escolha se quer o plano Individual, Semanal, Fim de Semana Livre ou Mensal.</p>
-                    </div>
-                </div>
-
-                <div class="card" style="flex: 1; min-width: 200px; padding: 20px;">
-                    <div class="box">
-                        <i class="fas fa-check-square" style="font-size: 40px; color: #2D5A27; margin-bottom:15px;"></i>
-                        <div class="text" style="font-size:20px;">2. Monte o Cardápio</div>
-                        <p>Escolha seus pratos favoritos entre as linhas Tradicional, Gourmet, Fit ou Kids aqui mesmo pelo site.</p>
-                    </div>
-                </div>
-
-                 <div class="card" style="flex: 1; min-width: 200px; padding: 20px;">
-                    <div class="box">
-                        <i class="fas fa-money-bill" style="font-size: 40px; color: #2D5A27; margin-bottom:15px;"></i>
-                        <div class="text" style="font-size:20px;">3. Faça o Pagamento</div>
-                        <p>Os pagamentos devem ser realizados em até 3 dias antes da entrega via pix ou efetivo.</p>
-                    </div>
-                </div>
-
-                <div class="card" style="flex: 1; min-width: 200px; padding: 20px;">
-                    <div class="box">
-                        <i class="fas fa-truck" style="font-size: 40px; color: #2D5A27; margin-bottom:15px;"></i>
-                        <div class="text" style="font-size:20px;">4. Receba em Casa</div>
-                        <p>Entregamos às Segundas ou Terças entre 18h e 23h.</p>
-                    </div>
-                </div>
-
-                <div class="card" style="flex: 1; min-width: 200px; padding: 20px;">
-                    <div class="box">
-                        <i class="fas fa-fire" style="font-size: 40px; color: #2D5A27; margin-bottom:15px;"></i>
-                        <div class="text" style="font-size:20px;">5. Aqueça e Coma</div>
-                        <p>Do freezer para o micro-ondas. Pronto em minutos!</p>
-                    </div>
-                </div>
-
-            </div>
+        <div class="pratos-grid" id="grid-Tradicional"></div>
+      </div>
+      <div class="linha-card">
+        <div class="linha-header">
+          <h3><span class="line-indicator li-gourmet"></span> Gourmet</h3>
+          <span class="preco-tag">₲ 35.000/un</span>
         </div>
-    </section>
-
-    <section class="projects" id="projects">
-        <div class="max-width">
-            <h2 class="title">Nossos Pratos</h2>
-        
-        <div class="price-banner">
-            <div class="price-tag">
-                <span>Linha Tradicional</span>
-                <strong>₲ 30.000</strong>
-            </div>
-            <div class="price-tag">
-                <span>Gourmet / Fit </span>
-                <strong>₲ 35.000</strong>
-            </div>
-            <div class="price-tag">
-                <span>Kids</span>
-                <strong>₲ 28.000</strong>
-            </div>
+        <div class="pratos-grid" id="grid-Gourmet"></div>
+      </div>
+      <div class="linha-card">
+        <div class="linha-header">
+          <h3><span class="line-indicator li-fit"></span> Fit</h3>
+          <span class="preco-tag">₲ 35.000/un</span>
         </div>
-            
-            <h3 class="line-title" style="color:#2D5A27; margin: 20px 0 10px; border-left: 5px solid #2D5A27; padding-left: 10px;">Linha Tradicional</h3>
-            <div class="carousel-info">
-                <span><i class="fas fa-info-circle"></i> Clique no prato para ver ingredientes e tabela nutricional</span>
-                <p class="img-disclaimer">*Imagens ilustrativas. O produto é entregue congelado para preservar o sabor e nutrientes.</p>
-            </div>
-            <div class="carousel owl-carousel">
-                <div class="card" onclick="abrirDetalhes('trad1')"><div class="img-container"><img src="img/carne-moída.webp"></div><div class="box"><div class="text">1. Carne Moída Refogada</div><p class="plate-line">Tradicional</p></div></div>
-                <div class="card" onclick="abrirDetalhes('trad2')"><div class="img-container"><img src="img/macarrao-com-almondega.webp"></div><div class="box"><div class="text">2. Macarrão com Almôndega</div><p class="plate-line">Tradicional</p></div></div>
-                <div class="card" onclick="abrirDetalhes('trad3')"><div class="img-container"><img src="img/carne-desfiada.webp"></div><div class="box"><div class="text">3. Carne de Panela Desfiada</div><p class="plate-line">Tradicional</p></div></div>
-                <div class="card" onclick="abrirDetalhes('trad4')"><div class="img-container"><img src="img/carre-suino.webp"></div><div class="box"><div class="text">4. Carré Suíno</div><p class="plate-line">Tradicional</p></div></div>
-                <div class="card" onclick="abrirDetalhes('trad5')"><div class="img-container"><img src="img/frango-cremoso.webp"></div><div class="box"><div class="text">5. Frango em Cubos Cremoso</div><p class="plate-line">Tradicional</p></div></div>
-                <div class="card" onclick="abrirDetalhes('trad6')"><div class="img-container"><img src="img/sobrecoxa.webp"></div><div class="box"><div class="text">6. Sobrecoxa Assada</div><p class="plate-line">Tradicional</p></div></div>
-                <div class="card" onclick="abrirDetalhes('trad7')"><div class="img-container"><img src="img/frango-desfiado.webp"></div><div class="box"><div class="text">7. Frango Desfiado</div><p class="plate-line">Tradicional</p></div></div>
-                <div class="card" onclick="abrirDetalhes('trad8')"><div class="img-container"><img src="img/parmegiana.webp"></div><div class="box"><div class="text">8. Frango a Parmegiana</div><p class="plate-line">Tradicional</p></div></div>
-                <div class="card" onclick="abrirDetalhes('trad9')"><div class="img-container"><img src="img/Frango Xadrez.webp"></div><div class="box"><div class="text">9. Frango Xadrez</div><p class="plate-line">Tradicional</p></div></div>
-                <div class="card" onclick="abrirDetalhes('trad10')"><div class="img-container"><img src="img/strogonoff.webp"></div><div class="box"><div class="text">10. Strogonoff de Frango</div><p class="plate-line">Tradicional</p></div></div>
-            </div>
+        <div class="pratos-grid" id="grid-Fit"></div>
+      </div>
+      <div class="linha-card">
+        <div class="linha-header">
+          <h3><span class="line-indicator li-kids"></span> Kids</h3>
+          <span class="preco-tag">₲ 28.000/un</span>
+        </div>
+        <div class="pratos-grid" id="grid-Kids"></div>
+      </div>
+    </div>
+  </section>
 
-            <h3 class="line-title" style="color:#2D5A27; margin: 40px 0 10px; border-left: 5px solid #2D5A27; padding-left: 10px;">Linha Gourmet</h3>
-            <div class="carousel-info">
-                <span><i class="fas fa-info-circle"></i> Clique no prato para ver ingredientes e tabela nutricional</span>
-                <p class="img-disclaimer">*Imagens ilustrativas. O produto é entregue congelado para preservar o sabor e nutrientes.</p>
-            </div>
-            <div class="carousel owl-carousel">
-                <div class="card" onclick="abrirDetalhes('gourmet1')"><div class="img-container"><img src="img/mostarda-e-mel.webp"></div><div class="box"><div class="text">1. Frango Mostarda e Mel</div><p class="plate-line">Gourmet</p></div></div>
-                <div class="card" onclick="abrirDetalhes('gourmet2')"><div class="img-container"><img src="img/escalopinho.webp"></div><div class="box"><div class="text">2. Escalopinho ao Molho Madeira</div><p class="plate-line">Gourmet</p></div></div>
-                <div class="card" onclick="abrirDetalhes('gourmet3')"><div class="img-container"><img src="img/bife acebolado.webp"></div><div class="box"><div class="text">3. Bife Acebolado</div><p class="plate-line">Gourmet</p></div></div>
-                <div class="card" onclick="abrirDetalhes('gourmet4')"><div class="img-container"><img src="img/lombo-suino.webp"></div><div class="box"><div class="text">4. Lombo Suíno Agridoce</div><p class="plate-line">Gourmet</p></div></div>
-                <div class="card" onclick="abrirDetalhes('gourmet5')"><div class="img-container"><img src="img/costelinha-barbecue.webp"></div><div class="box"><div class="text">5. Costelinha BBQ</div><p class="plate-line">Gourmet</p></div></div>
-                <div class="card" onclick="abrirDetalhes('gourmet6')"><div class="img-container"><img src="img/rocambole.webp"></div><div class="box"><div class="text">6. Rocambole de Frango</div><p class="plate-line">Gourmet</p></div></div>
-                <div class="card" onclick="abrirDetalhes('gourmet7')"><div class="img-container"><img src="img/escondidinho.webp"></div><div class="box"><div class="text">7. Escondidinho</div><p class="plate-line">Gourmet</p></div></div>
-                <div class="card" onclick="abrirDetalhes('gourmet8')"><div class="img-container"><img src="img/charuto.webp"></div><div class="box"><div class="text">8. Charuto de Repolho</div><p class="plate-line">Gourmet</p></div></div>
-                <div class="card" onclick="abrirDetalhes('gourmet9')"><div class="img-container"><img src="img/strogonoff-de-carne.webp"></div><div class="box"><div class="text">9. Strogonoff de Carne</div><p class="plate-line">Gourmet</p></div></div>
-                <div class="card" onclick="abrirDetalhes('gourmet10')"><div class="img-container"><img src="img/iscas-de-frango.webp"></div><div class="box"><div class="text">10. Iscas ao Molho Mostarda</div><p class="plate-line">Gourmet</p></div></div>
-            </div>
+  <!-- PEDIDO -->
+  <section class="section section-alt" id="pedido">
+    <div class="container">
+      <h2 class="section-title">Arma tu Pedido</h2>
+      <div class="pedido-card">
 
-            <h3 class="line-title" style="color:#2D5A27; margin: 40px 0 10px; border-left: 5px solid #2D5A27; padding-left: 10px;">Linha Fit</h3>
-            <div class="carousel-info">
-                <span><i class="fas fa-info-circle"></i> Clique no prato para ver ingredientes e tabela nutricional</span>
-                <p class="img-disclaimer">*Imagens ilustrativas. O produto é entregue congelado para preservar o sabor e nutrientes.</p>
-            </div>
-            <div class="carousel owl-carousel">
-                <div class="card" onclick="abrirDetalhes('fit1')"><div class="img-container"><img src="img/frango-grelhado.webp"></div><div class="box"><div class="text">1. Peito de Frango Grelhado</div><p class="plate-line">Fit</p></div></div>
-                <div class="card" onclick="abrirDetalhes('fit2')"><div class="img-container"><img src="img/escondidinho-batata-doce.webp"></div><div class="box"><div class="text">2. Escondidinho Batata Doce</div><p class="plate-line">Fit</p></div></div>
-                <div class="card" onclick="abrirDetalhes('fit3')"><div class="img-container"><img src="img/panqueca-frango.webp"></div><div class="box"><div class="text">3. Panqueca de Frango</div><p class="plate-line">Fit</p></div></div>
-                <div class="card" onclick="abrirDetalhes('fit4')"><div class="img-container"><img src="img/patinho-sugo.webp"></div><div class="box"><div class="text">4. Patinho Moído ao Sugo</div><p class="plate-line">Fit</p></div></div>
-                <div class="card" onclick="abrirDetalhes('fit5')"><div class="img-container"><img src="img/frango-em-cubos-grelhado.webp"></div><div class="box"><div class="text">5. Frango em Cubos Grelhado</div><p class="plate-line">Fit</p></div></div>
-                <div class="card" onclick="abrirDetalhes('fit6')"><div class="img-container"><img src="img/picadinho-patinho.webp"></div><div class="box"><div class="text">6. Picadinho de Patinho</div><p class="plate-line">Fit</p></div></div>
-            </div>
-
-            <h  3 class="line-title" style="color:#2D5A27; margin: 40px 0 10px; border-left: 5px solid #2D5A27; padding-left: 10px;">Linha Kid's</h3>
-            <div class="carousel-info">
-                <span><i class="fas fa-info-circle"></i> Clique no prato para ver ingredientes e tabela nutricional</span>
-                <p class="img-disclaimer">*Imagens ilustrativas. O produto é entregue congelado para preservar o sabor e nutrientes.</p>
-            </div>
-            <div class="carousel owl-carousel">
-                <div class="card" onclick="abrirDetalhes('kids1')">
-                    <div class="img-container">
-                        <img src="img/nuggets.webp">
-                    </div>
-                    <div class="box">
-                        <div class="text">1. Nuggets c/ Legumes</div>
-                        <p class="plate-line">Kids</p>
-                    </div>
-                </div>
-                
-                <div class="card" onclick="abrirDetalhes('kids2')">
-                    <div class="img-container">
-                        <img src="img/hamburger.webp">
-                    </div>
-                    <div class="box">
-                        <div class="text">2. Hamburger c/ Legumes</div>
-                        <p class="plate-line">Kids</p>
-                    </div>
-                </div>
-                
-                <div class="card" onclick="abrirDetalhes('kids3')">
-                    <div class="img-container">
-                        <img src="img/almondega.webp">
-                    </div>
-                    <div class="box">
-                        <div class="text">3. Almôndega c/ Legumes</div>
-                        <p class="plate-line">Kids</p>
-                    </div>
-                </div>
-                
-                <div class="card" onclick="abrirDetalhes('kids4')">
-                    <div class="img-container">
-                        <img src="img/panqueca-kids.webp">
-                    </div>
-                    <div class="box">
-                        <div class="text">4. Panqueca c/ Legumes</div>
-                        <p class="plate-line">Kids</p>
-                    </div>
-                </div>
-                
-                <div class="card" onclick="abrirDetalhes('kids5')">
-                    <div class="img-container">
-                        <img src="img/escondidinho-kids.webp">
-                    </div>
-                    <div class="box">
-                        <div class="text">5. Escondidinho Colorido</div>
-                        <p class="plate-line">Kids</p>
-                    </div>
-                </div>
-            </div>
+        <!-- Plano -->
+        <div class="form-group">
+          <label class="form-label">Elija tu Plan</label>
+          <select class="form-control" id="plano-selecionado" onchange="configurarPlano()">
+            <option value="">Selecciona un plan...</option>
+            <option value="Individual">Individual (hasta 13 unidades)</option>
+            <option value="Semanal">Semanal (14 unidades — 5% OFF)</option>
+            <option value="FDS">Fines de semana Libres (40 unidades — 5% OFF)</option>
+            <option value="Mensal">Mensal (56 unidades — 10% OFF)</option>
+            <option value="Personalizado">Personalizado (cualquier cantidad)</option>
+          </select>
         </div>
 
-    </section>     
-            <div class="line-selector">
-                <button class="tab-btn active" onclick="updatePrices('tradicional', this)">Tradicional</button>
-                <button class="tab-btn" onclick="updatePrices('gourmet', this)">Gourmet/Fit</button>
-                <button class="tab-btn" onclick="updatePrices('kids', this)">Kids</button>
-                <button class="tab-btn" onclick="updatePrices('personalizada', this)">Personalizada</button>
-            </div>
-
-            <div class="skills-content">
-
-                <div class="card-plan">
-                    <div class="box">
-                        <div class="text">Semanal</div>
-                        <p class="plan-desc">14 Refeições<br><span>(1 Entrega)</span></p>
-                        <div class="price-container">
-                            <span class="old-price" id="old-semanal">₲ 420.000</span>
-                            <span class="discount-badge" id="desc-semanal">5% OFF</span>
-                            <h3 id="price-semanal">₲ 399.000</h3>
-                        </div>
-                        <a href="#montar-prato" class="btn-plan">Pedir Agora</a>
-                    </div>
-                </div>
-
-                <div class="card-plan featured">
-                    <div class="box">
-                        <div class="text">Fins de Semana Livres</div>
-                        <p class="plan-desc">40 Refeições<br><span>(4 Entregas de 10)</span></p>
-                        <div class="price-container">
-                            <span class="old-price" id="old-business">₲ 1.200.000</span>
-                            <span class="discount-badge" id="desc-business">5% OFF</span>
-                            <h3 id="price-business">₲ 1.140.000</h3>
-                        </div>
-                        <a href="#montar-prato" class="btn-plan">Mais Vendido</a>
-                    </div>
-                </div>
-
-                <div class="card-plan">
-                    <div class="box">
-                        <div class="text">Plano Mensal</div>
-                        <p class="plan-desc">56 Refeições<br><span>(4 Entregas de 14)</span></p>
-                        <div class="price-container">
-                            <span class="old-price" id="old-libertad">₲ 1.680.000</span>
-                            <span class="discount-badge" id="desc-libertad">10% OFF</span>
-                            <h3 id="price-libertad">₲ 1.512.000</h3>
-                        </div>
-                        <a href="#montar-prato" class="btn-plan">Assinar</a>
-                    </div>
-                </div>
-            </div>
-            <p class="delivery-info">* Delivery a consultar na área de pedidos.</p>
+        <!-- Progresso -->
+        <div id="pedido-progress" hidden>
+          <div class="progress-header">
+            <span id="progress-label-text">Platos agregados</span>
+            <span><strong id="atual">0</strong> / <span id="limite-txt">—</span></span>
+          </div>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar" id="progress-fill" style="width:0%"></div>
+          </div>
+          <p class="progress-hint" id="individual-desconto-hint" hidden></p>
         </div>
-    </section>
 
-    <section class="menu-selection" id="montar-prato">
-    <div class="max-width">
-        <h2 class="title">Monte seu Pedido</h2>
-        <div class="menu-box">
-            <div class="selection-header" id="container-linha">
-                <div class="field">
-                    <label>1. Escolha seu Plano:</label>
-                    <select id="plano-selecionado" onchange="configurarPlano()">
-                        <option value="">Selecione o plano...</option>
-                        <option value="Individual">Individual / Degustação</option>
-                        <option value="Semanal">Semanal (14 pratos)</option>
-                        <option value="FDS">Fins de Semana Livres (10 pratos semanais)</option>
-                        <option value="Mensal">Mensal (14 pratos semanais)</option>
-                    </select>
-                    <small id="aviso-linha" style="display:none; color: #666; font-style: italic;">
-                        *Para este plano, recomenda-se escolher pratos da mesma linha (ex: só Fit).
-                    </small>
-                </div>
-                <p id="counter">Pratos Selecionados: <span id="atual">0</span> / <span id="limite-txt">0</span></p>
-                <progress id="progresso" value="0" max="14"></progress>
+        <!-- Carrinho inline -->
+        <div class="carrinho-wrap">
+          <h4 class="carrinho-title"><i class="fas fa-shopping-cart"></i> Su Pedido</h4>
+          <ul class="carrinho-list" id="carrinho-itens">
+            <li class="carrinho-empty">Aún no se han añadido platos.</li>
+          </ul>
+        </div>
+
+        <!-- Resumo Financeiro -->
+        <div class="resumo-financeiro" id="resumo-financeiro" hidden></div>
+
+        <!-- Dados do Cliente -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Nombre y Apelido</label>
+            <input type="text" class="form-control" id="cliente-nome" placeholder="Su Nombre">
+          </div>
+          <div class="form-group">
+            <label class="form-label">WhatsApp</label>
+            <div class="input-tel">
+              <select id="cliente-ddi">
+                <option value="+595">🇵🇾 +595</option>
+                <option value="+55">🇧🇷 +55</option>
+              </select>
+              <input type="tel" id="cliente-tel" placeholder="991 123 456">
             </div>
+          </div>
+        </div>
 
-            <div id="controles-prato" style="display:none;">
-                <div class="field">
-                    <label>2. Escolha a Linha:</label>
-                    <select id="linha-escolhida" onchange="atualizarOpcoesItens()">
-                        <option value="Tradicional">Linha Tradicional</option>
-                        <option value="Gourmet">Linha Gourmet</option>
-                        <option value="Kids">Linha Kids</option>
-                        <option value="Fit">Linha Fit</option>
-                    </select>
-                </div>
+        <!-- Localização -->
+        <div class="form-group">
+          <label class="form-label">Dirección de entrega</label>
+          <button type="button" class="btn btn-outline" onclick="obterLocalizacaoEFrete()">
+            <i class="fas fa-map-marker-alt"></i> Usar mi ubicación
+          </button>
+          <div id="frete-detalhe" hidden></div>
+          <div id="valor-frete-display" style="margin-top:8px;font-weight:600;">—</div>
+        </div>
 
-                <div class="field checkbox-personalizado">
-                    <input type="checkbox" id="is-personalizado" onchange="togglePersonalizado()">
-                    <label for="is-personalizado">Desejo personalizar as gramas deste prato</label>
-                </div>
+        <!-- Observações -->
+        <div class="form-group">
+          <label class="form-label">Observaciones generales</label>
+          <textarea class="form-control" id="observacoes-gerais" rows="2" placeholder="¿Alguna observación especial?"></textarea>
+        </div>
 
-                <div class="field">
-                    <label>3. Proteína (Escolha 1):</label>
-                    <select id="select-proteina"></select>
-                    <div id="g-prot-container" style="display:none; margin-top:5px;">
-                        <input type="number" id="g-prot" placeholder="Gramas da Proteína (ex: 150)">
-                    </div>
-                </div>
-
-                <div class="field">
-                    <label style="font-weight:bold;">4. Acompanhamentos Base (Escolha até 2):</label>
-                    <div class="options-container" id="base-sides" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px;">
-                        
-                        <div class="acomp-item-wrapper">
-                            <label class="option-item">
-                                <input type="checkbox" name="acomp_base" value="Arroz Branco"> <span>Arroz Branco</span>
-                            </label>
-                            <input type="number" class="g-acomp" placeholder="Gramas" style="display:none; width: 80px; margin-top: 5px; margin-left: 25px;">
-                        </div>
-
-                        <div class="acomp-item-wrapper">
-                            <label class="option-item">
-                                <input type="checkbox" name="acomp_base" value="Purê de Batata"> <span>Purê de Batata</span>
-                            </label>
-                            <input type="number" class="g-acomp" placeholder="Gramas" style="display:none; width: 80px; margin-top: 5px; margin-left: 25px;">
-                        </div>
-
-                        <div class="acomp-item-wrapper">
-                            <label class="option-item">
-                                <input type="checkbox" name="acomp_base" value="Feijão Preto"> <span>Feijão Preto</span>
-                            </label>
-                            <input type="number" class="g-acomp" placeholder="Gramas" style="display:none; width: 80px; margin-top: 5px; margin-left: 25px;">
-                        </div>
-
-                        <div class="acomp-item-wrapper">
-                            <label class="option-item">
-                                <input type="checkbox" name="acomp_base" value="Purê de Batata Doce"> <span>Purê de Batata Doce</span>
-                            </label>
-                            <input type="number" class="g-acomp" placeholder="Gramas" style="display:none; width: 80px; margin-top: 5px; margin-left: 25px;">
-                        </div>
-
-                        <div class="acomp-item-wrapper">
-                            <label class="option-item">
-                                <input type="checkbox" name="acomp_base" value="Macarrão"> <span>Macarrão</span>
-                            </label>
-                            <input type="number" class="g-acomp" placeholder="Gramas" style="display:none; width: 80px; margin-top: 5px; margin-left: 25px;">
-                        </div>
-
-                        <div class="acomp-item-wrapper">
-                            <label class="option-item">
-                                <input type="checkbox" name="acomp_base" value="Purê de Abóbora"> <span>Purê de Abóbora</span>
-                            </label>
-                            <input type="number" class="g-acomp" placeholder="Gramas" style="display:none; width: 80px; margin-top: 5px; margin-left: 25px;">
-                        </div>
-
-                    </div>
-                </div>
-
-                <div class="field seleta-container" style="margin-top: 20px; padding: 15px; background: #fdfdfd; border: 1px solid #ddd; border-radius: 8px;">
-                    <label style="font-weight: bold; color: #2D5A27; display: block; margin-bottom: 10px;">
-                        5. Deseja adicionar a Seleta de Legumes?
-                    </label>
-                    
-                    <div style="display: flex; gap: 20px; align-items: center; margin-bottom: 10px;">
-                        <label class="option-item" style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-                            <input type="radio" name="escolha_seleta" value="Sim" checked>
-                            <span>Sim, adicionar</span>
-                        </label>
-                        
-                        <input type="number" id="g-seleta" class="g-acomp" placeholder="Gramas" style="display:none; width: 80px;">
-
-                        <label class="option-item" style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-                            <input type="radio" name="escolha_seleta" value="Não">
-                            <span>Não, obrigado</span>
-                        </label>
-                    </div>
-
-                    <div class="legumes-warning" style="font-size: 13px; color: #555; background: #fffbe6; padding: 10px; border-left: 4px solid #f0ad4e; border-radius: 4px;">
-                        <strong><i class="fas fa-exclamation-triangle"></i> Composição:</strong>
-                        A seleta contém 2 ou mais itens (Cenoura, Brócolis, Couve-Flor, Vagem, Milho-Verde, Beterraba, Ervilha, Champignon).
-                        <br>
-                        <em>*Restrições? Informe nas observações abaixo.</em>
-                    </div>
-                </div>
-
-                <button type="button" onclick="adicionarPratoLista()" class="btn-add">Adicionar Prato ao Carrinho</button>
-            </div>
-
-            <div class="selected-list">
-                <h4>Itens no Carrinho:</h4>
-                <ul id="carrinho-itens"></ul>
-            </div>
-
-            <div class="field observation-field" style="margin-top: 20px;">
-                <label>Alguma observação para o seu pedido?</label>
-                <textarea id="observacoes-gerais" placeholder="Ex: Não colocar cebola, etc." rows="3"></textarea>
-            </div>
-
-            <div class="shipping-box" style="margin-top: 30px; background: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px dashed #2D5A27;">
-                <h4 style="color: #2D5A27; margin-bottom: 10px;"><i class="fas fa-motorcycle"></i> Calcule seu Frete</h4>
-                <div class="frete-container">
-                    <button onclick="obterLocalizacaoEFrete()" id="btn-calcular-frete" class="btn-frete" style="background: #555; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px;">
-                        <i class="fas fa-location-arrow"></i> Calcular Entrega
-                    </button>
-                    <p>Valor do Delivery: <span id="valor-frete-display">Aguardando...</span></p>
-                </div>
-                <div id="resultado-frete" style="margin-top: 10px; display: none;">
-                    <p><strong>Distância:</strong> <span id="distancia-km"></span> km | <strong>Taxa:</strong> <span id="valor-frete" style="font-weight: bold; color: #2D5A27;"></span></p>
-                </div>
-            </div>
-
-            <div class="checkout-form" style="margin-top: 20px; padding: 15px; background: #fff; border-radius: 8px; border: 1px solid #ddd;">
-                <h4 style="color: #2D5A27; margin-bottom: 10px;">Informações de Entrega</h4>
-                
-                <input type="text" id="cliente-nome" placeholder="Seu Nome Completo" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 5px;">
-                
-                <div class="phone-group" style="display: flex; gap: 5px; margin-bottom: 10px;">
-                    <select id="cliente-ddi" style="padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
-                        <option value="+595" selected>🇵🇾 +595</option>
-                        <option value="+55">🇧🇷 +55</option>
-                        <option value="+54">🇦🇷 +54</option>
-                    </select>
-                    <input type="tel" id="cliente-tel" placeholder="Número de Telefone" style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
-                </div>
-
-                <select id="forma-pagamento" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px;">
-                    <option value="">Escolha a Forma de Pagamento</option>
-                    <option value="Efetivo">Efetivo</option>
-                    <option value="Pix">Pix</option>
-                    <option value="Transferência">Transferência</option>
-                    <option value="Cartão de Crédito">Cartão de Crédito</option>
-                </select>
-            </div>
-
-            <button id="btn-whatsapp" class="disabled" onclick="enviarPedidoZap()" disabled>
-                Finalizar e Enviar via WhatsApp
+        <!-- Pagamento -->
+        <div class="form-group">
+          <label class="form-label">Forma de Pago</label>
+          <input type="hidden" id="forma-pagamento">
+          <div class="pagamento-grid">
+            <button type="button" class="pag-opt" onclick="selecionarPagamento(this,'Efetivo ₲')">
+              <i class="fas fa-money-bill-wave"></i> ₲ Efectivo 
             </button>
+            <button type="button" class="pag-opt" onclick="selecionarPagamento(this,'cartao')">
+              <i class="fas fa-money-bill-wave"></i> Tarjeta
+            </button>
+            <button type="button" class="pag-opt" onclick="selecionarPagamento(this,'Pix')">
+              <i class="fas fa-qrcode"></i> Pix 🇧🇷
+            </button>
+            <button type="button" class="pag-opt" onclick="selecionarPagamento(this,'Transferência')">
+              <i class="fas fa-university"></i> Transferencia
+            </button>
+          </div>
         </div>
+
+        <!-- Enviar -->
+        <button class="btn btn-whatsapp btn-lg" id="btn-whatsapp" onclick="enviarPedidoZap()" disabled>
+          <i class="fab fa-whatsapp"></i> Enviar solicitud vía WhatsApp
+        </button>
+        <p class="botao-hint" id="botao-hint" hidden></p>
+      </div>
     </div>
-</section>
+  </section>
 
-    <section class="about" id="about">
-        <div class="max-width">
-            <h2 class="title">Você Merece</h2>
-            <div class="about-content">
-                <div class="column left">
-                    <img src="img/Confie.webp" alt="Doña Maria Cozinhando">
-                </div>
-                <div class="column right">
-                    <div class="text">Foque no seu tempo, <br><span class="typing-2"></span></div>
-                    <p>Sabemos que a rotina é intensa. O tempo que você gasta no supermercado e na cozinha é um tempo precioso de estudo ou descanso.</p>
-                    <p>A <strong>Doña Maria</strong> não entrega apenas comida; entregamos <strong>tempo e saúde</strong>. Nossas refeições são ultracongeladas para manter o sabor de recém-feito.</p>
-                </div>
-            </div>
+  <!-- RASTREAR -->
+  <section class="section" id="rastrear">
+    <div class="container">
+      <h2 class="section-title">Seguimiento de mi entrega</h2>
+      <div class="tracker-card">
+        <div class="tracker-input-wrap">
+          <select id="tracker-ddi">
+            <option value="+595">🇵🇾 +595</option>
+            <option value="+55">🇧🇷 +55</option>
+          </select>
+          <input type="tel" id="tracker-tel" placeholder="Su WhatsApp">
+          <button class="btn btn-primary" onclick="buscarStatusEntrega()">
+            <i class="fas fa-search"></i> Buscar
+          </button>
         </div>
-    </section>
-
-    <section class="testimonials" id="depoimentos">
-    <div class="max-width">
-        <h2 class="title">O que dizem nossos clientes</h2>
-        <div class="carousel owl-carousel">
-            <div class="card testimonial-card">
-                <div class="img-container-print">
-                    <img src="img/print1.jpg" alt="Depoimento Cliente">
-                </div>
-            </div>
-            <div class="card testimonial-card">
-                <div class="img-container-print">
-                    <img src="img/print2.jpg" alt="Depoimento Cliente">
-                </div>
-            </div>
-            <div class="card testimonial-card">
-                <div class="img-container-print">
-                    <img src="img/print3.jpg" alt="Depoimento Cliente">
-                </div>
-            </div>
-             <div class="card testimonial-card">
-                <div class="img-container-print">
-                    <img src="img/print4.jpg" alt="Depoimento Cliente">
-                </div>
-            </div>
-             <div class="card testimonial-card">
-                <div class="img-container-print">
-                    <img src="img/print5.jpg" alt="Depoimento Cliente">
-                </div>
-            </div>
-            </div>
+        <div id="tracker-result" hidden></div>
+      </div>
     </div>
-</section>
+  </section>
 
-    <section class="faq" id="faq">
-        <div class="max-width">
-            <h2 class="title">Dúvidas Frequentes</h2>
-            <div class="faq-content">
-                
-                <div class="wrapper">
-                    <div class="toggle">
-                        Como faço para descongelar?
-                        <i class="fas fa-plus icon"></i>
-                    </div>
-                    <div class="content">
-                        <p>O ideal é deixar descongelar dentro da geladeira de um dia para o outro. <strong>NUNCA DESCONGELE FORA DA GELADEIRA</strong>, pois pode proliferar bactérias.</p>
-                    </div>
-                </div>
-
-                <div class="wrapper">
-                    <div class="toggle">
-                        Qual o horário de entrega?
-                        <i class="fas fa-plus icon"></i>
-                    </div>
-                    <div class="content">
-                        <p>Nossas entregas são realizadas todas as <strong>Segundas ou Terças-feiras</strong>, entre <strong>18:00h e 23:00h</strong>.</p>
-                    </div>
-                </div>
-
-                <div class="wrapper">
-                    <div class="toggle">
-                        Posso colocar direto no micro-ondas?
-                        <i class="fas fa-plus icon"></i>
-                    </div>
-                    <div class="content">
-                        <p>Sim, pode! Sempre <strong>SEM a tampa</strong>.</p>
-                    </div>
-                </div>
-
-                <div class="wrapper">
-                    <div class="toggle">
-                        Posso colocar a embalagem no forno?
-                        <i class="fas fa-plus icon"></i>
-                    </div>
-                    <div class="content">
-                        <p>As embalagens nao podem ir ao forno convencional, elétrico ou Air Fryer</p>
-                    </div>
-                </div>
-
-                <div class="wrapper">
-                    <div class="toggle">
-                        Formas de pagamento?
-                        <i class="fas fa-plus icon"></i>
-                    </div>
-                    <div class="content">
-                        <p>Aceitamos Pix (cotação do dia via <strong>Moneygram</strong>) ou Efetivo em Guaranis, em até 3 dias antes da entrega.</p>
-                    </div>
-                </div>
-
-            </div>
+  <!-- FAQ -->
+  <section class="section section-alt" id="faq">
+    <div class="container">
+      <h2 class="section-title">Preguntas frecuentes</h2>
+      <div class="faq-list">
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)" aria-expanded="false">
+            <span>¿Cómo funciona el plan mensual?</span><i class="fas fa-chevron-down"></i>
+          </button>
+          <div class="faq-answer" hidden>
+            <p>El plan mensual incluye 56 recipientes para preparar comidas (14 por semana durante 4 semanas). Tú eliges los platos y recibes entregas semanales. ¡Obtén un 10% de descuento!</p>
+          </div>
         </div>
-    </section>
-
-    <section class="contact" id="contact">
-        <div class="max-width">
-            <h2 class="title">Contato</h2>
-            <div class="card-container">
-                <div class="card"><div class="box"><a href="https://api.whatsapp.com/send?phone=595991635604" target="_blank"><i class="fab fa-whatsapp-square"></i></a></div></div>
-                <div class="card"><div class="box"><a href="https://instagram.com/congelados.Doña.maria" target="_blank"><i class="fab fa-instagram"></i></a></div></div>
-            </div>
-            <div class="contact-content">
-                <div class="column left">
-                    <div class="text">Fale com a gente!</div>
-                    <p>Tire suas dúvidas e garanta sua alimentação saudável.</p>
-                    <div class="icons">
-                        <div class="row"><i class="fas fa-user"></i><div class="info"><div class="head">Nome</div><div class="sub-title">Doña Maria Congelados</div></div></div>
-                        <div class="row"><i class="fas fa-map-marker-alt"></i><div class="info"><div class="head">Cidade</div><div class="sub-title">Mariano Roque Alonso - PY</div></div></div>
-                        <div class="row"><i class="fab fa-whatsapp"></i><div class="info"><a href="https://api.whatsapp.com/send?phone=595991635604" target="_blank"><div class="head2">Whatsapp</div><div class="sub-title2">+595991635604</div></a></div></div>
-                    </div>
-                </div>
-                <div class="column right">
-                    <div class="text">Envie um e-mail</div>
-                    <form action="#">
-                        <div class="fields">
-                            <div class="field name"><input type="text" placeholder="Seu Nome" required></div>
-                            <div class="field email"><input type="email" placeholder="Seu E-mail" required></div>
-                        </div>
-                        <div class="field"><input type="text" placeholder="Assunto" required></div>
-                        <div class="field textarea"><textarea cols="30" rows="10" placeholder="Mensagem.." required></textarea></div>
-                        <div class="button-area"><button type="submit">Enviar Mensagem</button></div>
-                    </form>
-                </div>
-            </div>
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)" aria-expanded="false">
+            <span>¿Cómo funciona el plan Finde Semana Libre?</span><i class="fas fa-chevron-down"></i>
+          </button>
+          <div class="faq-answer" hidden>
+            <p>El plan Finde Semana Libre incluye 40 recipientes para preparar comidas (10 por semana durante 4 semanas). Tú eliges los platos y recibes entregas semanales. ¡Obtén un 5% de descuento!</p>
+          </div>
         </div>
-    </section>
-
-    <a href="https://api.whatsapp.com/send?phone=595991635604&text=Olá!%20Gostaria%20de%20informações!" class="whatsapp-float" target="_blank">
-        <i class="fab fa-whatsapp"></i>
-    </a>
-
-    <footer>
-        <span>Doña Maria Congelados | <span class="far fa-copyright"></span> 2026 - Todos os direitos reservados.</span>
-    </footer>
-
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
-    <script src="script.js"></script>
-
-    <div id="dish-modal" class="modal-details">
-        <div class="modal-content">
-            <span class="close-modal" onclick="fecharModal()">&times;</span>
-            <div class="modal-img-container" style="flex:1; min-width:250px;">
-                <img id="modal-img" src="" alt="Prato" style="width:100%; height:100%; object-fit:cover; border-radius:10px;">
-            </div>
-            <div class="modal-body" style="flex:1; min-width:250px;">
-                <h2 id="modal-titulo" style="margin-top:0;">Nome do Prato</h2>
-        
-                <div style="margin-bottom: 15px;">
-                    <h4 style="color: #2D5A27; margin-bottom: 5px;">Ingredientes:</h4>
-                    <p id="modal-ingredientes" style="font-size: 0.9rem; color: #555; line-height: 1.4;">Carregando...</p>
-                </div>
-
-                <div class="portion-info">
-                    <p><strong>Porção Única 400g:</strong> <span id="cal-400">0</span> Kcal</p>
-                </div>
-
-                <div class="allergens">
-                    <p id="modal-alergenos"></p>
-                </div>
-
-                <table class="nutri-table">
-                    <thead>
-                        <tr>
-                            <th>Item</th>
-                            <th>Qtd</th>
-                            <th>%VD*</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabela-nutricional">
-                        </tbody>
-                </table>
-            </div>
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)" aria-expanded="false">
+            <span>¿Puedo mezclar platos de diferentes líneas?</span><i class="fas fa-chevron-down"></i>
+          </button>
+          <div class="faq-answer" hidden>
+            <p>¡Sí! En los planes Individual y Personalizado puedes combinarlos. En los planes Semanal, de Fin de Semana y Mensual, eliges una línea de platos y todos deben ser de esa misma línea.</p>
+          </div>
         </div>
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)" aria-expanded="false">
+            <span>¿Cuál es la fecha de caducidad de las comidas?</span><i class="fas fa-chevron-down"></i>
+          </button>
+          <div class="faq-answer" hidden>
+            <p>Nuestras comidas congeladas tienen una vida útil de 90 días si se almacenan a -18 °C. Recomendamos consumirlas en un plazo de 30 días para disfrutar de un sabor óptimo.</p>
+          </div>
+        </div>
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)" aria-expanded="false">
+            <span>¿Cómo lo caliento?</span><i class="fas fa-chevron-down"></i>
+          </button>
+          <div class="faq-answer" hidden>
+            <p>Retirar del congelador, quitar la tapa y cocinar en el microondas durante 5 a 7 minutos, dependiendo de la potencia de su microondas.</p>
+          </div>
+        </div>
+      </div>
     </div>
+  </section>
+
+  <!-- DEPOIMENTOS -->
+  <section class="section" id="depoimentos">
+    <div class="container">
+      <h2 class="section-title">Lo que dicen nuestros clientes</h2>
+      <p class="section-subtitle">Resultados reales de quienes ya han elegido Doña María.</p>
+      <div class="depoimentos-grid">
+        <div class="depoimento-card"><img src="img/print1.jpg" alt="Depoimento" loading="lazy"></div>
+        <div class="depoimento-card"><img src="img/print2.jpg" alt="Depoimento" loading="lazy"></div>
+        <div class="depoimento-card"><img src="img/print3.jpg" alt="Depoimento" loading="lazy"></div>
+        <div class="depoimento-card"><img src="img/print4.jpg" alt="Depoimento" loading="lazy"></div>
+        <div class="depoimento-card"><img src="img/print5.jpg" alt="Depoimento" loading="lazy"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTATO -->
+  <section class="section section-alt" id="contato">
+    <div class="container">
+      <h2 class="section-title">Contáctenos</h2>
+      <div class="contato-grid">
+        <div class="contato-card">
+          <i class="fab fa-whatsapp"></i>
+          <h4>WhatsApp</h4>
+          <p>+595 991 635 604</p>
+          <a href="https://wa.me/595991635604" target="_blank" class="btn btn-outline btn-sm">Llamar</a>
+        </div>
+        <div class="contato-card">
+          <i class="fab fa-instagram"></i>
+          <h4>Instagram</h4>
+          <p>@donamariacongelados</p>
+          <a href="https://instagram.com/congelados.dona.maria" target="_blank" class="btn btn-outline btn-sm">Seguir</a>
+        </div>
+        <div class="contato-card">
+          <i class="fas fa-map-marker-alt"></i>
+          <h4>Endereço</h4>
+          <p>Mariano Roque Alonso, PY</p>
+          <a href="https://maps.google.com/?q=Mariano+Roque+Alonso" target="_blank" class="btn btn-outline btn-sm">Ver Mapa</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <i class="fas fa-utensils"></i>
+          <span>Doña Maria Congelados</span>
+        </div>
+        <p class="footer-text">Comidas caseras hechas con amor y dedicación desde 2025.</p>
+        <div class="footer-social">
+          <a href="https://wa.me/595991635604" target="_blank"><i class="fab fa-whatsapp"></i></a>
+          <a href="#"><i class="fab fa-instagram"></i></a>
+          <a href="#"><i class="fab fa-facebook"></i></a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2025 Doña Maria Congelados. Reservados todos los derechos.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ═══════════════════════════════════════════════
+       MODAL DE PRATO — estrutura limpa
+  ════════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="modal-prato" hidden>
+    <div class="modal-box">
+      <button class="modal-close" onclick="fecharModalPrato()">✕</button>
+
+      <div class="modal-img-wrap">
+        <img id="modal-img" src="" alt="">
+      </div>
+
+      <div class="modal-body">
+
+        <!-- Nome e linha -->
+        <span class="modal-linha-tag" id="modal-linha-tag"></span>
+        <h3 class="modal-prato-nome" id="modal-prato-nome"></h3>
+        <p class="modal-ingredientes" id="modal-ingredientes"></p>
+        <p class="modal-alergenos" id="modal-alergenos" hidden></p>
+
+        <!-- Nutricional -->
+        <div class="modal-nutri">
+          <div class="modal-nutri-header">
+            <span>🔥 <span id="modal-kcal">—</span> kcal</span>
+            <span>Tabla Nutricional</span>
+          </div>
+          <table class="modal-nutri-table">
+            <thead><tr><th>Nutriente</th><th>Qtd</th><th>%VD</th></tr></thead>
+            <tbody id="modal-nutri-tbody"></tbody>
+          </table>
+        </div>
+
+        <!-- ── CHECKBOX PERSONALIZAR (único) ─────────── -->
+        <div class="modal-personalizar-section">
+          <label class="personalizar-checkbox">
+            <input type="checkbox" id="chk-personalizar" onchange="togglePersonalizar()">
+            <span class="checkmark"></span>
+            <div class="personalizar-texto">
+              <strong><i class="fas fa-sliders-h"></i> Personalizar plato</strong>
+              <small>Edite los gramos y mezcle líneas como desee.</small>
+            </div>
+          </label>
+        </div>
+
+        <!-- Preço base (modo normal) -->
+        <div class="modal-preco-wrap" id="preco-normal-wrap">
+          <span class="modal-preco-label">Preço base:</span>
+          <span class="modal-preco-base" id="modal-preco-base">₲ —</span>
+        </div>
+        <!-- Preço sob consulta (modo personalizado) -->
+        <div class="modal-preco-sob-consulta" id="preco-consulta-wrap" hidden>
+          <span class="consulta-badge">Sob Consulta</span>
+          <small>El precio se calculará después de la confirmación.</small>
+        </div>
+
+        <!-- ── PROTEÍNA ────────────────────────────── -->
+        <div class="modal-section">
+          <label class="modal-section-title" id="proteina-label">Proteína</label>
+
+          <!-- Modo normal: só mostra a quantidade -->
+          <div id="proteina-gramas-display-row">
+            <span id="proteina-gramas-display" class="gram-display">130g</span>
+          </div>
+
+          <!-- Modo personalizado: input editável -->
+          <div id="proteina-gramas-wrap" class="gram-row" hidden>
+            <input type="number" id="proteina-gramas" value="130" min="50" max="400" class="gram-input">
+            <span>gramos</span>
+          </div>
+        </div>
+
+        <!-- ── ACOMPANHAMENTOS ─────────────────────── -->
+        <div class="modal-section">
+          <label class="modal-section-title">Guarniciones <small>(máx. 2)</small></label>
+          <div class="acomp-grid" id="acomp-grid">
+
+            <!-- Cada linha: div.acomp-row contém label(checkbox+nome) + display-g + .acomp-grams(input) -->
+            <div class="acomp-row">
+              <label class="acomp-label">
+                <input type="checkbox" class="acomp-check" value="Arroz Branco">
+                <span>Arroz Blanco</span>
+              </label>
+              <span class="acomp-display-g gram-display" hidden>80g</span>
+              <span class="acomp-grams" hidden>
+                <input type="number" class="gram-input" value="80" min="20" max="300">g
+              </span>
+            </div>
+
+            <div class="acomp-row">
+              <label class="acomp-label">
+                <input type="checkbox" class="acomp-check" value="Feijão Preto">
+                <span>Poroto negro</span>
+              </label>
+              <span class="acomp-display-g gram-display" hidden>90g</span>
+              <span class="acomp-grams" hidden>
+                <input type="number" class="gram-input" value="90" min="20" max="300">g
+              </span>
+            </div>
+
+            <div class="acomp-row">
+              <label class="acomp-label">
+                <input type="checkbox" class="acomp-check" value="Purê de Batata">
+                <span>Puré de Papas</span>
+              </label>
+              <span class="acomp-display-g gram-display" hidden>120g</span>
+              <span class="acomp-grams" hidden>
+                <input type="number" class="gram-input" value="120" min="20" max="300">g
+              </span>
+            </div>
+
+            <div class="acomp-row">
+              <label class="acomp-label">
+                <input type="checkbox" class="acomp-check" value="Purê de Batata Doce">
+                <span>Puré de Batata Dulce</span>
+              </label>
+              <span class="acomp-display-g gram-display" hidden>120g</span>
+              <span class="acomp-grams" hidden>
+                <input type="number" class="gram-input" value="120" min="20" max="300">g
+              </span>
+            </div>
+
+            <div class="acomp-row">
+              <label class="acomp-label">
+                <input type="checkbox" class="acomp-check" value="Purê de Abóbora">
+                <span>Puré de Calabaza</span>
+              </label>
+              <span class="acomp-display-g gram-display" hidden>120g</span>
+              <span class="acomp-grams" hidden>
+                <input type="number" class="gram-input" value="120" min="20" max="300">g
+              </span>
+            </div>
+
+            <div class="acomp-row">
+              <label class="acomp-label">
+                <input type="checkbox" class="acomp-check" value="Macarrão">
+                <span>Fideo</span>
+              </label>
+              <span class="acomp-display-g gram-display" hidden>120g</span>
+              <span class="acomp-grams" hidden>
+                <input type="number" class="gram-input" value="120" min="20" max="300">g
+              </span>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ── SELETA DE LEGUMES ───────────────────── -->
+        <div class="modal-section">
+          <label class="modal-section-title">¿Incluir legumbres mixtos?</label>
+          <div class="seleta-toggle">
+            <button type="button" class="seleta-btn active" id="btn-sim" onclick="toggleSeleta(true)">Sí</button>
+            <button type="button" class="seleta-btn" id="btn-nao" onclick="toggleSeleta(false)">No</button>
+          </div>
+          <p class="seleta-info" id="seleta-info">
+            <i class="fas fa-info-circle"></i> Zanahorias, Arvejo, Choclo, Repollo, Brócoli, Coliflor, Judías Verdes o Remolachas.
+          </p>
+
+          <!-- Modo normal: exibe quantia -->
+          <div id="seleta-gram-display-row">
+            <span id="seleta-gram-display" class="gram-display">80g</span>
+          </div>
+
+          <!-- Modo personalizado: input editável -->
+          <div id="seleta-gram-row" class="gram-row" hidden>
+            <input type="number" id="seleta-gramas" value="80" min="20" max="300" class="gram-input">
+            <span>gramos</span>
+          </div>
+        </div>
+
+        <!-- ── OBSERVAÇÃO POR PRATO (só no personalizado) -->
+        <div class="modal-section" id="obs-prato-row" hidden>
+          <label class="modal-section-title">
+            <i class="fas fa-comment-alt"></i> Observación de este plato
+          </label>
+          <textarea id="obs-prato" class="form-control" rows="2"
+            placeholder="Ej: sin cebolla, más arroz, poco sal…"></textarea>
+        </div>
+
+        <!-- Preço total calculado -->
+        <div class="modal-preco-total" id="modal-preco-total"></div>
+
+        <!-- Botões -->
+        <div class="modal-actions">
+          <button class="btn btn-outline" onclick="fecharModalPrato()">Cancelar</button>
+          <button class="btn btn-primary" onclick="confirmarAdicaoPrato()">
+            <i class="fas fa-plus"></i> Añadir al Pedido
+          </button>
+        </div>
+
+      </div><!-- /modal-body -->
+    </div><!-- /modal-box -->
+  </div><!-- /modal-prato -->
+
+  <!-- ═══════════════════════════════════════════════
+       MODAL CARRINHO (painel lateral)
+  ════════════════════════════════════════════════ -->
+  <div id="modal-carrinho" class="modal-overlay" hidden>
+    <div class="modal-carrinho-panel">
+      <div class="modal-carrinho-header">
+        <h3><i class="fas fa-shopping-basket"></i> Tu Carrito</h3>
+        <button class="modal-close-btn" onclick="fecharCarrinho()">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+      <div class="modal-carrinho-body" id="carrinho-modal-itens"></div>
+      <div id="carrinho-modal-resumo" hidden></div>
+      <div class="modal-carrinho-footer">
+        <button class="btn btn-outline" onclick="fecharCarrinho()">Continuar añadindo</button>
+        <a href="#pedido" class="btn btn-primary" onclick="fecharCarrinho()">
+          <i class="fas fa-check"></i> Ir al Pedido
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Botão flutuante carrinho -->
+  <button class="fab-carrinho" onclick="abrirCarrinho()" aria-label="Ver carrinho">
+    <i class="fas fa-shopping-basket"></i>
+    <span class="carrinho-badge" id="carrinho-badge" hidden>0</span>
+  </button>
+
+  <!-- Scroll Top -->
+  <button class="scroll-top" id="scroll-top"
+    onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Voltar ao topo">
+    <i class="fas fa-arrow-up"></i>
+  </button>
+
+  <script src="script.js"></script>
 </body>
 </html>

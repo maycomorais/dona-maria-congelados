@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Doña Maria - Painel Administrativo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+  <!-- LOGIN SCREEN -->
+  <div class="login-screen" id="login-screen">
+    <div class="login-box">
+      <div class="login-brand">
+        <i class="fas fa-utensils"></i>
+        <span>Doña Maria</span>
+      </div>
+      <h2>Acesso Administrativo</h2>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" class="form-control" id="login-email" placeholder="admin@donamaria.com">
+      </div>
+      <div class="form-group">
+        <label>Senha</label>
+        <div class="input-password">
+          <input type="password" class="form-control" id="login-senha" placeholder="••••••••">
+          <button type="button" onclick="toggleSenha(this)"><i class="fas fa-eye"></i></button>
+        </div>
+      </div>
+      <p class="login-error" id="login-error" hidden>Email ou senha incorretos.</p>
+      <button class="btn btn-primary btn-lg" id="login-btn" onclick="fazerLogin()">
+        <i class="fas fa-sign-in-alt"></i> Entrar
+      </button>
+    </div>
+  </div>
+
+  <!-- MAIN APP -->
+  <div class="app" id="app" hidden>
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <i class="fas fa-utensils"></i>
+        <span>Doña Maria</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section">Principal</div>
+        <button class="nav-item active" onclick="showPage('dashboard', this)">
+          <i class="fas fa-chart-line"></i> Dashboard
+        </button>
+        <button class="nav-item" onclick="showPage('clientes', this)">
+          <i class="fas fa-users"></i> Clientes & Entregas
+        </button>
+
+        <div class="nav-section">Pedidos</div>
+        <button class="nav-item" onclick="showPage('pedidos-pendentes', this)">
+          <i class="fas fa-clock"></i> Pendentes
+          <span class="nav-badge" id="badge-pendentes" style="display:none">0</span>
+        </button>
+        <button class="nav-item" onclick="showPage('pedidos-todos', this)">
+          <i class="fas fa-list"></i> Todos os Pedidos
+        </button>
+        <button class="nav-item" onclick="showPage('semana', this)">
+          <i class="fas fa-calendar-week"></i> Lista da Semana
+        </button>
+        <button class="nav-item" onclick="showPage('producao', this)">
+          <i class="fas fa-fire"></i> Produção do Sábado
+        </button>
+
+        <div class="nav-section">Logística</div>
+        <button class="nav-item" onclick="showPage('motoboys', this)">
+          <i class="fas fa-motorcycle"></i> Motoboys
+        </button>
+
+        <div class="nav-section">Financeiro</div>
+        <button class="nav-item" onclick="showPage('caixa', this)">
+          <i class="fas fa-cash-register"></i> Caixa do Mês
+        </button>
+        <button class="nav-item" onclick="showPage('lancamentos', this)">
+          <i class="fas fa-list-alt"></i> Lançamentos
+        </button>
+
+        <div class="nav-section">Cardápio</div>
+        <button class="nav-item" onclick="showPage('cardapio-admin', this)">
+          <i class="fas fa-book-open"></i> Gerenciar Cardápio
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-info">
+          <i class="fas fa-user-circle"></i>
+          <span id="user-email">Admin</span>
+        </div>
+        <button class="btn btn-outline btn-sm" onclick="fazerLogout()">
+          <i class="fas fa-sign-out-alt"></i> Sair
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+      <!-- Header -->
+      <header class="main-header">
+        <button class="menu-toggle" onclick="toggleSidebar()">
+          <i class="fas fa-bars"></i>
+        </button>
+        <h1 class="page-title" id="page-title">Dashboard</h1>
+        <div class="header-actions">
+          <button class="btn btn-primary btn-sm" onclick="abrirModalLancamento()">
+            <i class="fas fa-plus"></i> Novo Lançamento
+          </button>
+        </div>
+      </header>
+
+      <!-- DASHBOARD -->
+      <div class="page active" id="page-dashboard">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#dbeafe;color:#1e40af"><i class="fas fa-users"></i></div>
+            <div class="stat-info">
+              <span class="stat-value" id="stat-clientes">0</span>
+              <span class="stat-label">Clientes Ativos</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#d1fae5;color:#065f46"><i class="fas fa-motorcycle"></i></div>
+            <div class="stat-info">
+              <span class="stat-value" id="stat-entregas">0</span>
+              <span class="stat-label">Entregas esta semana</span>
+            </div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon" style="background:#fef3c7;color:#92400e"><i class="fas fa-wallet"></i></div>
+            <div class="stat-info">
+              <span class="stat-value" id="stat-saldo-brl">R$ 0,00</span>
+              <span class="stat-label" id="stat-saldo-gs">₲ 0</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="dashboard-grid">
+          <div class="card">
+            <div class="card-header"><h3>Próximas Entregas</h3></div>
+            <div id="dash-proximas"><p class="empty-msg">Carregando...</p></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><h3>Resumo Financeiro do Mês</h3></div>
+            <div class="caixa-resumo">
+              <div class="caixa-item receita">
+                <span>Receitas</span>
+                <strong id="dash-receita">R$ 0,00</strong>
+              </div>
+              <div class="caixa-item despesa">
+                <span>Despesas</span>
+                <strong id="dash-despesa">R$ 0,00</strong>
+              </div>
+              <div class="caixa-item saldo">
+                <span>Saldo</span>
+                <strong id="dash-saldo">R$ 0,00</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header"><h3>Pratos Mais Vendidos</h3></div>
+          <div class="chart-container">
+            <canvas id="chart-pratos-vendidos"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- CLIENTES -->
+      <div class="page" id="page-clientes">
+        <div class="page-actions">
+          <input type="text" class="form-control form-control--search" placeholder="Buscar cliente..." oninput="filtrarClientes(this.value)">
+          <button class="btn btn-primary" onclick="abrirModalCliente()">
+            <i class="fas fa-plus"></i> Novo Cliente
+          </button>
+        </div>
+        <div class="card">
+          <div class="table-wrap">
+            <table id="table-clientes">
+              <thead>
+                <tr>
+                  <th>Cliente</th>
+                  <th>Plano</th>
+                  <th>Entregas</th>
+                  <th>Próxima</th>
+                  <th>Status</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-clientes"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- PEDIDOS PENDENTES -->
+      <div class="page" id="page-pedidos-pendentes">
+        <div class="page-actions">
+          <div class="filtros-pedidos">
+            <input type="text" class="form-control form-control--search" id="filtro-pendente-cliente" placeholder="Buscar cliente..." oninput="filtrarPedidosPendentes()">
+          </div>
+          <button class="btn btn-primary" onclick="carregarPedidosPendentes()">
+            <i class="fas fa-sync"></i> Atualizar
+          </button>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h3>Pedidos Pendentes de Aprovação</h3>
+            <span class="badge badge-orange" id="total-pendentes">0 pedidos</span>
+          </div>
+          <div class="table-wrap">
+            <table id="table-pendentes">
+              <thead>
+                <tr>
+                  <th><input type="checkbox" id="select-all-pendentes" onchange="toggleSelectAllPendentes()"></th>
+                  <th>Data</th>
+                  <th>Cliente</th>
+                  <th>Plano</th>
+                  <th>Pratos</th>
+                  <th>Total</th>
+                  <th>Forma Pag</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-pendentes"></tbody>
+            </table>
+          </div>
+          <div class="batch-actions" id="batch-actions-pendentes" hidden>
+            <span id="selected-count">0 selecionados</span>
+            <button class="btn btn-primary" onclick="aceitarPedidosBatch()">
+              <i class="fas fa-check"></i> Aceitar Todos
+            </button>
+            <button class="btn btn-danger" onclick="recusarPedidosBatch()">
+              <i class="fas fa-times"></i> Recusar Todos
+            </button>
+            <button class="btn btn-info" onclick="abrirModalCriarRota()">
+              <i class="fas fa-motorcycle"></i> Criar Rota
+            </button>
+            <button class="btn btn-outline" onclick="imprimirEtiquetas()">
+              <i class="fas fa-print"></i> Etiquetas
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- TODOS OS PEDIDOS -->
+      <div class="page" id="page-pedidos-todos">
+        <div class="page-actions">
+          <div class="filtros-pedidos">
+            <input type="text" class="form-control form-control--search" id="filtro-pedido-cliente" placeholder="Buscar cliente..." oninput="filtrarPedidos()">
+            <select class="form-control" id="filtro-pedido-status" onchange="filtrarPedidos()">
+              <option value="">Todos os status</option>
+              <option value="pendente">Pendente</option>
+              <option value="aceito">Aceito</option>
+              <option value="em_producao">Em Produção</option>
+              <option value="pronto">Pronto</option>
+              <option value="em_entrega">Em Entrega</option>
+              <option value="entregue">Entregue</option>
+              <option value="recusado">Recusado</option>
+              <option value="cancelado">Cancelado</option>
+            </select>
+            <input type="date" class="form-control" id="filtro-pedido-data-inicio" onchange="filtrarPedidos()">
+            <input type="date" class="form-control" id="filtro-pedido-data-fim" onchange="filtrarPedidos()">
+          </div>
+          <button class="btn btn-primary" onclick="exportarPedidosExcel()">
+            <i class="fas fa-file-excel"></i> Exportar Excel
+          </button>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>Todos os Pedidos</h3></div>
+          <div class="table-wrap">
+            <table id="table-todos-pedidos">
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Cliente</th>
+                  <th>Status</th>
+                  <th>Plano</th>
+                  <th>Pratos</th>
+                  <th>Total</th>
+                  <th>Forma Pag</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-todos-pedidos"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- LISTA DA SEMANA -->
+      <div class="page" id="page-semana">
+        <div class="page-actions">
+          <select class="form-control" id="semana-select" onchange="carregarSemana()">
+            <option value="2024-W45">Semana 45 - 2024</option>
+          </select>
+          <button class="btn btn-primary" onclick="imprimirListaSemana()">
+            <i class="fas fa-print"></i> Imprimir
+          </button>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h3 id="semana-titulo">Entregas da Semana</h3>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Cliente</th>
+                  <th>Plano</th>
+                  <th>Data</th>
+                  <th>Entrega</th>
+                  <th>Linha</th>
+                  <th>Status</th>
+                  <th>Obs</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-semana"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRODUÇÃO -->
+      <div class="page" id="page-producao">
+        <div class="page-actions">
+          <select class="form-control" id="prod-semana-select" onchange="carregarProducao()">
+            <option value="2024-W45">Semana 45 - 2024</option>
+          </select>
+          <button class="btn btn-primary" onclick="imprimirProducao()">
+            <i class="fas fa-print"></i> Imprimir
+          </button>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <h3>Produção do Sábado</h3>
+            <span class="badge badge-blue" id="prod-total-marmitas">0 marmitas</span>
+          </div>
+          <div class="producao-grid" id="grid-producao"></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>Lista Consolidada</h3></div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Prato</th>
+                  <th>Linha</th>
+                  <th>Quantidade</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-producao"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- MOTOBOYS -->
+      <div class="page" id="page-motoboys">
+        <div class="page-actions">
+          <div></div>
+          <button class="btn btn-primary" onclick="abrirModalMotoboy()">
+            <i class="fas fa-plus"></i> Novo Motoboy
+          </button>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>Motoboys Cadastrados</h3></div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Nome</th><th>Telefone</th><th>Status</th><th>Ações</th></tr>
+              </thead>
+              <tbody id="tbody-motoboys"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- CAIXA -->
+      <div class="page" id="page-caixa">
+        <div class="page-actions">
+          <select class="form-control" id="filtro-mes-caixa" onchange="carregarCaixa()">
+            <option value="">Selecione o mês...</option>
+          </select>
+          <button class="btn btn-primary" onclick="exportarCaixaExcel()">
+            <i class="fas fa-file-excel"></i> Exportar
+          </button>
+        </div>
+        <div class="caixa-resumo caixa-resumo--large">
+          <div class="caixa-item receita">
+            <span>Receitas</span>
+            <strong id="caixa-receita-brl">R$ 0,00</strong>
+            <small id="caixa-receita-gs">₲ 0</small>
+          </div>
+          <div class="caixa-item despesa">
+            <span>Despesas</span>
+            <strong id="caixa-despesa-brl">R$ 0,00</strong>
+            <small id="caixa-despesa-gs">₲ 0</small>
+          </div>
+          <div class="caixa-item saldo">
+            <span>Saldo</span>
+            <strong id="caixa-saldo-brl">R$ 0,00</strong>
+            <small id="caixa-saldo-gs">₲ 0</small>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>Movimentação do Mês</h3></div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Tipo</th>
+                  <th>Categoria</th>
+                  <th>Descrição</th>
+                  <th>Forma</th>
+                  <th>Valor R$</th>
+                  <th>Valor ₲</th>
+                  <th>Cliente</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-caixa"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- LANÇAMENTOS -->
+      <div class="page" id="page-lancamentos">
+        <div class="page-actions">
+          <div class="filtros-pedidos">
+            <select class="form-control" id="filtro-mes-lanc" onchange="carregarLancamentos()">
+              <option value="">Todos os meses</option>
+            </select>
+            <select class="form-control" id="filtro-tipo-lanc" onchange="carregarLancamentos()">
+              <option value="">Todos os tipos</option>
+              <option value="receita">Receita</option>
+              <option value="despesa">Despesa</option>
+            </select>
+            <select class="form-control" id="filtro-categoria-lanc" onchange="carregarLancamentos()">
+              <option value="">Todas categorias</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" onclick="exportarLancamentosExcel()">
+            <i class="fas fa-file-excel"></i> Exportar
+          </button>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>Todos os Lançamentos</h3></div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Data</th>
+                  <th>Tipo</th>
+                  <th>Categoria</th>
+                  <th>Descrição</th>
+                  <th>Forma</th>
+                  <th>Valor R$</th>
+                  <th>Valor ₲</th>
+                  <th>Cliente</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-lancamentos"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARDÁPIO ADMIN -->
+      <div class="page" id="page-cardapio-admin">
+        <div class="page-actions">
+          <div class="filtros-pedidos">
+            <select class="form-control" id="filtro-linha-cardapio" onchange="filtrarCardapio()">
+              <option value="">Todas as linhas</option>
+              <option value="Tradicional">Tradicional</option>
+              <option value="Gourmet">Gourmet</option>
+              <option value="Fit">Fit</option>
+              <option value="Kids">Kids</option>
+            </select>
+            <input type="text" class="form-control" id="filtro-nome-cardapio" placeholder="Buscar prato..." oninput="filtrarCardapio()">
+          </div>
+          <button class="btn btn-primary" onclick="abrirModalPratoAdmin()">
+            <i class="fas fa-plus"></i> Novo Prato
+          </button>
+        </div>
+        <div class="card">
+          <div class="card-header"><h3>Gerenciar Cardápio</h3></div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Imagem</th>
+                  <th>Nome</th>
+                  <th>Linha</th>
+                  <th>Preço</th>
+                  <th>Kcal</th>
+                  <th>Status</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-cardapio-admin"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- MODAL: CLIENTE -->
+  <div class="modal-overlay" id="modal-cliente">
+    <div class="modal-box">
+      <button class="modal-close" onclick="fecharModal('modal-cliente')">✕</button>
+      <div class="modal-title" id="modal-cliente-titulo">Novo Cliente</div>
+      <input type="hidden" id="cli-id">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Nome *</label>
+          <input type="text" class="form-control" id="cli-nome" placeholder="Nome completo">
+        </div>
+        <div class="form-group">
+          <label>Telefone</label>
+          <input type="tel" class="form-control" id="cli-tel" placeholder="595991234567">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Plano</label>
+          <select class="form-control" id="cli-plano" onchange="atualizarEntregasPlano()">
+            <option value="Individual">Individual</option>
+            <option value="Semanal">Semanal</option>
+            <option value="FDS">Fins de Semana Livres</option>
+            <option value="Mensal" selected>Mensal</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Linha Preferida</label>
+          <select class="form-control" id="cli-linha">
+            <option value="Mista">Mista</option>
+            <option value="Tradicional">Tradicional</option>
+            <option value="Gourmet">Gourmet</option>
+            <option value="Fit">Fit</option>
+            <option value="Kids">Kids</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Total de Entregas</label>
+          <input type="number" class="form-control" id="cli-total-entregas" value="4">
+        </div>
+        <div class="form-group">
+          <label>Entregas Feitas</label>
+          <input type="number" class="form-control" id="cli-entregas-feitas" value="0">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Próxima Entrega</label>
+          <input type="date" class="form-control" id="cli-prox-entrega">
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select class="form-control" id="cli-status">
+            <option value="ativo">Ativo</option>
+            <option value="pausado">Pausado</option>
+            <option value="encerrado">Encerrado</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Endereço</label>
+        <textarea class="form-control" id="cli-endereco" rows="2" placeholder="Endereço completo"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Observações</label>
+        <textarea class="form-control" id="cli-obs" rows="2"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="fecharModal('modal-cliente')">Cancelar</button>
+        <button class="btn btn-primary" onclick="salvarCliente()">
+          <i class="fas fa-save"></i> Salvar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ENTREGA -->
+  <div class="modal-overlay" id="modal-entrega">
+    <div class="modal-box">
+      <button class="modal-close" onclick="fecharModal('modal-entrega')">✕</button>
+      <div class="modal-title">Registrar Entrega</div>
+      <input type="hidden" id="ent-cli-id">
+      <p id="ent-cliente-nome" style="margin-bottom:16px;font-weight:600;"></p>
+      <div class="form-group">
+        <label>Data da Entrega</label>
+        <input type="date" class="form-control" id="ent-data">
+      </div>
+      <div class="form-group">
+        <label>Observações</label>
+        <textarea class="form-control" id="ent-obs" rows="2" placeholder="Alguma observação?"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="fecharModal('modal-entrega')">Cancelar</button>
+        <button class="btn btn-primary" onclick="confirmarEntrega()">
+          <i class="fas fa-check"></i> Confirmar Entrega
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: LANÇAMENTO -->
+  <div class="modal-overlay" id="modal-lancamento">
+    <div class="modal-box">
+      <button class="modal-close" onclick="fecharModal('modal-lancamento')">✕</button>
+      <div class="modal-title">Novo Lançamento</div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Tipo</label>
+          <select class="form-control" id="lanc-tipo">
+            <option value="receita">Receita</option>
+            <option value="despesa">Despesa</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Categoria</label>
+          <select class="form-control" id="lanc-categoria">
+            <option value="Vendas">Vendas</option>
+            <option value="Materiais">Materiais</option>
+            <option value="Logística">Logística</option>
+            <option value="Marketing">Marketing</option>
+            <option value="Outros">Outros</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Descrição *</label>
+        <input type="text" class="form-control" id="lanc-desc" placeholder="Descrição do lançamento">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Valor R$ *</label>
+          <input type="number" class="form-control" id="lanc-valor-brl" placeholder="0.00" step="0.01">
+        </div>
+        <div class="form-group">
+          <label>Valor ₲</label>
+          <input type="number" class="form-control" id="lanc-valor-gs" placeholder="0" step="1">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Forma de Pagamento</label>
+          <select class="form-control" id="lanc-forma">
+            <option value="efetivo_brl">Efetivo R$</option>
+            <option value="efetivo_gs">Efetivo ₲</option>
+            <option value="pix">Pix</option>
+            <option value="wise">Wise</option>
+            <option value="transferencia">Transferência</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Data</label>
+          <input type="date" class="form-control" id="lanc-data">
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Vincular a Cliente</label>
+        <select class="form-control" id="lanc-cliente">
+          <option value="">— Sem vínculo —</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="fecharModal('modal-lancamento')">Cancelar</button>
+        <button class="btn btn-primary" onclick="salvarLancamento()">
+          <i class="fas fa-save"></i> Salvar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: EDITAR PEDIDO -->
+  <div class="modal-overlay" id="modal-editar-pedido">
+    <div class="modal-box modal-box--lg">
+      <button class="modal-close" onclick="fecharModal('modal-editar-pedido')">✕</button>
+      <div class="modal-title">Editar Pedido</div>
+      <input type="hidden" id="edit-pedido-id">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Cliente</label>
+          <input type="text" class="form-control" id="edit-cliente-nome">
+        </div>
+        <div class="form-group">
+          <label>Telefone</label>
+          <input type="text" class="form-control" id="edit-cliente-tel">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Plano</label>
+          <select class="form-control" id="edit-plano">
+            <option value="Individual">Individual</option>
+            <option value="Semanal">Semanal</option>
+            <option value="FDS">Fins de Semana Livres</option>
+            <option value="Mensal">Mensal</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select class="form-control" id="edit-status">
+            <option value="pendente">Pendente</option>
+            <option value="aceito">Aceito</option>
+            <option value="em_producao">Em Produção</option>
+            <option value="pronto">Pronto</option>
+            <option value="em_entrega">Em Entrega</option>
+            <option value="entregue">Entregue</option>
+            <option value="recusado">Recusado</option>
+            <option value="cancelado">Cancelado</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Pratos (JSON)</label>
+        <textarea class="form-control" id="edit-pratos" rows="5" style="font-family:monospace;font-size:0.85rem;"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Observações</label>
+        <textarea class="form-control" id="edit-obs" rows="2"></textarea>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="fecharModal('modal-editar-pedido')">Cancelar</button>
+        <button class="btn btn-primary" onclick="salvarEdicaoPedido()">
+          <i class="fas fa-save"></i> Salvar Alterações
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: MOTOBOY -->
+  <div class="modal-overlay" id="modal-motoboy">
+    <div class="modal-box">
+      <button class="modal-close" onclick="fecharModal('modal-motoboy')">✕</button>
+      <div class="modal-title" id="modal-motoboy-titulo">Novo Motoboy</div>
+      <input type="hidden" id="motoboy-id">
+      <div class="form-group">
+        <label>Nome *</label>
+        <input type="text" class="form-control" id="motoboy-nome" placeholder="Nome completo">
+      </div>
+      <div class="form-group">
+        <label>Telefone (WhatsApp) *</label>
+        <input type="text" class="form-control" id="motoboy-telefone" placeholder="595991234567">
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="fecharModal('modal-motoboy')">Cancelar</button>
+        <button class="btn btn-primary" onclick="salvarMotoboy()">
+          <i class="fas fa-save"></i> Salvar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CRIAR ROTA -->
+  <div class="modal-overlay" id="modal-criar-rota">
+    <div class="modal-box">
+      <button class="modal-close" onclick="fecharModal('modal-criar-rota')">✕</button>
+      <div class="modal-title">Criar Rota de Entrega</div>
+      <div class="rota-info">
+        <p><i class="fas fa-info-circle"></i> Será enviada uma mensagem no WhatsApp do motoboy com todos os pedidos selecionados.</p>
+      </div>
+      <div class="form-group">
+        <label>Selecione o Motoboy *</label>
+        <select class="form-control" id="rota-motoboy">
+          <option value="">Selecione...</option>
+        </select>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="fecharModal('modal-criar-rota')">Cancelar</button>
+        <button class="btn btn-primary" onclick="criarRotaEntrega()">
+          <i class="fab fa-whatsapp"></i> Enviar Rota
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: PRATO ADMIN -->
+  <div class="modal-overlay" id="modal-prato-admin">
+    <div class="modal-box">
+      <button class="modal-close" onclick="fecharModal('modal-prato-admin')">✕</button>
+      <div class="modal-title" id="modal-prato-admin-titulo">Novo Prato</div>
+      <input type="hidden" id="prato-admin-id">
+      <div class="form-group">
+        <label>Nome *</label>
+        <input type="text" class="form-control" id="prato-admin-nome" placeholder="Nome do prato">
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Linha *</label>
+          <select class="form-control" id="prato-admin-linha">
+            <option value="Tradicional">Tradicional</option>
+            <option value="Gourmet">Gourmet</option>
+            <option value="Fit">Fit</option>
+            <option value="Kids">Kids</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Preço (₲)</label>
+          <input type="number" class="form-control" id="prato-admin-preco" placeholder="30000">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Kcal</label>
+          <input type="number" class="form-control" id="prato-admin-kcal" placeholder="400">
+        </div>
+        <div class="form-group">
+          <label>Tipo Nutricional</label>
+          <select class="form-control" id="prato-admin-tipo-nutri">
+            <option value="frango">Frango</option>
+            <option value="bovina">Bovina</option>
+            <option value="suino">Suíno</option>
+            <option value="kids">Kids</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Ingredientes</label>
+        <textarea class="form-control" id="prato-admin-ingredientes" rows="2"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Alergenos</label>
+        <input type="text" class="form-control" id="prato-admin-alergenos" placeholder="Contém glúten, lactose...">
+      </div>
+      <div class="form-group">
+        <label>URL da Imagem</label>
+        <input type="text" class="form-control" id="prato-admin-img" placeholder="img/nome-da-imagem.webp">
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="fecharModal('modal-prato-admin')">Cancelar</button>
+        <button class="btn btn-primary" onclick="salvarPratoAdmin()">
+          <i class="fas fa-save"></i> Salvar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>
