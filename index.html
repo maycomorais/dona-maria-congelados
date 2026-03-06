@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Doña Maria Congelados — Refecciones Caseras</title>
+  <title>Doña Maria Congelados — El Sabor de Casa en tu Mesa</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,300;1,9..144,500&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -25,11 +25,12 @@
         <i class="fas fa-bars"></i>
       </button>
       <ul class="nav-menu" id="nav-menu">
-        <li><a href="#inicio">Início</a></li>
-        <li><a href="#cardapio">Carta</a></li>
-        <li><a href="#pedido">Haz tu pedido</a></li>
-        <li><a href="#rastrear">Seguimiento de la entrega</a></li>
-        <li><a href="#faq">Dudas</a></li>
+        <li><a href="#inicio">Inicio</a></li>
+        <li><a href="#como-funciona">Cómo Funciona</a></li>
+        <li><a href="#cardapio">Menú</a></li>
+        <li><a href="#pedido">Hacer Pedido</a></li>
+        <li><a href="#sobre">Nosotros</a></li>
+        <li><a href="#faq">FAQ</a></li>
         <li><a href="#contato">Contacto</a></li>
       </ul>
     </div>
@@ -40,15 +41,15 @@
   <section class="hero" id="inicio">
     <div class="hero-bg"></div>
     <div class="hero-content">
-      <div class="hero-eyebrow"><i class="fas fa-fire-alt"></i> Comidas caseras desde 2025</div>
+      <div class="hero-eyebrow"><i class="fas fa-fire-alt"></i> Comida casera desde 2025</div>
       <h1 class="hero-title">Refecciones <br><span class="typing-text"></span></h1>
-      <p class="hero-subtitle">Comodidad, sabor y nutrición en tu mesa. ¡Elige tu plan y arma tu pedido!</p>
+      <p class="hero-subtitle">Practicidad, sabor y nutrición en tu mesa. ¡Elegí tu plan y armá tu pedido!</p>
       <div class="hero-cta-row">
         <a href="#pedido" class="btn btn-primary btn-lg">
-          <i class="fas fa-shopping-basket"></i> Arma tu Pedido
+          <i class="fas fa-shopping-basket"></i> Armá tu Pedido
         </a>
         <a href="#cardapio" class="btn btn-ghost btn-lg">
-          <i class="fas fa-utensils"></i> Ver Menu
+          <i class="fas fa-utensils"></i> Ver Menú
         </a>
       </div>
       <div class="hero-stats">
@@ -60,11 +61,51 @@
     </div>
   </section>
 
-  <!-- CARDÁPIO -->
-  <section class="section" id="cardapio">
+  <!-- COMO FUNCIONA -->
+  <section class="section" id="como-funciona" style="background:#fff;">
     <div class="container">
-      <h2 class="section-title">Nuestra Carta</h2>
-      <p class="section-subtitle">Elija entre 4 líneas de deliciosas comidas.</p>
+      <h2 class="section-title">Cómo Funciona</h2>
+      <p class="section-subtitle">En 5 simples pasos, comida saludable llega a tu puerta.</p>
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <i class="fas fa-list-alt step-icon"></i>
+          <h4>Elegí el Plan</h4>
+          <p>Individual, Semanal, Fines de Semana Libres o Mensual. ¡Hay una opción para todos!</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <i class="fas fa-utensils step-icon"></i>
+          <h4>Armá tu Menú</h4>
+          <p>Elegí tus platos favoritos entre Tradicional, Gourmet, Fit o Kids.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <i class="fas fa-money-bill step-icon"></i>
+          <h4>Pagá Antes</h4>
+          <p>El pago debe hacerse hasta 3 días antes de la entrega vía Pix, efectivo o tarjeta.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">4</div>
+          <i class="fas fa-truck step-icon"></i>
+          <h4>Recibí en Casa</h4>
+          <p>Entregamos los Lunes o Martes entre 18h y 23h.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">5</div>
+          <i class="fas fa-fire step-icon"></i>
+          <h4>¡Calentá y Comé!</h4>
+          <p>Del freezer al microondas. Sin tapa. ¡Listo en minutos!</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CARDÁPIO -->
+  <section class="section section-alt" id="cardapio">
+    <div class="container">
+      <h2 class="section-title">Nuestros Platos</h2>
+      <p class="section-subtitle">Elegí entre 4 líneas de comidas deliciosas. Hacé click en cualquier plato para ver detalles.</p>
       <div class="linha-card">
         <div class="linha-header">
           <h3><span class="line-indicator li-trad"></span> Tradicional</h3>
@@ -97,20 +138,20 @@
   </section>
 
   <!-- PEDIDO -->
-  <section class="section section-alt" id="pedido">
+  <section class="section" id="pedido">
     <div class="container">
-      <h2 class="section-title">Arma tu Pedido</h2>
+      <h2 class="section-title">Armá tu Pedido</h2>
       <div class="pedido-card">
 
         <!-- Plano -->
         <div class="form-group">
-          <label class="form-label">Elija tu Plan</label>
+          <label class="form-label">Elegí tu Plan</label>
           <select class="form-control" id="plano-selecionado" onchange="configurarPlano()">
-            <option value="">Selecciona un plan...</option>
+            <option value="">Seleccioná un plan...</option>
             <option value="Individual">Individual (hasta 13 unidades)</option>
             <option value="Semanal">Semanal (14 unidades — 5% OFF)</option>
-            <option value="FDS">Fines de semana Libres (40 unidades — 5% OFF)</option>
-            <option value="Mensal">Mensal (56 unidades — 10% OFF)</option>
+            <option value="FDS">Fines de Semana Libres (40 unidades — 5% OFF)</option>
+            <option value="Mensal">Mensual (56 unidades — 10% OFF)</option>
             <option value="Personalizado">Personalizado (cualquier cantidad)</option>
           </select>
         </div>
@@ -129,9 +170,9 @@
 
         <!-- Carrinho inline -->
         <div class="carrinho-wrap">
-          <h4 class="carrinho-title"><i class="fas fa-shopping-cart"></i> Su Pedido</h4>
+          <h4 class="carrinho-title"><i class="fas fa-shopping-cart"></i> Tu Pedido</h4>
           <ul class="carrinho-list" id="carrinho-itens">
-            <li class="carrinho-empty">Aún no se han añadido platos.</li>
+            <li class="carrinho-empty">Todavía no hay platos agregados.</li>
           </ul>
         </div>
 
@@ -141,8 +182,8 @@
         <!-- Dados do Cliente -->
         <div class="form-row">
           <div class="form-group">
-            <label class="form-label">Nombre y Apelido</label>
-            <input type="text" class="form-control" id="cliente-nome" placeholder="Su Nombre">
+            <label class="form-label">Nombre Completo</label>
+            <input type="text" class="form-control" id="cliente-nome" placeholder="Tu Nombre">
           </div>
           <div class="form-group">
             <label class="form-label">WhatsApp</label>
@@ -169,8 +210,10 @@
         <!-- Observações -->
         <div class="form-group">
           <label class="form-label">Observaciones generales</label>
-          <textarea class="form-control" id="observacoes-gerais" rows="2" placeholder="¿Alguna observación especial?"></textarea>
+          <textarea class="form-control" id="observacoes-gerais" rows="2" placeholder="¿Alguna observación especial? ¿Alergias?"></textarea>
         </div>
+
+        
 
         <!-- Pagamento -->
         <div class="form-group">
@@ -178,9 +221,9 @@
           <input type="hidden" id="forma-pagamento">
           <div class="pagamento-grid">
             <button type="button" class="pag-opt" onclick="selecionarPagamento(this,'Efetivo ₲')">
-              <i class="fas fa-money-bill-wave"></i> ₲ Efectivo 
+              <i class="fas fa-money-bill-wave"></i> ₲ Efectivo
             </button>
-            <button type="button" class="pag-opt" onclick="selecionarPagamento(this,'cartao')">
+            <button type="button" class="pag-opt" onclick="selecionarPagamento(this,'Cartão')">
               <i class="fa-solid fa-credit-card"></i> Tarjeta
             </button>
             <button type="button" class="pag-opt" onclick="selecionarPagamento(this,'Pix')">
@@ -194,87 +237,131 @@
 
         <!-- Enviar -->
         <button class="btn btn-whatsapp btn-lg" id="btn-whatsapp" onclick="enviarPedidoZap()" disabled>
-          <i class="fab fa-whatsapp"></i> Enviar solicitud vía WhatsApp
+          <i class="fab fa-whatsapp"></i> Finalizar y Enviar por WhatsApp
         </button>
         <p class="botao-hint" id="botao-hint" hidden></p>
       </div>
     </div>
   </section>
 
-  <!-- RASTREAR -->
-  <section class="section" id="rastrear">
+  <!-- SOBRE NÓS -->
+  <section class="section section-alt" id="sobre">
     <div class="container">
-      <h2 class="section-title">Seguimiento de mi entrega</h2>
-      <div class="tracker-card">
-        <div class="tracker-input-wrap">
-          <select id="tracker-ddi">
-            <option value="+595">🇵🇾 +595</option>
-            <option value="+55">🇧🇷 +55</option>
-          </select>
-          <input type="tel" id="tracker-tel" placeholder="Su WhatsApp">
-          <button class="btn btn-primary" onclick="buscarStatusEntrega()">
-            <i class="fas fa-search"></i> Buscar
-          </button>
+      <div class="sobre-grid">
+        <div class="sobre-img-wrap">
+          <img src="img/Confie.webp" alt="Doña Maria" class="sobre-img">
         </div>
-        <div id="tracker-result" hidden></div>
+        <div class="sobre-texto">
+          <span class="section-eyebrow">Nuestra Historia</span>
+          <h2 class="sobre-titulo">Hecho con amor <br>desde el principio</h2>
+          <p>Nacimos en Mariano Roque Alonso como un pequeño negocio familiar, con la misión de llevar el sabor de casa a quienes no tienen tiempo para cocinar. Cada comida se prepara con ingredientes frescos y se ultracongelada para mantener el sabor de recién hecho.</p>
+          <p><strong>Doña Maria</strong> no entrega solo comida — entregamos <strong>tiempo y salud</strong>. El tiempo que pasás en el super y en la cocina es un tiempo precioso de descanso, estudio o familia.</p>
+          <div class="sobre-stats">
+            <div class="sobre-stat"><strong>500+</strong><span>Clientes felices</span></div>
+            <div class="sobre-stat"><strong>30+</strong><span>Platos en el menú</span></div>
+            <div class="sobre-stat"><strong>90 dias</strong><span>de validez</span></div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 
   <!-- FAQ -->
-  <section class="section section-alt" id="faq">
+  <section class="section" id="faq">
     <div class="container">
-      <h2 class="section-title">Preguntas frecuentes</h2>
+      <h2 class="section-title">Preguntas Frecuentes</h2>
       <div class="faq-list">
+
         <div class="faq-item">
           <button class="faq-question" onclick="toggleFaq(this)" aria-expanded="false">
-            <span>¿Cómo funciona el plan mensual?</span><i class="fas fa-chevron-down"></i>
+            <span>¿Cómo funciona el Plan Individual?</span><i class="fas fa-chevron-down"></i>
           </button>
           <div class="faq-answer" hidden>
-            <p>El plan mensual incluye 56 recipientes para preparar comidas (14 por semana durante 4 semanas). Tú eliges los platos y recibes entregas semanales. ¡Obtén un 10% de descuento!</p>
+            <p>Ideal para quien quiere probar o necesita pocas unidades. Podés pedir <strong>de 5 a 13 unidades</strong> y mezclar platos de cualquier línea (Tradicional, Gourmet, Fit o Kids). El precio es por unidad según la línea elegida. Sin descuento, pero sin compromiso.</p>
           </div>
         </div>
+
         <div class="faq-item">
           <button class="faq-question" onclick="toggleFaq(this)" aria-expanded="false">
-            <span>¿Cómo funciona el plan Finde Semana Libre?</span><i class="fas fa-chevron-down"></i>
+            <span>¿Cómo funciona el Plan Semanal?</span><i class="fas fa-chevron-down"></i>
           </button>
           <div class="faq-answer" hidden>
-            <p>El plan Finde Semana Libre incluye 40 recipientes para preparar comidas (10 por semana durante 4 semanas). Tú eliges los platos y recibes entregas semanales. ¡Obtén un 5% de descuento!</p>
+            <p>Son <strong>14 comidas en una sola entrega</strong>. Cubrís el almuerzo o la cena de toda la semana laboral. Los platos deben ser de la misma línea. Ganás un <strong>5% de descuento</strong> sobre el precio unitario.</p>
           </div>
         </div>
+
         <div class="faq-item">
           <button class="faq-question" onclick="toggleFaq(this)" aria-expanded="false">
-            <span>¿Puedo mezclar platos de diferentes líneas?</span><i class="fas fa-chevron-down"></i>
+            <span>¿Cómo funciona el Plan Fines de Semana Libres?</span><i class="fas fa-chevron-down"></i>
           </button>
           <div class="faq-answer" hidden>
-            <p>¡Sí! En los planes Individual y Personalizado puedes combinarlos. En los planes Semanal, de Fin de Semana y Mensual, eliges una línea de platos y todos deben ser de esa misma línea.</p>
+            <p>Son <strong>40 comidas al mes</strong> — 10 por semana durante 4 semanas, entregadas semanalmente. Cubrís el almuerzo o la cena de lunes a viernes todos los días, ¡y el finde queda libre para salir! Con <strong>5% de descuento</strong>. Es nuestro plan más vendido.</p>
           </div>
         </div>
+
         <div class="faq-item">
           <button class="faq-question" onclick="toggleFaq(this)" aria-expanded="false">
-            <span>¿Cuál es la fecha de caducidad de las comidas?</span><i class="fas fa-chevron-down"></i>
+            <span>¿Cómo funciona el Plan Mensual?</span><i class="fas fa-chevron-down"></i>
           </button>
           <div class="faq-answer" hidden>
-            <p>Nuestras comidas congeladas tienen una vida útil de 90 días si se almacenan a -18 °C. Recomendamos consumirlas en un plazo de 30 días para disfrutar de un sabor óptimo.</p>
+            <p>Son <strong>56 comidas al mes</strong> — 14 por semana durante 4 semanas. Cubrís las dos comidas principales (almuerzo y cena) todos los días de la semana. Recibís 4 entregas mensuales y obtenés el mayor descuento: <strong>10% OFF</strong>.</p>
           </div>
         </div>
+
         <div class="faq-item">
           <button class="faq-question" onclick="toggleFaq(this)" aria-expanded="false">
-            <span>¿Cómo lo caliento?</span><i class="fas fa-chevron-down"></i>
+            <span>¿El pago es antes de la entrega?</span><i class="fas fa-chevron-down"></i>
           </button>
           <div class="faq-answer" hidden>
-            <p>Retirar del congelador, quitar la tapa y cocinar en el microondas durante 5 a 7 minutos, dependiendo de la potencia de su microondas.</p>
+            <p>Sí. El pago debe realizarse <strong>hasta 3 días antes</strong> de la entrega. Aceptamos Pix (cotización del día vía Moneygram), Efectivo en Guaraníes, Tarjeta o Transferencia.</p>
           </div>
         </div>
+
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)" aria-expanded="false">
+            <span>¿Cuándo y cómo se hace la entrega?</span><i class="fas fa-chevron-down"></i>
+          </button>
+          <div class="faq-answer" hidden>
+            <p>Entregamos <strong>los Lunes o Martes</strong> entre <strong>18h y 23h</strong>, en Mariano Roque Alonso y alrededores. El valor del flete se calcula por la distancia desde nuestra base.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)" aria-expanded="false">
+            <span>¿Cómo descongelo correctamente?</span><i class="fas fa-chevron-down"></i>
+          </button>
+          <div class="faq-answer" hidden>
+            <p>Lo ideal es descongelar dentro de la heladera de un día para el otro. <strong>NUNCA descongelés a temperatura ambiente</strong>, ya que puede proliferar bacterias peligrosas.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)" aria-expanded="false">
+            <span>¿Puedo ponerlo directo en el microondas?</span><i class="fas fa-chevron-down"></i>
+          </button>
+          <div class="faq-answer" hidden>
+            <p>¡Sí! Siempre <strong>SIN la tapa</strong>. Calentá por 5 a 7 minutos según la potencia de tu microondas. El envase no puede ir al horno convencional, eléctrico ni Air Fryer.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question" onclick="toggleFaq(this)" aria-expanded="false">
+            <span>¿Cuál es la validez de las comidas?</span><i class="fas fa-chevron-down"></i>
+          </button>
+          <div class="faq-answer" hidden>
+            <p>Nuestras comidas congeladas tienen una validez de <strong>90 días</strong> a -18°C. Para mejor sabor y textura, recomendamos consumirlas dentro de los primeros 30 días.</p>
+          </div>
+        </div>
+
       </div>
     </div>
   </section>
 
   <!-- DEPOIMENTOS -->
-  <section class="section" id="depoimentos">
+  <section class="section section-alt" id="depoimentos">
     <div class="container">
       <h2 class="section-title">Lo que dicen nuestros clientes</h2>
-      <p class="section-subtitle">Resultados reales de quienes ya han elegido Doña María.</p>
+      <p class="section-subtitle">Resultados reales de quienes ya eligieron Doña María.</p>
       <div class="depoimentos-grid">
         <div class="depoimento-card"><img src="img/print1.jpg" alt="Depoimento" loading="lazy"></div>
         <div class="depoimento-card"><img src="img/print2.jpg" alt="Depoimento" loading="lazy"></div>
@@ -286,15 +373,15 @@
   </section>
 
   <!-- CONTATO -->
-  <section class="section section-alt" id="contato">
+  <section class="section" id="contato">
     <div class="container">
-      <h2 class="section-title">Contáctenos</h2>
+      <h2 class="section-title">Contacto</h2>
       <div class="contato-grid">
         <div class="contato-card">
           <i class="fab fa-whatsapp"></i>
           <h4>WhatsApp</h4>
           <p>+595 991 635 604</p>
-          <a href="https://wa.me/595991635604" target="_blank" class="btn btn-outline btn-sm">Llamar</a>
+          <a href="https://wa.me/595991635604" target="_blank" class="btn btn-outline btn-sm">Escribir</a>
         </div>
         <div class="contato-card">
           <i class="fab fa-instagram"></i>
@@ -304,7 +391,7 @@
         </div>
         <div class="contato-card">
           <i class="fas fa-map-marker-alt"></i>
-          <h4>Endereço</h4>
+          <h4>Ubicación</h4>
           <p>Mariano Roque Alonso, PY</p>
           <a href="https://maps.google.com/?q=Mariano+Roque+Alonso" target="_blank" class="btn btn-outline btn-sm">Ver Mapa</a>
         </div>
@@ -320,7 +407,7 @@
           <i class="fas fa-utensils"></i>
           <span>Doña Maria Congelados</span>
         </div>
-        <p class="footer-text">Comidas caseras hechas con amor y dedicación desde 2025.</p>
+        <p class="footer-text">Comida casera hecha con amor y dedicación desde 2025.</p>
         <div class="footer-social">
           <a href="https://wa.me/595991635604" target="_blank"><i class="fab fa-whatsapp"></i></a>
           <a href="#"><i class="fab fa-instagram"></i></a>
@@ -328,7 +415,7 @@
         </div>
       </div>
       <div class="footer-bottom">
-        <p>&copy; 2025 Doña Maria Congelados. Reservados todos los derechos.</p>
+        <p>&copy; 2025 Doña Maria Congelados. Todos los derechos reservados.</p>
       </div>
     </div>
   </footer>
@@ -371,7 +458,7 @@
             <span class="checkmark"></span>
             <div class="personalizar-texto">
               <strong><i class="fas fa-sliders-h"></i> Personalizar plato</strong>
-              <small>Edite los gramos y mezcle líneas como desee.</small>
+              <small>Editá los gramos y mezclá líneas como quieras.</small>
             </div>
           </label>
         </div>
@@ -412,7 +499,7 @@
             <div class="acomp-row">
               <label class="acomp-label">
                 <input type="checkbox" class="acomp-check" value="Arroz Branco">
-                <span>Arroz Blanco</span>
+                <span>Arroz Branco</span>
               </label>
               <span class="acomp-display-g gram-display" hidden>80g</span>
               <span class="acomp-grams" hidden>
@@ -423,7 +510,7 @@
             <div class="acomp-row">
               <label class="acomp-label">
                 <input type="checkbox" class="acomp-check" value="Feijão Preto">
-                <span>Poroto negro</span>
+                <span>Feijão Preto</span>
               </label>
               <span class="acomp-display-g gram-display" hidden>90g</span>
               <span class="acomp-grams" hidden>
@@ -434,7 +521,7 @@
             <div class="acomp-row">
               <label class="acomp-label">
                 <input type="checkbox" class="acomp-check" value="Purê de Batata">
-                <span>Puré de Papas</span>
+                <span>Purê de Batata</span>
               </label>
               <span class="acomp-display-g gram-display" hidden>120g</span>
               <span class="acomp-grams" hidden>
@@ -445,7 +532,7 @@
             <div class="acomp-row">
               <label class="acomp-label">
                 <input type="checkbox" class="acomp-check" value="Purê de Batata Doce">
-                <span>Puré de Batata Dulce</span>
+                <span>Purê de Batata Doce</span>
               </label>
               <span class="acomp-display-g gram-display" hidden>120g</span>
               <span class="acomp-grams" hidden>
@@ -456,7 +543,7 @@
             <div class="acomp-row">
               <label class="acomp-label">
                 <input type="checkbox" class="acomp-check" value="Purê de Abóbora">
-                <span>Puré de Calabaza</span>
+                <span>Purê de Abóbora</span>
               </label>
               <span class="acomp-display-g gram-display" hidden>120g</span>
               <span class="acomp-grams" hidden>
@@ -467,7 +554,7 @@
             <div class="acomp-row">
               <label class="acomp-label">
                 <input type="checkbox" class="acomp-check" value="Macarrão">
-                <span>Fideo</span>
+                <span>Macarrão</span>
               </label>
               <span class="acomp-display-g gram-display" hidden>120g</span>
               <span class="acomp-grams" hidden>
@@ -480,13 +567,13 @@
 
         <!-- ── SELETA DE LEGUMES ───────────────────── -->
         <div class="modal-section">
-          <label class="modal-section-title">¿Incluir legumbres mixtos?</label>
+          <label class="modal-section-title">¿Querés incluir la Seleta de Verduras?</label>
           <div class="seleta-toggle">
             <button type="button" class="seleta-btn active" id="btn-sim" onclick="toggleSeleta(true)">Sí</button>
             <button type="button" class="seleta-btn" id="btn-nao" onclick="toggleSeleta(false)">No</button>
           </div>
           <p class="seleta-info" id="seleta-info">
-            <i class="fas fa-info-circle"></i> Zanahorias, Arvejo, Choclo, Repollo, Brócoli, Coliflor, Judías Verdes o Remolachas.
+            <i class="fas fa-info-circle"></i> Zanahoria, Arvejo, Choclo, Repollo, Brócoli, Coliflor, Vainitas o Remolacha.
           </p>
 
           <!-- Modo normal: exibe quantia -->
@@ -507,7 +594,7 @@
             <i class="fas fa-comment-alt"></i> Observación de este plato
           </label>
           <textarea id="obs-prato" class="form-control" rows="2"
-            placeholder="Ej: sin cebolla, más arroz, poco sal…"></textarea>
+            placeholder="Ej: sin cebolla, más arroz, poca sal…"></textarea>
         </div>
 
         <!-- Preço total calculado -->
@@ -516,8 +603,11 @@
         <!-- Botões -->
         <div class="modal-actions">
           <button class="btn btn-outline" onclick="fecharModalPrato()">Cancelar</button>
+          <button class="btn btn-repeat-modal" onclick="confirmarAdicaoERepetir()">
+            <i class="fas fa-copy"></i> Agregar y Repetir
+          </button>
           <button class="btn btn-primary" onclick="confirmarAdicaoPrato()">
-            <i class="fas fa-plus"></i> Añadir al Pedido
+            <i class="fas fa-plus"></i> Agregar al Pedido
           </button>
         </div>
 
@@ -539,7 +629,7 @@
       <div class="modal-carrinho-body" id="carrinho-modal-itens"></div>
       <div id="carrinho-modal-resumo" hidden></div>
       <div class="modal-carrinho-footer">
-        <button class="btn btn-outline" onclick="fecharCarrinho()">Continuar añadindo</button>
+        <button class="btn btn-outline" onclick="fecharCarrinho()">Seguir agregando</button>
         <a href="#pedido" class="btn btn-primary" onclick="fecharCarrinho()">
           <i class="fas fa-check"></i> Ir al Pedido
         </a>

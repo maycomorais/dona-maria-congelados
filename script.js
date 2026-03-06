@@ -43,11 +43,11 @@ function calcularTaxaGrama(tipo, gramas) {
 }
 
 const CONFIG_PLANOS = {
-  Individual:    { min:1,  max:13,   exato:false, linhaLock:false, permiteMix:true  },
+  Individual:    { min:5,  max:13,   exato:false, linhaLock:false, permiteMix:true  },
   Semanal:       { min:14, max:14,   exato:true,  linhaLock:true,  permiteMix:false },
   FDS:           { min:10, max:10,   exato:true,  linhaLock:true,  permiteMix:false },
   Mensal:        { min:14, max:14,   exato:true,  linhaLock:true,  permiteMix:false },
-  Personalizado: { min:1,  max:null, exato:false, linhaLock:false, permiteMix:true  },
+  Personalizado: { min:5,  max:null, exato:false, linhaLock:false, permiteMix:true  },
 };
 
 let CARDAPIO = {};
@@ -112,7 +112,7 @@ function initScroll() {
 function initTyped() {
   if(typeof Typed==="undefined") return;
   const el=document.querySelector(".typing-text");
-  if(el) new Typed(".typing-text",{strings:["Prácticas", "Deliciosas", "Saludables", "Equilibradas"],typeSpeed:90,backSpeed:55,loop:true});
+  if(el) new Typed(".typing-text",{strings:["Prácticas 🥡","Deliciosas 😋","Saludables 🥦","Equilibradas 💪","Congeladas ❄️"],typeSpeed:90,backSpeed:55,loop:true});
 }
 
 /* ── CARDÁPIO ────────────────────────────────────────────────── */
@@ -196,10 +196,10 @@ function renderizarGrids() {
 function verificarRestricaoLinha(linhaPrato) {
   const plano=document.getElementById('plano-selecionado').value;
   const cfg=CONFIG_PLANOS[plano];
-  if(!cfg) return {permitido:false,mensagem:'Selecione um plano primeiro.'};
+  if(!cfg) return {permitido:false,mensagem:'Seleccioná un plan primero.'};
   if(cfg.permiteMix) return {permitido:true,mensagem:''};
   if(!linhaLocked) return {permitido:true,mensagem:''};
-  if(linhaLocked!==linhaPrato) return {permitido:false,mensagem:`Este plano exige a linha ${linhaLocked}.`};
+  if(linhaLocked!==linhaPrato) return {permitido:false,mensagem:`Este plan requiere la línea ${linhaLocked}.`};
   return {permitido:true,mensagem:''};
 }
 function atualizarVisibilidadePratos() {
@@ -229,11 +229,11 @@ function mostrarAvisoLinhaTravada(linha) {
   document.querySelector('.pedido-card')?.prepend(aviso);
 }
 function resetarLinhaTravada() {
-  if(itensPedido.length>0&&!confirm('Trocar a linha vai limpar o carrinho. Continuar?')) return;
+  if(itensPedido.length>0&&!confirm('¿Cambiar la línea borrará el carrito. ¿Continuar?')) return;
   itensPedido=[]; linhaLocked=null;
   document.getElementById('aviso-linha-travada')?.remove();
   atualizarVisibilidadePratos(); atualizarCarrinho();
-  mostrarToast('Linha resetada.');
+  mostrarToast('Línea reseteada.');
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -245,7 +245,7 @@ function abrirModalPrato(pratoId, linha) {
   // ── Sem plano? Salvar prato e redirecionar
   if(!plano) {
     pratoPendenteTemp={pratoId,linha};
-    mostrarToast('👆 Primeiro escolha seu plano!');
+    mostrarToast('👆 ¡Primero elegí tu plan!');
     document.getElementById('pedido')?.scrollIntoView({behavior:'smooth'});
     setTimeout(()=>{
       const sel=document.getElementById('plano-selecionado');
@@ -257,8 +257,8 @@ function abrirModalPrato(pratoId, linha) {
   const restricao=verificarRestricaoLinha(linha);
   if(!restricao.permitido){mostrarToast(restricao.mensagem);return;}
   const cfg=CONFIG_PLANOS[plano];
-  if(plano==='Individual'&&itensPedido.length>=13){mostrarToast('Limite de 13 pratos para Individual.');return;}
-  if(cfg?.exato&&itensPedido.length>=cfg.max){mostrarToast(`Limite de ${cfg.max} pratos atingido.`);return;}
+  if(plano==='Individual'&&itensPedido.length>=13){mostrarToast('Límite de 13 platos para Individual.');return;}
+  if(cfg?.exato&&itensPedido.length>=cfg.max){mostrarToast(`Límite de ${cfg.max} platos alcanzado.`);return;}
 
   const prato=CARDAPIO[linha]?.find(p=>String(p.id)===pratoId);
   if(!prato) return;
@@ -362,7 +362,7 @@ function togglePersonalizar() {
       const wrap=document.getElementById('pedido-progress');
       if(wrap) wrap.hidden=false;
     }
-    mostrarToast('Personalizado ativado — ajuste gramas e misture linhas à vontade!');
+    mostrarToast('¡Personalizado activado! Ajustá los gramos y mezclá líneas libremente.');
   }
   aplicarModoPersonalizado();
   if(!modoPersonalizado) atualizarPrecoModal();
@@ -437,12 +437,56 @@ function confirmarAdicaoPrato() {
   const plano=document.getElementById('plano-selecionado').value;
   if(CONFIG_PLANOS[plano]?.linhaLock&&!linhaLocked){
     linhaLocked=pratoPendente.linhaNome;
-    mostrarToast(`Linha ${linhaLocked} selecionada!`);
+    mostrarToast(`Línea ${linhaLocked} seleccionada!`);
     atualizarVisibilidadePratos();
   }
   const nomePrato = pratoPendente.nome;
   atualizarCarrinho(); salvarDados(); fecharModalPrato();
-  mostrarToast(`"${nomePrato}" adicionado!`);
+  mostrarToast(`«${nomePrato}» agregado!`);
+}
+
+/* Agrega el plato y mantiene el modal abierto para volver a agregar */
+function confirmarAdicaoERepetir() {
+  if(!pratoPendente) return;
+  const plano=document.getElementById('plano-selecionado').value;
+  const cfg=CONFIG_PLANOS[plano];
+  if(plano==='Individual'&&itensPedido.length>=13){mostrarToast('Límite de 13 platos alcanzado.');return;}
+  if(cfg?.exato&&itensPedido.length>=cfg.max){mostrarToast(`Límite de ${cfg.max} platos alcanzado.`);return;}
+  const acomps=[];
+  document.querySelectorAll('.acomp-check:checked').forEach(cb=>{
+    const row=cb.closest('.acomp-row');
+    const rule=GRAM_RULES[cb.value];
+    const g=modoPersonalizado?(parseInt(row?.querySelector('.gram-input')?.value)||rule?.base||80):(rule?.base||80);
+    acomps.push({nome:cb.value,gramas:g});
+  });
+  const gProt=modoPersonalizado?(parseInt(document.getElementById('proteina-gramas').value)||130):130;
+  const gSel=quereSeleta?(modoPersonalizado?(parseInt(document.getElementById('seleta-gramas').value)||80):80):null;
+  const obsPrato=modoPersonalizado?(document.getElementById('obs-prato')?.value?.trim()||''):'';
+  const precoBase=PRECOS_LINHA[pratoPendente.linhaNome]||30000;
+  let extras=0;
+  if(modoPersonalizado){
+    extras+=calcularTaxaGrama('Proteína',gProt);
+    acomps.forEach(a=>extras+=calcularTaxaGrama(a.nome,a.gramas));
+    if(quereSeleta&&gSel) extras+=calcularTaxaGrama('Seleta',gSel);
+  }
+  itensPedido.push({
+    ...pratoPendente,
+    gramasProteina:gProt,acompanhamentos:acomps,seleta:quereSeleta,gramasSeleta:gSel,
+    precoBase,extrasGrama:extras,
+    precoItem:modoPersonalizado?null:precoBase,
+    personalizado:modoPersonalizado,obsPrato,
+  });
+  if(CONFIG_PLANOS[plano]?.linhaLock&&!linhaLocked){
+    linhaLocked=pratoPendente.linhaNome;
+    atualizarVisibilidadePratos();
+  }
+  atualizarCarrinho(); salvarDados();
+  mostrarToast(`«${pratoPendente.nome}» agregado! ¡Podés agregar otro igual!`);
+  // Verificar si se llegó al límite tras agregar
+  const cfgNew=CONFIG_PLANOS[plano];
+  if((plano==='Individual'&&itensPedido.length>=13)||(cfgNew?.exato&&itensPedido.length>=cfgNew.max)){
+    fecharModalPrato();
+  }
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -498,7 +542,7 @@ function renderizarModalCarrinho() {
   const n=itensPedido.length;
   const fmt=v=>`₲ ${Math.round(v).toLocaleString('es-PY')}`;
   if(n===0){
-    lista.innerHTML=`<div class="carrinho-vazio"><i class="fas fa-shopping-basket"></i><p>Carrinho vazio.</p><button class="btn btn-outline" onclick="fecharCarrinho()">Escolher Pratos</button></div>`;
+    lista.innerHTML=`<div class="carrinho-vazio"><i class="fas fa-shopping-basket"></i><p>Carrito vacío.</p><button class="btn btn-outline" onclick="fecharCarrinho()">Elegir Platos</button></div>`;
     if(resumoEl) resumoEl.hidden=true; return;
   }
   lista.innerHTML=itensPedido.map((item,i)=>{
@@ -515,11 +559,29 @@ function renderizarModalCarrinho() {
       </div>
       <div class="cm-item-preco">${preco}</div>
       <div class="cm-item-actions">
-        <button class="cm-btn cm-btn-repeat" onclick="repetirItemModal(${i})" title="Repetir prato"><i class="fas fa-copy"></i></button>
+        <button class="cm-btn cm-btn-repeat" onclick="repetirItemModal(${i})"><i class="fas fa-copy"></i> Repetir</button>
         <button class="cm-btn cm-btn-del"    onclick="removerItemModal(${i})"  title="Remover"><i class="fas fa-trash"></i></button>
       </div>
     </div>`;
   }).join('');
+  let totalBruto = total; // Valor acumulado dos itens
+let desconto = 0;
+let totalComDesconto = totalBruto;
+
+// Regra para o Plano Personalizado (ou Individual, dependendo do nome no seu CONFIG_PLANOS)
+if (planoSel === 'Individual' || planoSel === 'Personalizado') {
+    const qtdItens = itensPedido.length;
+
+    if (qtdItens >= 56) {
+        desconto = 0.10; // 10% de desconto
+    } else if (qtdItens >= 14) {
+        desconto = 0.05; // 5% de desconto
+    }
+
+    if (desconto > 0) {
+        totalComDesconto = totalBruto * (1 - desconto);
+    }
+}
   const t=calcularTotalPedido();
   if(t&&resumoEl){
     let html='<div class="resumo-modal">';
@@ -540,12 +602,12 @@ function removerItemModal(i){
 function repetirItemModal(i){
   const plano=document.getElementById('plano-selecionado').value;
   const cfg=CONFIG_PLANOS[plano];
-  if(plano==='Individual'&&itensPedido.length>=13){mostrarToast('Limite de 13 pratos atingido.');return;}
-  if(cfg?.exato&&itensPedido.length>=cfg.max){mostrarToast(`Limite de ${cfg.max} pratos atingido.`);return;}
+  if(plano==='Individual'&&itensPedido.length>=13){mostrarToast('Límite de 13 platos alcanzado.');return;}
+  if(cfg?.exato&&itensPedido.length>=cfg.max){mostrarToast(`Límite de ${cfg.max} platos alcanzado.`);return;}
   const nome=itensPedido[i].nome;
   itensPedido.push({...itensPedido[i]});
   atualizarCarrinho(); renderizarModalCarrinho(); salvarDados();
-  mostrarToast(`"${nome}" repetido!`);
+  mostrarToast(`«${nome}» repetido!`);
 }
 
 /* ── CARRINHO INLINE ─────────────────────────────────────────── */
@@ -568,7 +630,7 @@ function atualizarCarrinho() {
   if(dEl){
     if(plano==='Personalizado'){
       dEl.hidden=false;
-      dEl.textContent=n>56?'🎉 10% desconto!':n>14?'👍 5% desconto!':`Adicione ${15-n} prato(s) para 5% OFF`;
+      dEl.textContent=n>56?'🎉 10% desconto!':n>14?'👍 5% desconto!':`Agregá ${15-n} plato(s) para 5% OFF`;
     } else if(plano==='Individual'){
       dEl.hidden=false;
       dEl.textContent=n>=13?'✅ Carrinho completo!':` ${n}/13 pratos`;
@@ -578,7 +640,7 @@ function atualizarCarrinho() {
   const lista=document.getElementById('carrinho-itens');
   if(lista){
     lista.innerHTML=n===0
-      ?'<li class="carrinho-empty">Nenhum prato adicionado ainda.<br><small>Escolha no cardápio acima.</small></li>'
+      ?'<li class="carrinho-empty">Todavía no hay platos.<br><small>Elegí del menú de arriba.</small></li>'
       :itensPedido.map((item,i)=>`
         <li class="carrinho-item">
           <div class="carrinho-item-info">
@@ -586,7 +648,7 @@ function atualizarCarrinho() {
             <p class="carrinho-item-sub">${item.linhaNome} · Prot: ${item.gramasProteina}g</p>
           </div>
           <span class="carrinho-item-preco">${item.personalizado?'—':fmt(item.precoItem||item.precoBase)}</span>
-          <button class="ci-btn ci-btn-rep" onclick="repetirItemInline(${i})" title="Repetir"><i class="fas fa-copy"></i></button>
+          <button class="ci-btn ci-btn-rep" onclick="repetirItemInline(${i})"><i class="fas fa-copy"></i> Repetir</button>
           <button class="ci-btn ci-btn-del" onclick="removerItem(${i})"       title="Remover"><i class="fas fa-times"></i></button>
         </li>`).join('');
   }
@@ -600,12 +662,12 @@ function removerItem(i){
 function repetirItemInline(i){
   const plano=document.getElementById('plano-selecionado').value;
   const cfg=CONFIG_PLANOS[plano];
-  if(plano==='Individual'&&itensPedido.length>=13){mostrarToast('Limite de 13 pratos.');return;}
-  if(cfg?.exato&&itensPedido.length>=cfg.max){mostrarToast(`Limite de ${cfg.max} pratos.`);return;}
+  if(plano==='Individual'&&itensPedido.length>=13){mostrarToast('Límite de 13 platos.');return;}
+  if(cfg?.exato&&itensPedido.length>=cfg.max){mostrarToast(`Límite de ${cfg.max} platos.`);return;}
   const nome=itensPedido[i].nome;
   itensPedido.push({...itensPedido[i]});
   atualizarCarrinho(); salvarDados();
-  mostrarToast(`"${nome}" repetido!`);
+  mostrarToast(`«${nome}» repetido!`);
 }
 
 /* ── RESUMO FINANCEIRO ───────────────────────────────────────── */
@@ -648,7 +710,7 @@ function renderizarResumo() {
   if(plano==='FDS'||plano==='Mensal')
     html+=`<div class="resumo-row"><span>${plano==='FDS'?40:56} marmitas (${linhaLocked})</span><span>${fmt(t.baseTotal)}</span></div>`;
   else
-    html+=`<div class="resumo-row"><span>${itensPedido.length} prato(s)</span><span>${fmt(t.baseTotal)}</span></div>`;
+    html+=`<div class="resumo-row"><span>${itensPedido.length} plato(s)</span><span>${fmt(t.baseTotal)}</span></div>`;
   if(t.desconto>0) html+=`<div class="resumo-row resumo-desconto"><span>Desconto ${(t.desconto*100).toFixed(0)}%</span><span>− ${fmt(t.descValor)}</span></div>`;
   if(t.extrasGrama>0) html+=`<div class="resumo-row"><span>Personalização</span><span>+ ${fmt(t.extrasGrama)}</span></div>`;
   if(t.frete>0) html+=`<div class="resumo-row"><span>Frete</span><span>${fmt(t.frete)}</span></div>`;
@@ -677,12 +739,12 @@ function verificarBotao(){
   if(btn) btn.disabled=!ok;
   const hint=document.getElementById('botao-hint');
   if(hint){
-    if(!plano) hint.textContent='Selecione um plano.';
-    else if(plano==='Individual'&&n<1) hint.textContent='Adicione pelo menos 1 prato.';
-    else if(plano==='Individual'&&n>13) hint.textContent='Máximo 13 pratos no Individual.';
-    else if(cfg?.exato&&n<cfg.max) hint.textContent=`Adicione mais ${cfg.max-n} prato(s).`;
-    else if(!nome||!tel) hint.textContent='Preencha nome e WhatsApp.';
-    else if(!pagamentoSel) hint.textContent='Escolha a forma de pagamento.';
+    if(!plano) hint.textContent='Seleccioná un plan.';
+    else if(plano==='Individual'&&n<1) hint.textContent='Agregá al menos 1 plato.';
+    else if(plano==='Individual'&&n>13) hint.textContent='Máximo 13 platos en Individual.';
+    else if(cfg?.exato&&n<cfg.max) hint.textContent=`Agregá ${cfg.max-n} plato(s) más.`;
+    else if(!nome||!tel) hint.textContent='Completá nombre y WhatsApp.';
+    else if(!pagamentoSel) hint.textContent='Elegí la forma de pago.';
     else hint.textContent='';
     hint.hidden=!hint.textContent;
   }
@@ -690,8 +752,8 @@ function verificarBotao(){
 
 /* ── FRETE ───────────────────────────────────────────────────── */
 function obterLocalizacaoEFrete(){
-  if(!navigator.geolocation){mostrarToast("Geolocalização não disponível.");return;}
-  mostrarToast("Obtendo sua localização…");
+  if(!navigator.geolocation){mostrarToast("Geolocalización no disponible.");return;}
+  mostrarToast("Obteniendo tu ubicación…");
   navigator.geolocation.getCurrentPosition(
     pos=>{
       const{latitude,longitude}=pos.coords;
@@ -699,11 +761,11 @@ function obterLocalizacaoEFrete(){
       salvarLinkMapsCliente(latitude,longitude);
       const r=calcularFreteDistancia(latitude,longitude);
       exibirResultadoFrete(r);
-      mostrarToast(`✅ Localização capturada! ~${r.distancia} km`);
+      mostrarToast(`✅ ¡Ubicación capturada! ~${r.distancia} km`);
     },
     err=>{
       const msgs={1:"Permissão negada.",2:"Localização indisponível.",3:"Tempo esgotado."};
-      mostrarToast(msgs[err.code]||"Não foi possível obter localização.");
+      mostrarToast(msgs[err.code]||"No se pudo obtener la ubicación.");
     },
     {enableHighAccuracy:true,timeout:10000,maximumAge:60000}
   );
@@ -795,7 +857,7 @@ async function enviarPedidoZap(){
   const ddi=document.getElementById('cliente-ddi').value;
   const tel=document.getElementById('cliente-tel').value.trim();
   const obs=document.getElementById('observacoes-gerais').value.trim();
-  if(!nome||!tel){mostrarToast('Preencha nome e telefone.');return;}
+  if(!nome||!tel){mostrarToast('Completá nombre y teléfono.');return;}
   try{
     // ── Vincular ao cliente cadastrado pelo telefone
     let clienteId=null;
@@ -817,29 +879,59 @@ async function enviarPedidoZap(){
     window.open(`https://api.whatsapp.com/send?phone=595991635604&text=${encodeURIComponent(msg)}`,'_blank');
     itensPedido=[]; linhaLocked=null;
     atualizarCarrinho(); salvarDados();
-    mostrarToast('✅ Pedido enviado com sucesso!');
-  }catch(e){console.error(e);mostrarToast('Erro ao salvar pedido.');}
+    mostrarToast('✅ ¡Pedido enviado con éxito!');
+  }catch(e){console.error(e);mostrarToast('Error al guardar el pedido.');}
 }
 function gerarMensagemPedido(nome,plano,itens,obs,pedidoId){
   const total=calcularTotalPedido();
   const fmt=v=>`₲ ${Math.round(v).toLocaleString('es-PY')}`;
-  let msg=`🍽️ *NOVO PEDIDO — Doña Maria*\n📋 #${pedidoId?.slice(-6)||'-----'}\n\n*Cliente:* ${nome}\n*Plano:* ${plano}\n\n*PRATOS:*\n`;
-  itens.forEach((item,i)=>{
-    msg+=`${i+1}. ${item.nome} (${item.linhaNome})\n   Proteína: ${item.gramasProteina}g\n`;
-    if(item.acompanhamentos?.length) msg+=`   Acomp: ${item.acompanhamentos.map(a=>`${a.nome} (${a.gramas}g)`).join(', ')}\n`;
-    msg+=item.seleta?`   Seleta: ${item.gramasSeleta}g\n`:`   Sem seleta\n`;
-    if(item.obsPrato) msg+=`   📝 ${item.obsPrato}\n`;
-    msg+=item.personalizado?`   ⚠️ PERSONALIZADO\n\n`:`   ${fmt(item.precoItem||item.precoBase)}\n\n`;
+
+  // ── Agrupar pratos idênticos (mesma proteína + mesmos acompanhamentos + mesma seleta)
+  const grupos = new Map();
+  itens.forEach(item => {
+    const acompKey = (item.acompanhamentos||[]).map(a=>a.nome).sort().join(',');
+    const seletaKey = item.seleta ? 'seleta' : 'sem-seleta';
+    const key = `${item.nome}|${item.linhaNome}|${acompKey}|${seletaKey}|${item.personalizado?'perso':'std'}`;
+    if(grupos.has(key)){
+      grupos.get(key).qtd++;
+    } else {
+      grupos.set(key, { ...item, qtd: 1 });
+    }
   });
+
+  // ── Montar mensagem
+  let msg = `🍽️ *NOVO PEDIDO — Doña Maria*\n\n`;
+  msg += `*Cliente:* ${nome}\n`;
+  msg += `*Plano:* ${plano}\n\n`;
+  msg += `*── PRATOS ──*\n`;
+
+  let num = 1;
+  grupos.forEach(g => {
+    const prefix = g.qtd > 1 ? `${g.qtd}x ` : '';
+    msg += `${num}. ${prefix}*${g.nome}* _(${g.linhaNome}${g.personalizado?' · Personalizado':''})_\n`;
+    // Acompanhamentos sem gramas
+    if(g.acompanhamentos?.length){
+      const acompNomes = g.acompanhamentos.map(a=>a.nome).join(', ');
+      msg += `   Acomp: ${acompNomes}`;
+    }
+    msg += g.seleta ? ' + Seleta\n' : '\n';
+    if(g.obsPrato) msg += `   📝 ${g.obsPrato}\n`;
+    msg += '\n';
+    num++;
+  });
+
+  if(obs) msg += `📝 *Obs:* ${obs}\n\n`;
+
   if(total){
-    msg+=`*RESUMO:*\nSubtotal: ${fmt(total.baseTotal)}\n`;
-    if(total.desconto>0) msg+=`Desconto ${(total.desconto*100).toFixed(0)}%: -${fmt(total.descValor)}\n`;
-    if(total.extrasGrama>0) msg+=`Personalização: +${fmt(total.extrasGrama)}\n`;
-    msg+=`Frete: ${freteValor>0?fmt(freteValor):'A calcular'}\n*TOTAL: ${fmt(total.total)}*\n\n`;
+    msg += `*── RESUMO ──*\n`;
+    if(total.desconto>0) msg += `Desconto ${(total.desconto*100).toFixed(0)}%: -${fmt(total.descValor)}\n`;
+    if(total.extrasGrama>0) msg += `Personalização: +${fmt(total.extrasGrama)}\n`;
+    msg += `Frete: ${freteValor>0?fmt(freteValor):'A calcular'}\n`;
+    msg += `*TOTAL: ${fmt(total.total)}*\n\n`;
   }
-  msg+=`*Pagamento:* ${pagamentoSel}\n`;
-  if(linkMaps) msg+=`\n📍 *Localização:* ${linkMaps}\n`;
-  if(obs) msg+=`\n📝 *Obs:* ${obs}\n`;
+
+  msg += `*Pagamento:* ${pagamentoSel}`;
+  if(linkMaps) msg += `\n📍 *Localização:* ${linkMaps}`;
   return msg;
 }
 function getSemanaAtual(){
