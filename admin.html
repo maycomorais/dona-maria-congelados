@@ -41,8 +41,6 @@
 
   <!-- MAIN APP -->
   <div class="app" id="app" hidden>
-    <!-- SIDEBAR BACKDROP (tablet) -->
-    <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="closeSidebar()"></div>
     <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-brand">
@@ -175,6 +173,56 @@
             <canvas id="chart-pratos-vendidos"></canvas>
           </div>
         </div>
+
+        <!-- GRÁFICO RECEITAS vs DESPESAS -->
+        <div class="card">
+          <div class="card-header">
+            <h3>Receitas vs Despesas</h3>
+          </div>
+          <div class="grafico-filtros">
+            <div class="grafico-filtro-row">
+              <div class="form-group" style="flex:1;min-width:130px">
+                <label style="font-size:.8rem">De</label>
+                <input type="date" class="form-control form-control--sm" id="graf-data-inicio">
+              </div>
+              <div class="form-group" style="flex:1;min-width:130px">
+                <label style="font-size:.8rem">Até</label>
+                <input type="date" class="form-control form-control--sm" id="graf-data-fim">
+              </div>
+              <div class="form-group" style="min-width:120px">
+                <label style="font-size:.8rem">Agrupar por</label>
+                <select class="form-control form-control--sm" id="graf-agrupamento">
+                  <option value="dia">Dia</option>
+                  <option value="semana">Semana</option>
+                  <option value="mes" selected>Mês</option>
+                </select>
+              </div>
+              <button class="btn btn-primary btn-sm" onclick="carregarGraficoFinanceiro()" style="align-self:flex-end">
+                <i class="fas fa-search"></i> Aplicar
+              </button>
+            </div>
+            <div class="grafico-filtro-row" style="align-items:center;gap:12px;padding:6px 0">
+              <label class="comparar-check-label">
+                <input type="checkbox" id="graf-comparar" onchange="toggleComparacaoPeriodo()">
+                <span>Comparar Períodos</span>
+              </label>
+              <div id="graf-comparacao-wrap" style="display:none;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+                <div class="form-group" style="flex:1;min-width:130px">
+                  <label style="font-size:.8rem">Período 2 — De</label>
+                  <input type="date" class="form-control form-control--sm" id="graf-data2-inicio">
+                </div>
+                <div class="form-group" style="flex:1;min-width:130px">
+                  <label style="font-size:.8rem">Até</label>
+                  <input type="date" class="form-control form-control--sm" id="graf-data2-fim">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="chart-container" style="height:280px">
+            <canvas id="chart-financeiro"></canvas>
+          </div>
+          <div class="grafico-resumo-wrap" id="grafico-resumo-wrap"></div>
+        </div>
       </div>
 
       <!-- CLIENTES -->
@@ -286,6 +334,7 @@
                   <th>Data</th>
                   <th>Cliente</th>
                   <th>Status</th>
+                  <th>Pagamento</th>
                   <th>Plano</th>
                   <th>Pratos</th>
                   <th>Total</th>
@@ -318,6 +367,9 @@
           <span id="semana-sel-count">0 clientes selecionados</span>
           <button class="btn btn-primary btn-sm" onclick="mostrarResumoSelecionados()">
             <i class="fas fa-list-ul"></i> Ver Resumo dos Selecionados
+          </button>
+          <button class="btn btn-success btn-sm" onclick="abrirModalRotaSemana()" id="btn-rota-semana">
+            <i class="fas fa-motorcycle"></i> Enviar Rota ao Motoboy
           </button>
         </div>
 
@@ -627,6 +679,23 @@
         <textarea class="form-control" id="cli-endereco" rows="2" placeholder="Endereço completo"></textarea>
       </div>
       <div class="form-group">
+        <label><i class="fas fa-map-marker-alt" style="color:#2d9b4f"></i> Link Google Maps</label>
+        <input type="text" class="form-control" id="cli-maps" placeholder="https://maps.google.com/...">
+      </div>
+      <div class="form-group">
+        <label><i class="fas fa-money-bill-wave" style="color:#2d9b4f"></i> Status de Pagamento</label>
+        <select class="form-control" id="cli-pag-status">
+          <option value="pago">✅ Pago</option>
+          <option value="receber_entrega">💵 Receber na Entrega (Efetivo/Cartão)</option>
+          <option value="em_aberto">⏳ Em Aberto</option>
+        </select>
+      </div>
+      <div class="form-group" id="cli-valor-cobrar-wrap" style="display:none">
+        <label>Valor a Cobrar na Entrega</label>
+        <input type="number" class="form-control" id="cli-valor-cobrar" placeholder="0" step="1000">
+        <small style="color:#6b7280">Em Guaranis (₲)</small>
+      </div>
+      <div class="form-group">
         <label>Observações</label>
         <textarea class="form-control" id="cli-obs" rows="2"></textarea>
       </div>
@@ -910,70 +979,28 @@
     </div>
   </div>
 
-  <!-- BOTTOM NAV (mobile only) -->
-  <nav class="bottom-nav" id="bottom-nav">
-    <button class="bottom-nav-btn active" data-page="dashboard"
-      onclick="showPage('dashboard',navBtn('dashboard'));closeMobileDrawer()">
-      <i class="fas fa-chart-line"></i><span>Início</span>
-    </button>
-    <button class="bottom-nav-btn" data-page="pedidos-pendentes"
-      onclick="showPage('pedidos-pendentes',navBtn('pedidos-pendentes'));closeMobileDrawer()">
-      <i class="fas fa-clock"></i><span>Pedidos</span>
-    </button>
-    <button class="bottom-nav-btn" data-page="semana"
-      onclick="showPage('semana',navBtn('semana'));closeMobileDrawer()">
-      <i class="fas fa-calendar-week"></i><span>Semana</span>
-    </button>
-    <button class="bottom-nav-btn" data-page="producao"
-      onclick="showPage('producao',navBtn('producao'));closeMobileDrawer()">
-      <i class="fas fa-fire"></i><span>Produção</span>
-    </button>
-    <button class="bottom-nav-btn" id="btn-mais" onclick="toggleMobileDrawer()">
-      <i class="fas fa-grid-2" style="font-size:1rem"></i><span>Mais</span>
-    </button>
-  </nav>
-
-  <!-- MOBILE DRAWER (More menu) -->
-  <div class="mobile-drawer" id="mobile-drawer">
-    <div class="mobile-drawer-backdrop" onclick="closeMobileDrawer()"></div>
-    <div class="mobile-drawer-panel">
-      <div class="mobile-drawer-handle"></div>
-      <div class="mobile-drawer-user">
-        <i class="fas fa-user-circle"></i>
-        <span id="drawer-user-name">Admin</span>
+  <!-- MODAL: ROTA SEMANA (enviar ao motoboy por cliente selecionado) -->
+  <div class="modal-overlay" id="modal-rota-semana">
+    <div class="modal-box">
+      <button class="modal-close" onclick="fecharModal('modal-rota-semana')">✕</button>
+      <div class="modal-title"><i class="fas fa-motorcycle"></i> Enviar Rota ao Motoboy</div>
+      <div class="rota-info">
+        <p><i class="fas fa-info-circle"></i> Será enviada uma mensagem no WhatsApp do motoboy com os clientes selecionados.</p>
       </div>
-      <div class="mobile-drawer-divider"></div>
-
-      <div class="mobile-drawer-section">Principal</div>
-      <button class="mobile-drawer-item" onclick="showPage('clientes',navBtn('clientes'));closeMobileDrawer()">
-        <i class="fas fa-users"></i> Clientes &amp; Entregas
-      </button>
-
-      <div class="mobile-drawer-section">Logística</div>
-      <button class="mobile-drawer-item" onclick="showPage('motoboys',navBtn('motoboys'));closeMobileDrawer()">
-        <i class="fas fa-motorcycle"></i> Motoboys
-      </button>
-
-      <div class="mobile-drawer-section">Financeiro</div>
-      <button class="mobile-drawer-item" onclick="showPage('caixa',navBtn('caixa'));closeMobileDrawer()">
-        <i class="fas fa-cash-register"></i> Caixa do Mês
-      </button>
-      <button class="mobile-drawer-item" onclick="showPage('lancamentos',navBtn('lancamentos'));closeMobileDrawer()">
-        <i class="fas fa-list-alt"></i> Lançamentos
-      </button>
-
-      <div class="mobile-drawer-section">Cardápio</div>
-      <button class="mobile-drawer-item" onclick="showPage('cardapio-admin',navBtn('cardapio-admin'));closeMobileDrawer()">
-        <i class="fas fa-book-open"></i> Gerenciar Cardápio
-      </button>
-      <button class="mobile-drawer-item" onclick="showPage('pedidos-todos',navBtn('pedidos-todos'));closeMobileDrawer()">
-        <i class="fas fa-list"></i> Todos os Pedidos
-      </button>
-
-      <div class="mobile-drawer-divider"></div>
-      <button class="mobile-drawer-item" style="color:#fca5a5" onclick="fazerLogout()">
-        <i class="fas fa-sign-out-alt" style="color:#f87171"></i> Sair
-      </button>
+      <div class="form-group">
+        <label>Selecione o Motoboy *</label>
+        <select class="form-control" id="rota-semana-motoboy">
+          <option value="">Selecione...</option>
+        </select>
+      </div>
+      <div id="rota-semana-preview" style="background:#f9f9f7;border:1px solid #e5e4e0;border-radius:8px;padding:14px;margin-top:10px;font-size:.82rem;color:#374151;white-space:pre-wrap;max-height:320px;overflow-y:auto;font-family:monospace;display:none"></div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="fecharModal('modal-rota-semana')">Cancelar</button>
+        <button class="btn btn-outline" onclick="previewRotaSemana()"><i class="fas fa-eye"></i> Pré-visualizar</button>
+        <button class="btn btn-primary" onclick="enviarRotaSemana()">
+          <i class="fab fa-whatsapp"></i> Enviar no WhatsApp
+        </button>
+      </div>
     </div>
   </div>
 

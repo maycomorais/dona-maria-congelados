@@ -17,15 +17,12 @@ let lancamentos         = [];
 let clientes            = [];
 let pedidosSelecionados = new Set();
 let graficoPratos       = null;
+let graficoFinanceiro   = null;
 
 /* ── BOOT ─────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', () => {
   verificarAutenticacao();
-  if (sessionStorage.getItem('donamaria_auth')) {
-    carregarDadosIniciais();
-    const saved = sessionStorage.getItem('donamaria_page') || 'dashboard';
-    showPage(saved, navBtn(saved));
-  }
+  if (sessionStorage.getItem('donamaria_auth')) carregarDadosIniciais();
 });
 
 /* ══════════════════════════════════════════════════════════
@@ -68,10 +65,8 @@ async function fazerLogin() {
   sessionStorage.setItem('donamaria_auth', JSON.stringify({
     id: data.id, nome: data.nome, username: data.username, role: data.role
   }));
-  sessionStorage.removeItem('donamaria_page');
   verificarAutenticacao();
   await carregarDadosIniciais();
-  showPage('dashboard', navBtn('dashboard'));
 }
 
 function fazerLogout() {
@@ -95,26 +90,8 @@ function showPage(page, el) {
   if (el) el.classList.add('active');
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-' + page)?.classList.add('active');
-
-  // Sync title
   const titleEl = document.getElementById('page-title');
   if (titleEl && el) titleEl.textContent = el.textContent.trim().replace(/\s+/g, ' ');
-
-  // Sync bottom nav
-  document.querySelectorAll('.bottom-nav-btn[data-page]').forEach(b => {
-    b.classList.toggle('active', b.dataset.page === page);
-  });
-  // Sync drawer items
-  document.querySelectorAll('.mobile-drawer-item').forEach(b => {
-    b.classList.toggle('active', (b.getAttribute('onclick') || '').includes(`'${page}'`));
-  });
-
-  // Persist tab
-  sessionStorage.setItem('donamaria_page', page);
-
-  // Close sidebar/drawer on mobile
-  closeSidebar();
-
   const loaders = {
     'dashboard':         carregarDashboard,
     'clientes':          carregarClientes,
@@ -130,42 +107,9 @@ function showPage(page, el) {
   if (loaders[page]) loaders[page]();
 }
 
-function navBtn(page) {
-  return document.querySelector(`.nav-item[onclick*="'${page}'"]`);
-}
-
 function toggleSidebar() {
-  const sb = document.getElementById('sidebar');
-  const bd = document.getElementById('sidebar-backdrop');
-  if (!sb) return;
-  const isOpen = sb.classList.toggle('open');
-  if (bd) bd.classList.toggle('show', isOpen);
+  document.getElementById('sidebar')?.classList.toggle('open');
 }
-
-function closeSidebar() {
-  const sb = document.getElementById('sidebar');
-  const bd = document.getElementById('sidebar-backdrop');
-  if (sb) sb.classList.remove('open');
-  if (bd) bd.classList.remove('show');
-}
-
-function toggleMobileDrawer() {
-  const drawer = document.getElementById('mobile-drawer');
-  if (!drawer) return;
-  drawer.classList.toggle('open');
-  // sync user name
-  const auth = sessionStorage.getItem('donamaria_auth');
-  if (auth) {
-    const u = JSON.parse(auth);
-    const el = document.getElementById('drawer-user-name');
-    if (el) el.textContent = u.nome || u.username || 'Admin';
-  }
-}
-
-function closeMobileDrawer() {
-  document.getElementById('mobile-drawer')?.classList.remove('open');
-}
-
 
 /* ══════════════════════════════════════════════════════════
    CARGA INICIAL
@@ -274,6 +218,8 @@ async function carregarDashboard() {
       options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
     });
   }
+  // Init gráfico financeiro com mês atual
+  initGraficoFinanceiro();
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -339,6 +285,10 @@ function abrirModalCliente() {
   document.getElementById('cli-prox-entrega').value    = '';
   document.getElementById('cli-status').value          = 'ativo';
   document.getElementById('cli-endereco').value        = '';
+  document.getElementById('cli-maps').value            = '';
+  document.getElementById('cli-pag-status').value      = 'pago';
+  document.getElementById('cli-valor-cobrar').value    = '';
+  document.getElementById('cli-valor-cobrar-wrap').style.display = 'none';
   document.getElementById('cli-obs').value             = '';
   document.getElementById('modal-cliente-titulo').textContent = 'Novo Cliente';
   document.getElementById('modal-cliente').classList.add('active');
@@ -357,6 +307,10 @@ async function editarCliente(id) {
   document.getElementById('cli-prox-entrega').value    = c.prox_entrega    || '';
   document.getElementById('cli-status').value          = c.status          || 'ativo';
   document.getElementById('cli-endereco').value        = c.endereco        || '';
+  document.getElementById('cli-maps').value            = c.link_maps       || '';
+  document.getElementById('cli-pag-status').value      = c.pag_status      || 'pago';
+  document.getElementById('cli-valor-cobrar').value    = c.valor_cobrar    || '';
+  document.getElementById('cli-valor-cobrar-wrap').style.display = (c.pag_status === 'receber_entrega') ? 'block' : 'none';
   document.getElementById('cli-obs').value             = c.obs             || '';
   document.getElementById('modal-cliente-titulo').textContent = 'Editar Cliente';
   document.getElementById('modal-cliente').classList.add('active');
@@ -434,6 +388,9 @@ async function salvarCliente() {
     prox_entrega:    document.getElementById('cli-prox-entrega').value || null,
     status:          document.getElementById('cli-status').value,
     endereco:        document.getElementById('cli-endereco').value.trim() || null,
+    link_maps:       document.getElementById('cli-maps').value.trim()    || null,
+    pag_status:      document.getElementById('cli-pag-status').value     || 'pago',
+    valor_cobrar:    parseInt(document.getElementById('cli-valor-cobrar').value) || null,
     obs:             document.getElementById('cli-obs').value.trim()      || null,
   };
   if (!payload.nome) { mostrarToast('Nome é obrigatório', 'error'); return; }
@@ -512,14 +469,15 @@ function renderizarPedidosPendentes(lista) {
   tbody.innerHTML = lista.map(p => {
     const pratos   = Array.isArray(p.pratos) ? p.pratos : [];
     const totalVal = pratos.reduce((s, pr) => s + (pr.precoItem || 0), 0);
+    const incluso  = p.incluso_plano === true;
     return `<tr>
       <td><input type="checkbox" class="pedido-check" value="${p.id}" onchange="togglePedidoSelecionado('${p.id}')"></td>
       <td>${fmtDataHora(p.created_at)}</td>
-      <td><strong>${p.cliente_nome}</strong>${p.cliente_tel ? `<br><small>${p.cliente_tel}</small>` : ''}</td>
+      <td><strong>${p.cliente_nome}</strong>${p.cliente_tel ? `<br><small>${p.cliente_tel}</small>` : ''}${incluso ? `<br><span class="incluso-badge" style="margin-top:3px"><i class="fas fa-box"></i> Incluso no Plano</span>` : ''}</td>
       <td>${p.plano || '—'}</td>
       <td>${pratos.length}</td>
-      <td>${totalVal ? formatGS(totalVal) : '—'}</td>
-      <td>${p.forma_pag || '—'}</td>
+      <td>${incluso ? '<span style="color:#6b7280;font-size:.8rem">—</span>' : (totalVal ? formatGS(totalVal) : '—')}</td>
+      <td>${incluso ? '<span style="color:#6b7280;font-size:.8rem">—</span>' : (p.forma_pag || '—')}</td>
       <td>
         <button class="btn btn-sm" style="background:#2a9d8f;color:#fff" onclick="aceitarPedido('${p.id}')"><i class="fas fa-check"></i></button>
         <button class="btn btn-sm" style="background:#e74c3c;color:#fff" onclick="recusarPedido('${p.id}')"><i class="fas fa-times"></i></button>
@@ -536,11 +494,11 @@ async function aceitarPedido(id) {
     .update({ status: 'aceito', updated_at: new Date().toISOString() }).eq('id', id);
   if (error) { mostrarToast('Erro: ' + error.message, 'error'); return; }
 
-  // Auto-criar cliente se não existir (telefone como identificador)
+  // Auto-criar cliente se não existir / marcar incluso_plano se já ativo
   if (p?.cliente_tel) {
     const tel = p.cliente_tel;
     const { data: existe } = await supabaseClient
-      .from('clientes').select('id').eq('tel', tel).maybeSingle();
+      .from('clientes').select('id,status').eq('tel', tel).maybeSingle();
     if (!existe) {
       const { data: novoCli } = await supabaseClient.from('clientes').insert([{
         nome:            p.cliente_nome || 'Cliente',
@@ -550,13 +508,19 @@ async function aceitarPedido(id) {
         total_entregas:  1,
         entregas_feitas: 0,
       }]).select('id').single();
-      // Vincular pedido ao novo cliente
       if (novoCli?.id) {
         await supabaseClient.from('pedidos').update({ cliente_id: novoCli.id }).eq('id', id);
       }
       mostrarToast(`✅ Pedido aceito! Cliente "${p.cliente_nome}" criado.`);
     } else {
-      mostrarToast('Pedido aceito!');
+      // Cliente já existe — se ativo, marcar entrega como inclusa no plano
+      if (existe.status === 'ativo') {
+        await supabaseClient.from('pedidos')
+          .update({ incluso_plano: true, cliente_id: existe.id }).eq('id', id);
+        mostrarToast(`✅ Aceito — entrega inclusa no plano de ${p.cliente_nome}.`);
+      } else {
+        mostrarToast('Pedido aceito!');
+      }
     }
   } else {
     mostrarToast('Pedido aceito!');
@@ -604,12 +568,12 @@ async function aceitarPedidosBatch() {
     .update({ status: 'aceito', updated_at: new Date().toISOString() }).in('id', ids);
   if (error) { mostrarToast('Erro: ' + error.message, 'error'); return; }
 
-  // Auto-criar clientes novos
+  // Auto-criar clientes novos / marcar incluso_plano para ativos
   for (const id of ids) {
     const p = pedidos.find(x => x.id === id);
     if (!p?.cliente_tel) continue;
     const { data: existe } = await supabaseClient
-      .from('clientes').select('id').eq('tel', p.cliente_tel).maybeSingle();
+      .from('clientes').select('id,status').eq('tel', p.cliente_tel).maybeSingle();
     if (!existe) {
       const { data: novoCli } = await supabaseClient.from('clientes').insert([{
         nome: p.cliente_nome || 'Cliente', tel: p.cliente_tel,
@@ -617,6 +581,9 @@ async function aceitarPedidosBatch() {
         total_entregas: 1, entregas_feitas: 0,
       }]).select('id').single();
       if (novoCli?.id) await supabaseClient.from('pedidos').update({ cliente_id: novoCli.id }).eq('id', id);
+    } else if (existe.status === 'ativo') {
+      await supabaseClient.from('pedidos')
+        .update({ incluso_plano: true, cliente_id: existe.id }).eq('id', id);
     }
   }
 
@@ -755,18 +722,49 @@ function filtrarPedidos() {
     const totalVal = pratos.reduce((s, pr) => s + (pr.precoItem || 0), 0);
     const sc = { pendente:'badge-orange', aceito:'badge-green', recusado:'badge-red',
       entregue:'badge-blue', cancelado:'badge-gray' }[p.status] || 'badge-gray';
-    return `<tr>
+    const incluso = p.incluso_plano === true;
+
+    let pagCell, valorCell, formaCell;
+    if (incluso) {
+      pagCell   = `<span class="incluso-badge"><i class="fas fa-box"></i> Incluso no Plano</span>`;
+      valorCell = `<span style="color:#6b7280;font-size:.8rem">—</span>`;
+      formaCell = `<span style="color:#6b7280;font-size:.8rem">—</span>`;
+    } else {
+      const pagSt  = p.pagamento_status || 'em_aberto';
+      const pagCls = { pago:'pag-badge--pago', receber_entrega:'pag-badge--receber', em_aberto:'pag-badge--aberto' }[pagSt];
+      pagCell   = `<select class="pag-badge ${pagCls}" onchange="salvarPagamentoStatus('${p.id}', this.value, this)">
+          <option value="em_aberto" ${pagSt==='em_aberto'?'selected':''}>⏳ Em aberto</option>
+          <option value="pago" ${pagSt==='pago'?'selected':''}>✅ Pago</option>
+          <option value="receber_entrega" ${pagSt==='receber_entrega'?'selected':''}>💵 Receber</option>
+        </select>`;
+      valorCell = totalVal ? formatGS(totalVal) : '—';
+      formaCell = p.forma_pag || '—';
+    }
+
+    return `<tr class="${incluso ? 'tr-incluso' : ''}">
       <td>${fmtDataHora(p.created_at)}</td>
       <td><strong>${p.cliente_nome}</strong></td>
       <td><span class="badge ${sc}">${p.status}</span></td>
+      <td>${pagCell}</td>
       <td>${p.plano || '—'}</td>
       <td>${pratos.length}</td>
-      <td>${totalVal ? formatGS(totalVal) : '—'}</td>
-      <td>${p.forma_pag || '—'}</td>
+      <td>${valorCell}</td>
+      <td>${formaCell}</td>
       <td><button class="btn btn-sm btn-outline" onclick="abrirModalEditarPedido('${p.id}')"><i class="fas fa-edit"></i></button>
           <button class="btn btn-sm btn-danger" style="margin-left:4px" onclick="excluirPedido('${p.id}')"><i class="fas fa-trash"></i></button></td>
     </tr>`;
-  }).join('') || '<tr><td colspan="8" class="empty-msg">Nenhum pedido.</td></tr>';
+  }).join('') || '<tr><td colspan="9" class="empty-msg">Nenhum pedido.</td></tr>';
+}
+
+async function salvarPagamentoStatus(pedidoId, novoStatus, selectEl) {
+  const { error } = await supabaseClient.from('pedidos')
+    .update({ pagamento_status: novoStatus, updated_at: new Date().toISOString() })
+    .eq('id', pedidoId);
+  if (error) { mostrarToast('Erro ao salvar: ' + error.message, 'error'); return; }
+  selectEl.className = 'pag-badge ' + { pago:'pag-badge--pago', receber_entrega:'pag-badge--receber', em_aberto:'pag-badge--aberto' }[novoStatus];
+  const p = pedidos.find(x => x.id === pedidoId);
+  if (p) p.pagamento_status = novoStatus;
+  mostrarToast('Pagamento atualizado!');
 }
 
 async function excluirPedido(id) {
@@ -1453,6 +1451,264 @@ async function criarRotaEntrega() {
   pedidosSelecionados.clear();
   await _buscarPedidos();
   filtrarPedidosPendentes();
+}
+
+/* ══════════════════════════════════════════════════════════
+   ROTA SEMANA — enviar motoboy por clientes selecionados
+   ══════════════════════════════════════════════════════════ */
+function abrirModalRotaSemana() {
+  if (!semanaClientesSel.size) { mostrarToast('Selecione pelo menos 1 cliente', 'error'); return; }
+  // Populate motoboys dropdown
+  const sel = document.getElementById('rota-semana-motoboy');
+  sel.innerHTML = '<option value="">Selecione...</option>';
+  motoboys.forEach(m => {
+    const opt = document.createElement('option');
+    opt.value = m.id; opt.textContent = m.nome;
+    sel.appendChild(opt);
+  });
+  document.getElementById('rota-semana-preview').style.display = 'none';
+  document.getElementById('modal-rota-semana').classList.add('active');
+}
+
+function _buildMsgRotaSemana() {
+  const dataBr = new Date().toLocaleDateString('pt-BR');
+  const clisSel = Object.values(semanaClientesData).filter(c => semanaClientesSel.has(c.nome));
+  let msg = `🛵 *ROTA DOÑA MARIA — ${dataBr}*\n\n`;
+  clisSel.forEach((cli, i) => {
+    const totalPratos = cli.pedidos.reduce((s, p) => {
+      return s + (Array.isArray(p.pratos) ? p.pratos.reduce((ss, pr) => ss + (pr.qtd || 1), 0) : 0);
+    }, 0);
+    const totalVal = cli.pedidos.reduce((s, p) => {
+      return s + (Array.isArray(p.pratos) ? p.pratos.reduce((ss, pr) => ss + (pr.precoItem || 0), 0) : 0);
+    }, 0);
+    // Buscar dados do cliente em memória
+    const cliObj = clientes.find(c => c.nome === cli.nome) || {};
+    const pagSt = cliObj.pag_status || 'em_aberto';
+    const formaPag = cli.pedidos[0]?.forma_pag || '';
+    let infoCobranca = '';
+    if (pagSt === 'pago') {
+      infoCobranca = '✅ *PAGO*';
+    } else if (pagSt === 'receber_entrega') {
+      const valor = cliObj.valor_cobrar ? `₲ ${cliObj.valor_cobrar.toLocaleString('es-PY')}` : (totalVal ? `₲ ${totalVal.toLocaleString('es-PY')}` : '—');
+      const forma = { efetivo_gs: 'Efectivo ₲', efetivo_brl: 'Efectivo R$', pix: 'Pix', tarjeta: 'Tarjeta', cartao: 'Tarjeta', transferencia: 'Transferencia' }[formaPag] || formaPag || 'Efectivo';
+      infoCobranca = `💵 *COBRAR NA ENTREGA: ${valor}* (${forma})`;
+    } else {
+      infoCobranca = '⏳ Em aberto — confirmar antes de entregar';
+    }
+
+    msg += `*${i + 1}. ${cli.nome}*\n`;
+    msg += `📦 ${totalPratos} prato${totalPratos !== 1 ? 's' : ''}\n`;
+    if (cliObj.tel) msg += `📞 ${cliObj.tel}\n`;
+    if (cliObj.link_maps) msg += `📍 ${cliObj.link_maps}\n`;
+    else if (cliObj.endereco) msg += `📍 ${cliObj.endereco}\n`;
+    msg += `${infoCobranca}\n\n`;
+  });
+  msg += `Total: ${clisSel.length} entrega${clisSel.length !== 1 ? 's' : ''}`;
+  return msg;
+}
+
+function previewRotaSemana() {
+  const prev = document.getElementById('rota-semana-preview');
+  prev.textContent = _buildMsgRotaSemana();
+  prev.style.display = 'block';
+}
+
+async function enviarRotaSemana() {
+  const motoboyId = document.getElementById('rota-semana-motoboy').value;
+  if (!motoboyId) { mostrarToast('Selecione um motoboy', 'error'); return; }
+  const motoboy = motoboys.find(m => m.id === motoboyId);
+  const msg = _buildMsgRotaSemana();
+  const tel = motoboy?.telefone?.replace(/\D/g, '');
+  if (tel) window.open(`https://wa.me/${tel}?text=${encodeURIComponent(msg)}`, '_blank');
+  fecharModal('modal-rota-semana');
+  mostrarToast('Rota enviada ao motoboy!');
+}
+
+/* ── Toggle valor_cobrar no modal de cliente ──────────────── */
+document.addEventListener('DOMContentLoaded', () => {
+  const pagSel = document.getElementById('cli-pag-status');
+  if (pagSel) {
+    pagSel.addEventListener('change', () => {
+      const wrap = document.getElementById('cli-valor-cobrar-wrap');
+      if (wrap) wrap.style.display = pagSel.value === 'receber_entrega' ? 'block' : 'none';
+    });
+  }
+});
+
+/* ══════════════════════════════════════════════════════════
+   GRÁFICO FINANCEIRO — Receitas vs Despesas com comparação
+   ══════════════════════════════════════════════════════════ */
+function toggleComparacaoPeriodo() {
+  const checked = document.getElementById('graf-comparar').checked;
+  const wrap = document.getElementById('graf-comparacao-wrap');
+  if (wrap) wrap.style.display = checked ? 'flex' : 'none';
+}
+
+async function carregarGraficoFinanceiro() {
+  const d1ini = document.getElementById('graf-data-inicio')?.value;
+  const d1fim = document.getElementById('graf-data-fim')?.value;
+  const agrup = document.getElementById('graf-agrupamento')?.value || 'mes';
+  const comparar = document.getElementById('graf-comparar')?.checked;
+  const d2ini = document.getElementById('graf-data2-inicio')?.value;
+  const d2fim = document.getElementById('graf-data2-fim')?.value;
+
+  if (!d1ini || !d1fim) { mostrarToast('Selecione o período', 'error'); return; }
+
+  const p1 = await _buscarDadosFinanceiros(d1ini, d1fim, agrup);
+
+  let datasets = [
+    {
+      label: `Receitas ${fmtPeriodoLabel(d1ini, d1fim)}`,
+      data: p1.labels.map((_, i) => p1.receitas[i]),
+      backgroundColor: 'rgba(45,155,79,0.7)',
+      borderColor: '#2d9b4f',
+      borderWidth: 1.5,
+      borderRadius: 5,
+    },
+    {
+      label: `Despesas ${fmtPeriodoLabel(d1ini, d1fim)}`,
+      data: p1.labels.map((_, i) => p1.despesas[i]),
+      backgroundColor: 'rgba(220,38,38,0.6)',
+      borderColor: '#dc2626',
+      borderWidth: 1.5,
+      borderRadius: 5,
+    }
+  ];
+  let labels = p1.labels;
+
+  if (comparar && d2ini && d2fim) {
+    const p2 = await _buscarDadosFinanceiros(d2ini, d2fim, agrup);
+    // Merge labels
+    const allLabels = [...new Set([...p1.labels, ...p2.labels])].sort();
+    labels = allLabels;
+    const getVal = (labelsArr, vals, lbl) => {
+      const i = labelsArr.indexOf(lbl); return i >= 0 ? vals[i] : 0;
+    };
+    datasets = [
+      { label: `Receitas ${fmtPeriodoLabel(d1ini, d1fim)}`, data: allLabels.map(l => getVal(p1.labels, p1.receitas, l)), backgroundColor: 'rgba(45,155,79,0.7)', borderColor: '#2d9b4f', borderWidth: 1.5, borderRadius: 4 },
+      { label: `Despesas ${fmtPeriodoLabel(d1ini, d1fim)}`, data: allLabels.map(l => getVal(p1.labels, p1.despesas, l)), backgroundColor: 'rgba(220,38,38,0.55)', borderColor: '#dc2626', borderWidth: 1.5, borderRadius: 4 },
+      { label: `Receitas ${fmtPeriodoLabel(d2ini, d2fim)}`, data: allLabels.map(l => getVal(p2.labels, p2.receitas, l)), backgroundColor: 'rgba(59,130,246,0.65)', borderColor: '#3b82f6', borderWidth: 1.5, borderRadius: 4 },
+      { label: `Despesas ${fmtPeriodoLabel(d2ini, d2fim)}`, data: allLabels.map(l => getVal(p2.labels, p2.despesas, l)), backgroundColor: 'rgba(249,115,22,0.6)', borderColor: '#f97316', borderWidth: 1.5, borderRadius: 4 },
+    ];
+    // Resumo comparação
+    _renderGraficoResumo(p1, d1ini, d1fim, p2, d2ini, d2fim);
+  } else {
+    _renderGraficoResumo(p1, d1ini, d1fim, null, null, null);
+  }
+
+  const ctx = document.getElementById('chart-financeiro');
+  if (!ctx) return;
+  if (graficoFinanceiro) graficoFinanceiro.destroy();
+  graficoFinanceiro = new Chart(ctx, {
+    type: 'bar',
+    data: { labels, datasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'top', labels: { font: { family: 'Plus Jakarta Sans', size: 12 } } } },
+      scales: {
+        y: { beginAtZero: true, ticks: { callback: v => formatGS(v).replace('₲ ', '₲') } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+}
+
+async function _buscarDadosFinanceiros(dataIni, dataFim, agrup) {
+  const { data } = await supabaseClient.from('lancamentos')
+    .select('tipo, valor_gs, valor_brl, data_lancamento')
+    .gte('data_lancamento', dataIni)
+    .lte('data_lancamento', dataFim)
+    .order('data_lancamento');
+
+  const buckets = {};
+  (data || []).forEach(l => {
+    const label = _bucketLabel(l.data_lancamento, agrup);
+    if (!buckets[label]) buckets[label] = { receita: 0, despesa: 0 };
+    const val = l.valor_gs || Math.round((l.valor_brl || 0) * 7700);
+    if (l.tipo === 'receita') buckets[label].receita += val;
+    else buckets[label].despesa += val;
+  });
+
+  const labels = Object.keys(buckets).sort();
+  return {
+    labels,
+    receitas: labels.map(l => buckets[l].receita),
+    despesas: labels.map(l => buckets[l].despesa),
+    totalReceita: Object.values(buckets).reduce((s, b) => s + b.receita, 0),
+    totalDespesa: Object.values(buckets).reduce((s, b) => s + b.despesa, 0),
+  };
+}
+
+function _bucketLabel(dateStr, agrup) {
+  if (!dateStr) return '—';
+  if (agrup === 'dia') return dateStr.slice(0, 10);
+  if (agrup === 'semana') {
+    const d = new Date(dateStr + 'T00:00:00');
+    const day = d.getDay(); const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+    const mon = new Date(d.setDate(diff));
+    return mon.toISOString().slice(0, 10);
+  }
+  return dateStr.slice(0, 7); // mes
+}
+
+function fmtPeriodoLabel(ini, fim) {
+  const fmtD = d => d ? d.slice(5).replace('-', '/') : '';
+  return `(${fmtD(ini)}–${fmtD(fim)})`;
+}
+
+function _renderGraficoResumo(p1, d1ini, d1fim, p2, d2ini, d2fim) {
+  const wrap = document.getElementById('grafico-resumo-wrap');
+  if (!wrap) return;
+  const fmt = v => formatGS(v);
+  const saldo1 = p1.totalReceita - p1.totalDespesa;
+  let html = `<div class="grafico-resumo">
+    <div class="gr-col">
+      <span class="gr-label">Receitas ${fmtPeriodoLabel(d1ini, d1fim)}</span>
+      <strong class="gr-val gr-rec">${fmt(p1.totalReceita)}</strong>
+    </div>
+    <div class="gr-col">
+      <span class="gr-label">Despesas ${fmtPeriodoLabel(d1ini, d1fim)}</span>
+      <strong class="gr-val gr-desp">${fmt(p1.totalDespesa)}</strong>
+    </div>
+    <div class="gr-col">
+      <span class="gr-label">Saldo</span>
+      <strong class="gr-val ${saldo1 >= 0 ? 'gr-rec' : 'gr-desp'}">${fmt(saldo1)}</strong>
+    </div>`;
+  if (p2) {
+    const saldo2 = p2.totalReceita - p2.totalDespesa;
+    const diffRec = p2.totalReceita - p1.totalReceita;
+    const diffDesp = p2.totalDespesa - p1.totalDespesa;
+    html += `
+    <div class="gr-sep"></div>
+    <div class="gr-col">
+      <span class="gr-label">Receitas ${fmtPeriodoLabel(d2ini, d2fim)}</span>
+      <strong class="gr-val" style="color:#3b82f6">${fmt(p2.totalReceita)}</strong>
+      <small class="${diffRec >= 0 ? 'gr-diff-pos' : 'gr-diff-neg'}">${diffRec >= 0 ? '▲' : '▼'} ${fmt(Math.abs(diffRec))}</small>
+    </div>
+    <div class="gr-col">
+      <span class="gr-label">Despesas ${fmtPeriodoLabel(d2ini, d2fim)}</span>
+      <strong class="gr-val" style="color:#f97316">${fmt(p2.totalDespesa)}</strong>
+      <small class="${diffDesp <= 0 ? 'gr-diff-pos' : 'gr-diff-neg'}">${diffDesp >= 0 ? '▲' : '▼'} ${fmt(Math.abs(diffDesp))}</small>
+    </div>
+    <div class="gr-col">
+      <span class="gr-label">Saldo P2</span>
+      <strong class="gr-val ${saldo2 >= 0 ? 'gr-rec' : 'gr-desp'}">${fmt(saldo2)}</strong>
+    </div>`;
+  }
+  html += '</div>';
+  wrap.innerHTML = html;
+}
+
+/* ── Init gráfico com mês atual ─────────────────────────── */
+function initGraficoFinanceiro() {
+  const hoje = new Date();
+  const ini = new Date(hoje.getFullYear(), hoje.getMonth(), 1).toISOString().slice(0, 10);
+  const fim = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0).toISOString().slice(0, 10);
+  const elIni = document.getElementById('graf-data-inicio');
+  const elFim = document.getElementById('graf-data-fim');
+  if (elIni) elIni.value = ini;
+  if (elFim) elFim.value = fim;
+  carregarGraficoFinanceiro();
 }
 
 /* ══════════════════════════════════════════════════════════

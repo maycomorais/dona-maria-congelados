@@ -859,30 +859,37 @@ async function enviarPedidoZap(){
   const obs=document.getElementById('observacoes-gerais').value.trim();
   if(!nome||!tel){mostrarToast('Completá nombre y teléfono.');return;}
   try{
-    // ── Vincular ao cliente cadastrado pelo telefone
+    // ── Verificar se é cliente cadastrado e ativo
     let clienteId=null;
+    let inclusoPlan=false;
     try{
-      const{data}=await supa.from('clientes').select('id').eq('tel',ddi+tel).maybeSingle();
-      if(data?.id) clienteId=data.id;
+      const{data}=await supa.from('clientes').select('id,status').eq('tel',ddi+tel).maybeSingle();
+      if(data?.id){
+        clienteId=data.id;
+        inclusoPlan=(data.status==='ativo'); // entrega já coberta pelo plano
+      }
     }catch(e){}
 
     const{data:pedido,error}=await supa.from('pedidos').insert([{
       cliente_nome:nome, cliente_tel:ddi+tel,
-      cliente_id:clienteId,   // ← vinculado se cadastrado
+      cliente_id:clienteId,
       plano, pratos:itensPedido, observacoes:obs,
       forma_pag:pagamentoSel, semana:getSemanaAtual(),
       status:'pendente',
+      incluso_plano: inclusoPlan,
     }]).select().single();
     if(error) throw error;
 
-    const msg=gerarMensagemPedido(nome,plano,itensPedido,obs,pedido.id);
+    const msg=gerarMensagemPedido(nome,plano,itensPedido,obs,pedido.id,inclusoPlan);
     window.open(`https://api.whatsapp.com/send?phone=595991635604&text=${encodeURIComponent(msg)}`,'_blank');
     itensPedido=[]; linhaLocked=null;
     atualizarCarrinho(); salvarDados();
-    mostrarToast('✅ ¡Pedido enviado con éxito!');
+    mostrarToast(inclusoPlan
+      ? '✅ ¡Pedido registrado como entrega de tu plan!'
+      : '✅ ¡Pedido enviado con éxito!');
   }catch(e){console.error(e);mostrarToast('Error al guardar el pedido.');}
 }
-function gerarMensagemPedido(nome,plano,itens,obs,pedidoId){
+function gerarMensagemPedido(nome,plano,itens,obs,pedidoId,inclusoPlan=false){
   const total=calcularTotalPedido();
   const fmt=v=>`₲ ${Math.round(v).toLocaleString('es-PY')}`;
 
@@ -922,7 +929,10 @@ function gerarMensagemPedido(nome,plano,itens,obs,pedidoId){
 
   if(obs) msg += `📝 *Obs:* ${obs}\n\n`;
 
-  if(total){
+  if(inclusoPlan){
+    msg += `*── RESUMO ──*\n`;
+    msg += `📋 *Entrega inclusa no plano ativo* — sem cobrança adicional\n\n`;
+  } else if(total){
     msg += `*── RESUMO ──*\n`;
     if(total.desconto>0) msg += `Desconto ${(total.desconto*100).toFixed(0)}%: -${fmt(total.descValor)}\n`;
     if(total.extrasGrama>0) msg += `Personalização: +${fmt(total.extrasGrama)}\n`;
@@ -930,7 +940,7 @@ function gerarMensagemPedido(nome,plano,itens,obs,pedidoId){
     msg += `*TOTAL: ${fmt(total.total)}*\n\n`;
   }
 
-  msg += `*Pagamento:* ${pagamentoSel}`;
+  msg += `*Pagamento:* ${inclusoPlan ? 'Incluso no plano' : pagamentoSel}`;
   if(linkMaps) msg += `\n📍 *Localização:* ${linkMaps}`;
   return msg;
 }
