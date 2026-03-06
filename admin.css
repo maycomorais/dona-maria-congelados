@@ -742,9 +742,10 @@ textarea.form-control { resize: vertical; min-height: 80px; }
   padding: 20px;
   opacity: 0;
   visibility: hidden;
+  pointer-events: none;
   transition: var(--transicao);
 }
-.modal-overlay.active { opacity: 1; visibility: visible; }
+.modal-overlay.active { opacity: 1; visibility: visible; pointer-events: all; }
 .modal-box {
   background: var(--branco);
   border-radius: var(--raio);

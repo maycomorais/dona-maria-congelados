@@ -111,6 +111,29 @@ function toggleSidebar() {
   document.getElementById('sidebar')?.classList.toggle('open');
 }
 
+/* ── Mobile Bottom Nav ──────────────────────────────────────── */
+// Retorna o botão do bottom-nav correspondente à página
+function navBtn(page) {
+  return document.querySelector(`.bottom-nav-btn[data-page="${page}"]`) || null;
+}
+
+function toggleMobileDrawer() {
+  const drawer = document.getElementById('mobile-drawer');
+  if (!drawer) return;
+  const isOpen = drawer.classList.contains('open');
+  if (isOpen) {
+    closeMobileDrawer();
+  } else {
+    drawer.classList.add('open');
+    document.getElementById('btn-mais')?.classList.add('active');
+  }
+}
+
+function closeMobileDrawer() {
+  document.getElementById('mobile-drawer')?.classList.remove('open');
+  document.getElementById('btn-mais')?.classList.remove('active');
+}
+
 /* ══════════════════════════════════════════════════════════
    CARGA INICIAL
    ══════════════════════════════════════════════════════════ */

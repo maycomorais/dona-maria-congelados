@@ -43,11 +43,21 @@ function calcularTaxaGrama(tipo, gramas) {
 }
 
 const CONFIG_PLANOS = {
-  Individual:    { min:5,  max:13,   exato:false, linhaLock:false, permiteMix:true  },
-  Semanal:       { min:14, max:14,   exato:true,  linhaLock:true,  permiteMix:false },
-  FDS:           { min:10, max:10,   exato:true,  linhaLock:true,  permiteMix:false },
-  Mensal:        { min:14, max:14,   exato:true,  linhaLock:true,  permiteMix:false },
-  Personalizado: { min:5,  max:null, exato:false, linhaLock:false, permiteMix:true  },
+  // Individual: 5–13 por pedido, sem desconto
+  Individual:    { min:5,  max:13,   exato:false, linhaLock:false, permiteMix:true,
+                   totalPlano:null, entregasPorPlano:1 },
+  // Semanal: 14 por entrega, 1 entrega
+  Semanal:       { min:14, max:14,   exato:true,  linhaLock:true,  permiteMix:false,
+                   totalPlano:14,   entregasPorPlano:1 },
+  // FDS: 10 por entrega × 4 semanas = 40 total
+  FDS:           { min:10, max:10,   exato:true,  linhaLock:true,  permiteMix:false,
+                   totalPlano:40,   entregasPorPlano:4 },
+  // Mensal: 14 por entrega × 4 semanas = 56 total
+  Mensal:        { min:14, max:14,   exato:true,  linhaLock:true,  permiteMix:false,
+                   totalPlano:56,   entregasPorPlano:4 },
+  // Personalizado: mín 5, sem limite. 5% OFF se >14, 10% OFF se >56
+  Personalizado: { min:5,  max:null, exato:false, linhaLock:false, permiteMix:true,
+                   totalPlano:null, entregasPorPlano:1 },
 };
 
 let CARDAPIO = {};
@@ -502,8 +512,10 @@ function configurarPlano() {
   const lTxt=document.getElementById('limite-txt');
   if(lTxt){
     if(!plano) lTxt.textContent='—';
-    else if(plano==='Individual') lTxt.textContent='13 máx.';
-    else if(plano==='Personalizado') lTxt.textContent='∞';
+    else if(plano==='Individual') lTxt.textContent='5 a 13';
+    else if(plano==='Personalizado') lTxt.textContent='5+ (desc. a partir de 15)';
+    else if(plano==='FDS') lTxt.textContent='10 por semana × 4 sem';
+    else if(plano==='Mensal') lTxt.textContent='14 por semana × 4 sem';
     else if(cfg?.exato) lTxt.textContent=String(cfg.max);
     else lTxt.textContent=`${cfg?.min}+`;
   }
@@ -568,16 +580,14 @@ function renderizarModalCarrinho() {
 let desconto = 0;
 let totalComDesconto = totalBruto;
 
-// Regra para o Plano Personalizado (ou Individual, dependendo do nome no seu CONFIG_PLANOS)
-if (planoSel === 'Individual' || planoSel === 'Personalizado') {
+// Regra de desconto — apenas Personalizado (passando de 14 ou de 56)
+if (planoSel === 'Personalizado') {
     const qtdItens = itensPedido.length;
-
-    if (qtdItens >= 56) {
-        desconto = 0.10; // 10% de desconto
-    } else if (qtdItens >= 14) {
-        desconto = 0.05; // 5% de desconto
+    if (qtdItens > 56) {
+        desconto = 0.10; // 10% acima de 56
+    } else if (qtdItens > 14) {
+        desconto = 0.05; // 5% acima de 14
     }
-
     if (desconto > 0) {
         totalComDesconto = totalBruto * (1 - desconto);
     }
@@ -707,9 +717,10 @@ function renderizarResumo() {
   const fmt=v=>`₲ ${Math.round(v).toLocaleString('es-PY')}`;
   const plano=document.getElementById('plano-selecionado').value;
   let html='';
-  if(plano==='FDS'||plano==='Mensal')
-    html+=`<div class="resumo-row"><span>${plano==='FDS'?40:56} marmitas (${linhaLocked})</span><span>${fmt(t.baseTotal)}</span></div>`;
-  else
+  if(plano==='FDS'||plano==='Mensal'){
+    const nSem=cfg.max; const nEnt=cfg.entregasPorPlano;
+    html+=`<div class="resumo-row"><span>${nSem} marmitas × ${nEnt} semanas = ${cfg.totalPlano} total (${linhaLocked})</span><span>${fmt(t.baseTotal)}</span></div>`;
+  } else
     html+=`<div class="resumo-row"><span>${itensPedido.length} plato(s)</span><span>${fmt(t.baseTotal)}</span></div>`;
   if(t.desconto>0) html+=`<div class="resumo-row resumo-desconto"><span>Desconto ${(t.desconto*100).toFixed(0)}%</span><span>− ${fmt(t.descValor)}</span></div>`;
   if(t.extrasGrama>0) html+=`<div class="resumo-row"><span>Personalização</span><span>+ ${fmt(t.extrasGrama)}</span></div>`;
@@ -731,8 +742,8 @@ function verificarBotao(){
   const tel=document.getElementById('cliente-tel').value.trim();
   const cfg=CONFIG_PLANOS[plano]; const n=itensPedido.length;
   let planOk=false;
-  if(plano==='Individual') planOk=n>=1&&n<=13;
-  else if(plano==='Personalizado') planOk=n>=1;
+  if(plano==='Individual') planOk=n>=5&&n<=13;
+  else if(plano==='Personalizado') planOk=n>=5;
   else if(cfg?.exato) planOk=n===cfg.max;
   const ok=planOk&&nome&&tel&&pagamentoSel;
   const btn=document.getElementById('btn-whatsapp');
@@ -740,9 +751,9 @@ function verificarBotao(){
   const hint=document.getElementById('botao-hint');
   if(hint){
     if(!plano) hint.textContent='Seleccioná un plan.';
-    else if(plano==='Individual'&&n<1) hint.textContent='Agregá al menos 1 plato.';
+    else if((plano==='Individual'||plano==='Personalizado')&&n<5) hint.textContent='Mínimo 5 platos.';
     else if(plano==='Individual'&&n>13) hint.textContent='Máximo 13 platos en Individual.';
-    else if(cfg?.exato&&n<cfg.max) hint.textContent=`Agregá ${cfg.max-n} plato(s) más.`;
+    else if(cfg?.exato&&n<cfg.max) hint.textContent=`Agregá ${cfg.max-n} plato(s) más para esta entrega.`;
     else if(!nome||!tel) hint.textContent='Completá nombre y WhatsApp.';
     else if(!pagamentoSel) hint.textContent='Elegí la forma de pago.';
     else hint.textContent='';
@@ -857,6 +868,13 @@ async function enviarPedidoZap(){
   const ddi=document.getElementById('cliente-ddi').value;
   const tel=document.getElementById('cliente-tel').value.trim();
   const obs=document.getElementById('observacoes-gerais').value.trim();
+  const cfg=CONFIG_PLANOS[plano];
+  const n=itensPedido.length;
+  if(!plano){mostrarToast('Seleccioná un plan.');return;}
+  if(n===0){mostrarToast('Agregá al menos 1 plato.');return;}
+  if((plano==='Individual'||plano==='Personalizado')&&n<5){mostrarToast('Mínimo 5 platos.');return;}
+  if(cfg?.exato&&n!==cfg.max){mostrarToast(`Este plano requer exatamente ${cfg.max} platos.`);return;}
+  if(!pagamentoSel){mostrarToast('Elegí la forma de pago.');return;}
   if(!nome||!tel){mostrarToast('Completá nombre y teléfono.');return;}
   try{
     // ── Verificar se é cliente cadastrado e ativo
@@ -909,7 +927,12 @@ function gerarMensagemPedido(nome,plano,itens,obs,pedidoId,inclusoPlan=false){
   // ── Montar mensagem
   let msg = `🍽️ *NOVO PEDIDO — Doña Maria*\n\n`;
   msg += `*Cliente:* ${nome}\n`;
-  msg += `*Plano:* ${plano}\n\n`;
+  if(plano==='FDS'||plano==='Mensal'){
+    const cfg=CONFIG_PLANOS[plano];
+    msg += `*Plano:* ${plano} — ${cfg.max} refeições/semana × ${cfg.entregasPorPlano} semanas (${cfg.totalPlano} total)\n\n`;
+  } else {
+    msg += `*Plano:* ${plano}\n\n`;
+  }
   msg += `*── PRATOS ──*\n`;
 
   let num = 1;
