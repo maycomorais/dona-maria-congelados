@@ -1004,6 +1004,76 @@
     </div>
   </div>
 
+  <!-- SIDEBAR BACKDROP (tablet) -->
+  <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="closeSidebar()"></div>
+
+  <!-- BOTTOM NAV (mobile only) -->
+  <nav class="bottom-nav" id="bottom-nav">
+    <button class="bottom-nav-btn active" data-page="dashboard"
+      onclick="showPage('dashboard',navBtn('dashboard'));closeMobileDrawer()">
+      <i class="fas fa-chart-line"></i><span>Início</span>
+    </button>
+    <button class="bottom-nav-btn" data-page="pedidos-pendentes"
+      onclick="showPage('pedidos-pendentes',navBtn('pedidos-pendentes'));closeMobileDrawer()">
+      <i class="fas fa-clock"></i><span>Pedidos</span>
+    </button>
+    <button class="bottom-nav-btn" data-page="semana"
+      onclick="showPage('semana',navBtn('semana'));closeMobileDrawer()">
+      <i class="fas fa-calendar-week"></i><span>Semana</span>
+    </button>
+    <button class="bottom-nav-btn" data-page="producao"
+      onclick="showPage('producao',navBtn('producao'));closeMobileDrawer()">
+      <i class="fas fa-fire"></i><span>Produção</span>
+    </button>
+    <button class="bottom-nav-btn" id="btn-mais" onclick="toggleMobileDrawer()">
+      <i class="fas fa-th" style="font-size:1rem"></i><span>Mais</span>
+    </button>
+  </nav>
+
+  <!-- MOBILE DRAWER (More menu) -->
+  <div class="mobile-drawer" id="mobile-drawer">
+    <div class="mobile-drawer-backdrop" onclick="closeMobileDrawer()"></div>
+    <div class="mobile-drawer-panel">
+      <div class="mobile-drawer-handle"></div>
+      <div class="mobile-drawer-user">
+        <i class="fas fa-user-circle"></i>
+        <span id="drawer-user-name">Admin</span>
+      </div>
+      <div class="mobile-drawer-divider"></div>
+
+      <div class="mobile-drawer-section">Principal</div>
+      <button class="mobile-drawer-item" onclick="showPage('clientes',navBtn('clientes'));closeMobileDrawer()">
+        <i class="fas fa-users"></i> Clientes &amp; Entregas
+      </button>
+
+      <div class="mobile-drawer-section">Logística</div>
+      <button class="mobile-drawer-item" onclick="showPage('motoboys',navBtn('motoboys'));closeMobileDrawer()">
+        <i class="fas fa-motorcycle"></i> Motoboys
+      </button>
+
+      <div class="mobile-drawer-section">Financeiro</div>
+      <button class="mobile-drawer-item" onclick="showPage('caixa',navBtn('caixa'));closeMobileDrawer()">
+        <i class="fas fa-cash-register"></i> Caixa do Mês
+      </button>
+      <button class="mobile-drawer-item" onclick="showPage('lancamentos',navBtn('lancamentos'));closeMobileDrawer()">
+        <i class="fas fa-list-alt"></i> Lançamentos
+      </button>
+
+      <div class="mobile-drawer-section">Cardápio</div>
+      <button class="mobile-drawer-item" onclick="showPage('cardapio-admin',navBtn('cardapio-admin'));closeMobileDrawer()">
+        <i class="fas fa-book-open"></i> Gerenciar Cardápio
+      </button>
+      <button class="mobile-drawer-item" onclick="showPage('pedidos-todos',navBtn('pedidos-todos'));closeMobileDrawer()">
+        <i class="fas fa-list"></i> Todos os Pedidos
+      </button>
+
+      <div class="mobile-drawer-divider"></div>
+      <button class="mobile-drawer-item" style="color:#fca5a5" onclick="fazerLogout()">
+        <i class="fas fa-sign-out-alt" style="color:#f87171"></i> Sair
+      </button>
+    </div>
+  </div>
+
   <script src="admin.js"></script>
 </body>
 </html>
