@@ -6,7 +6,7 @@
   <title>Doña Maria - Painel Administrativo</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -41,6 +41,8 @@
 
   <!-- MAIN APP -->
   <div class="app" id="app" hidden>
+    <!-- SIDEBAR BACKDROP (tablet) -->
+    <div class="sidebar-backdrop" id="sidebar-backdrop" onclick="closeSidebar()"></div>
     <!-- SIDEBAR -->
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-brand">
@@ -300,34 +302,44 @@
       <!-- LISTA DA SEMANA -->
       <div class="page" id="page-semana">
         <div class="page-actions">
-          <select class="form-control" id="semana-select" onchange="carregarSemana()">
-            <option value="2024-W45">Semana 45 - 2024</option>
-          </select>
-          <button class="btn btn-primary" onclick="imprimirListaSemana()">
-            <i class="fas fa-print"></i> Imprimir
+          <select class="form-control" id="semana-select" onchange="carregarSemana()" style="max-width:280px"></select>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-outline" onclick="exportarSemanaExcel()">
+              <i class="fas fa-file-excel"></i> Exportar Excel
+            </button>
+            <button class="btn btn-primary" onclick="imprimirListaSemana()">
+              <i class="fas fa-print"></i> Imprimir
+            </button>
+          </div>
+        </div>
+
+        <!-- Toolbar de seleção -->
+        <div id="semana-toolbar" class="batch-actions" style="display:none;margin-bottom:16px;border-radius:10px">
+          <span id="semana-sel-count">0 clientes selecionados</span>
+          <button class="btn btn-primary btn-sm" onclick="mostrarResumoSelecionados()">
+            <i class="fas fa-list-ul"></i> Ver Resumo dos Selecionados
           </button>
         </div>
+
+        <!-- Lista de clientes colapsável -->
         <div class="card">
           <div class="card-header">
             <h3 id="semana-titulo">Entregas da Semana</h3>
+            <label style="display:flex;align-items:center;gap:8px;font-size:.875rem;font-weight:500;cursor:pointer;user-select:none">
+              <input type="checkbox" id="sel-todos-semana" onchange="selecionarTodosSemana(this.checked)">
+              Selecionar todos
+            </label>
           </div>
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Cliente</th>
-                  <th>Plano</th>
-                  <th>Data</th>
-                  <th>Entrega</th>
-                  <th>Linha</th>
-                  <th>Status</th>
-                  <th>Obs</th>
-                </tr>
-              </thead>
-              <tbody id="tbody-semana"></tbody>
-            </table>
+          <div id="semana-clientes-list"><p class="empty-msg">Selecione uma semana</p></div>
+        </div>
+
+        <!-- Resumo dos selecionados -->
+        <div class="card" id="card-resumo-semana" style="display:none">
+          <div class="card-header">
+            <h3>Resumo — Produção dos Selecionados</h3>
+            <button class="btn btn-sm btn-outline" onclick="document.getElementById('card-resumo-semana').style.display='none'">Fechar</button>
           </div>
+          <div id="resumo-semana-content"></div>
         </div>
       </div>
 
@@ -335,7 +347,6 @@
       <div class="page" id="page-producao">
         <div class="page-actions">
           <select class="form-control" id="prod-semana-select" onchange="carregarProducao()">
-            <option value="2024-W45">Semana 45 - 2024</option>
           </select>
           <button class="btn btn-primary" onclick="imprimirProducao()">
             <i class="fas fa-print"></i> Imprimir
@@ -349,7 +360,12 @@
           <div class="producao-grid" id="grid-producao"></div>
         </div>
         <div class="card">
-          <div class="card-header"><h3>Lista Consolidada</h3></div>
+          <div class="card-header">
+            <h3>Lista Consolidada</h3>
+            <button class="btn btn-sm btn-outline" onclick="imprimirProducao()">
+              <i class="fas fa-print"></i> Imprimir Lista
+            </button>
+          </div>
           <div class="table-wrap">
             <table>
               <thead>
@@ -361,6 +377,32 @@
               </thead>
               <tbody id="tbody-producao"></tbody>
             </table>
+          </div>
+        </div>
+
+        <!-- Insumos de Proteína -->
+        <div class="card">
+          <div class="card-header">
+            <h3>Insumos — Proteínas (peso cru)</h3>
+            <span class="badge badge-green" id="insumos-total-kg">0 kg</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Proteína</th>
+                  <th>Tipo</th>
+                  <th style="text-align:center">Pratos</th>
+                  <th style="text-align:center">Fator Cocção</th>
+                  <th style="text-align:right">Total Cru (kg)</th>
+                  <th style="text-align:right">Total Cru (g)</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-insumos"></tbody>
+            </table>
+          </div>
+          <div style="padding:12px 20px;font-size:.8rem;color:#9ca3af">
+            <i class="fas fa-info-circle"></i> Peso cru calculado com base em 170g/prato padrão × fator de cocção (frango ×1,35 · bovina/suíno ×1,30). Pratos personalizados usam gramagem definida pelo cliente.
           </div>
         </div>
       </div>
@@ -427,6 +469,7 @@
                   <th>Valor R$</th>
                   <th>Valor ₲</th>
                   <th>Cliente</th>
+                  <th>Ações</th>
                 </tr>
               </thead>
               <tbody id="tbody-caixa"></tbody>
@@ -695,47 +738,61 @@
       <button class="modal-close" onclick="fecharModal('modal-editar-pedido')">✕</button>
       <div class="modal-title">Editar Pedido</div>
       <input type="hidden" id="edit-pedido-id">
-      <div class="form-row">
-        <div class="form-group">
-          <label>Cliente</label>
-          <input type="text" class="form-control" id="edit-cliente-nome">
+      <div style="padding:20px 26px 0">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Cliente</label>
+            <input type="text" class="form-control" id="edit-cliente-nome">
+          </div>
+          <div class="form-group">
+            <label>Telefone</label>
+            <input type="text" class="form-control" id="edit-cliente-tel">
+          </div>
         </div>
-        <div class="form-group">
-          <label>Telefone</label>
-          <input type="text" class="form-control" id="edit-cliente-tel">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Plano</label>
+            <select class="form-control" id="edit-plano">
+              <option value="Individual">Individual</option>
+              <option value="Semanal">Semanal</option>
+              <option value="FDS">Fins de Semana Livres</option>
+              <option value="Mensal">Mensal</option>
+              <option value="Personalizado">Personalizado</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select class="form-control" id="edit-status">
+              <option value="pendente">Pendente</option>
+              <option value="aceito">Aceito</option>
+              <option value="em_producao">Em Produção</option>
+              <option value="pronto">Pronto</option>
+              <option value="em_entrega">Em Entrega</option>
+              <option value="entregue">Entregue</option>
+              <option value="recusado">Recusado</option>
+              <option value="cancelado">Cancelado</option>
+            </select>
+          </div>
         </div>
-      </div>
-      <div class="form-row">
+
+        <!-- Visual dish editor -->
         <div class="form-group">
-          <label>Plano</label>
-          <select class="form-control" id="edit-plano">
-            <option value="Individual">Individual</option>
-            <option value="Semanal">Semanal</option>
-            <option value="FDS">Fins de Semana Livres</option>
-            <option value="Mensal">Mensal</option>
-          </select>
+          <label>Pratos</label>
+          <div id="edit-pratos-lista" style="background:#f9f9f7;border:1.5px solid #e5e4e0;border-radius:9px;min-height:52px;padding:8px;margin-bottom:10px"></div>
+          <div style="display:flex;gap:8px">
+            <select class="form-control" id="edit-add-prato-select" style="flex:1">
+              <option value="">Selecionar prato para adicionar...</option>
+            </select>
+            <button class="btn btn-outline btn-sm" onclick="adicionarPratoEdicao()" style="white-space:nowrap">
+              <i class="fas fa-plus"></i> Adicionar
+            </button>
+          </div>
         </div>
+
         <div class="form-group">
-          <label>Status</label>
-          <select class="form-control" id="edit-status">
-            <option value="pendente">Pendente</option>
-            <option value="aceito">Aceito</option>
-            <option value="em_producao">Em Produção</option>
-            <option value="pronto">Pronto</option>
-            <option value="em_entrega">Em Entrega</option>
-            <option value="entregue">Entregue</option>
-            <option value="recusado">Recusado</option>
-            <option value="cancelado">Cancelado</option>
-          </select>
+          <label>Observações</label>
+          <textarea class="form-control" id="edit-obs" rows="2"></textarea>
         </div>
-      </div>
-      <div class="form-group">
-        <label>Pratos (JSON)</label>
-        <textarea class="form-control" id="edit-pratos" rows="5" style="font-family:monospace;font-size:0.85rem;"></textarea>
-      </div>
-      <div class="form-group">
-        <label>Observações</label>
-        <textarea class="form-control" id="edit-obs" rows="2"></textarea>
       </div>
       <div class="modal-actions">
         <button class="btn btn-outline" onclick="fecharModal('modal-editar-pedido')">Cancelar</button>
@@ -850,6 +907,73 @@
           <i class="fas fa-save"></i> Salvar
         </button>
       </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV (mobile only) -->
+  <nav class="bottom-nav" id="bottom-nav">
+    <button class="bottom-nav-btn active" data-page="dashboard"
+      onclick="showPage('dashboard',navBtn('dashboard'));closeMobileDrawer()">
+      <i class="fas fa-chart-line"></i><span>Início</span>
+    </button>
+    <button class="bottom-nav-btn" data-page="pedidos-pendentes"
+      onclick="showPage('pedidos-pendentes',navBtn('pedidos-pendentes'));closeMobileDrawer()">
+      <i class="fas fa-clock"></i><span>Pedidos</span>
+    </button>
+    <button class="bottom-nav-btn" data-page="semana"
+      onclick="showPage('semana',navBtn('semana'));closeMobileDrawer()">
+      <i class="fas fa-calendar-week"></i><span>Semana</span>
+    </button>
+    <button class="bottom-nav-btn" data-page="producao"
+      onclick="showPage('producao',navBtn('producao'));closeMobileDrawer()">
+      <i class="fas fa-fire"></i><span>Produção</span>
+    </button>
+    <button class="bottom-nav-btn" id="btn-mais" onclick="toggleMobileDrawer()">
+      <i class="fas fa-grid-2" style="font-size:1rem"></i><span>Mais</span>
+    </button>
+  </nav>
+
+  <!-- MOBILE DRAWER (More menu) -->
+  <div class="mobile-drawer" id="mobile-drawer">
+    <div class="mobile-drawer-backdrop" onclick="closeMobileDrawer()"></div>
+    <div class="mobile-drawer-panel">
+      <div class="mobile-drawer-handle"></div>
+      <div class="mobile-drawer-user">
+        <i class="fas fa-user-circle"></i>
+        <span id="drawer-user-name">Admin</span>
+      </div>
+      <div class="mobile-drawer-divider"></div>
+
+      <div class="mobile-drawer-section">Principal</div>
+      <button class="mobile-drawer-item" onclick="showPage('clientes',navBtn('clientes'));closeMobileDrawer()">
+        <i class="fas fa-users"></i> Clientes &amp; Entregas
+      </button>
+
+      <div class="mobile-drawer-section">Logística</div>
+      <button class="mobile-drawer-item" onclick="showPage('motoboys',navBtn('motoboys'));closeMobileDrawer()">
+        <i class="fas fa-motorcycle"></i> Motoboys
+      </button>
+
+      <div class="mobile-drawer-section">Financeiro</div>
+      <button class="mobile-drawer-item" onclick="showPage('caixa',navBtn('caixa'));closeMobileDrawer()">
+        <i class="fas fa-cash-register"></i> Caixa do Mês
+      </button>
+      <button class="mobile-drawer-item" onclick="showPage('lancamentos',navBtn('lancamentos'));closeMobileDrawer()">
+        <i class="fas fa-list-alt"></i> Lançamentos
+      </button>
+
+      <div class="mobile-drawer-section">Cardápio</div>
+      <button class="mobile-drawer-item" onclick="showPage('cardapio-admin',navBtn('cardapio-admin'));closeMobileDrawer()">
+        <i class="fas fa-book-open"></i> Gerenciar Cardápio
+      </button>
+      <button class="mobile-drawer-item" onclick="showPage('pedidos-todos',navBtn('pedidos-todos'));closeMobileDrawer()">
+        <i class="fas fa-list"></i> Todos os Pedidos
+      </button>
+
+      <div class="mobile-drawer-divider"></div>
+      <button class="mobile-drawer-item" style="color:#fca5a5" onclick="fazerLogout()">
+        <i class="fas fa-sign-out-alt" style="color:#f87171"></i> Sair
+      </button>
     </div>
   </div>
 

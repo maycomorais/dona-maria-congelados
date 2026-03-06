@@ -21,7 +21,11 @@ let graficoPratos       = null;
 /* ── BOOT ─────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', () => {
   verificarAutenticacao();
-  if (sessionStorage.getItem('donamaria_auth')) carregarDadosIniciais();
+  if (sessionStorage.getItem('donamaria_auth')) {
+    carregarDadosIniciais();
+    const saved = sessionStorage.getItem('donamaria_page') || 'dashboard';
+    showPage(saved, navBtn(saved));
+  }
 });
 
 /* ══════════════════════════════════════════════════════════
@@ -64,8 +68,10 @@ async function fazerLogin() {
   sessionStorage.setItem('donamaria_auth', JSON.stringify({
     id: data.id, nome: data.nome, username: data.username, role: data.role
   }));
+  sessionStorage.removeItem('donamaria_page');
   verificarAutenticacao();
   await carregarDadosIniciais();
+  showPage('dashboard', navBtn('dashboard'));
 }
 
 function fazerLogout() {
@@ -89,8 +95,26 @@ function showPage(page, el) {
   if (el) el.classList.add('active');
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById('page-' + page)?.classList.add('active');
+
+  // Sync title
   const titleEl = document.getElementById('page-title');
   if (titleEl && el) titleEl.textContent = el.textContent.trim().replace(/\s+/g, ' ');
+
+  // Sync bottom nav
+  document.querySelectorAll('.bottom-nav-btn[data-page]').forEach(b => {
+    b.classList.toggle('active', b.dataset.page === page);
+  });
+  // Sync drawer items
+  document.querySelectorAll('.mobile-drawer-item').forEach(b => {
+    b.classList.toggle('active', (b.getAttribute('onclick') || '').includes(`'${page}'`));
+  });
+
+  // Persist tab
+  sessionStorage.setItem('donamaria_page', page);
+
+  // Close sidebar/drawer on mobile
+  closeSidebar();
+
   const loaders = {
     'dashboard':         carregarDashboard,
     'clientes':          carregarClientes,
@@ -106,9 +130,42 @@ function showPage(page, el) {
   if (loaders[page]) loaders[page]();
 }
 
-function toggleSidebar() {
-  document.getElementById('sidebar')?.classList.toggle('open');
+function navBtn(page) {
+  return document.querySelector(`.nav-item[onclick*="'${page}'"]`);
 }
+
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  const bd = document.getElementById('sidebar-backdrop');
+  if (!sb) return;
+  const isOpen = sb.classList.toggle('open');
+  if (bd) bd.classList.toggle('show', isOpen);
+}
+
+function closeSidebar() {
+  const sb = document.getElementById('sidebar');
+  const bd = document.getElementById('sidebar-backdrop');
+  if (sb) sb.classList.remove('open');
+  if (bd) bd.classList.remove('show');
+}
+
+function toggleMobileDrawer() {
+  const drawer = document.getElementById('mobile-drawer');
+  if (!drawer) return;
+  drawer.classList.toggle('open');
+  // sync user name
+  const auth = sessionStorage.getItem('donamaria_auth');
+  if (auth) {
+    const u = JSON.parse(auth);
+    const el = document.getElementById('drawer-user-name');
+    if (el) el.textContent = u.nome || u.username || 'Admin';
+  }
+}
+
+function closeMobileDrawer() {
+  document.getElementById('mobile-drawer')?.classList.remove('open');
+}
+
 
 /* ══════════════════════════════════════════════════════════
    CARGA INICIAL
@@ -167,18 +224,19 @@ async function carregarDashboard() {
   const mesAtual = new Date().toISOString().slice(0, 7);
   const { data: lancMes } = await supabaseClient
     .from('lancamentos').select('tipo,valor_brl,valor_gs')
-    .gte('data_lancamento', mesAtual + '-01');
+    .gte('data_lancamento', mesAtual + '-01')
+    .lte('data_lancamento', mesAtual + '-31');
   const lm     = lancMes || [];
   const recBRL = lm.filter(l => l.tipo === 'receita').reduce((s, l) => s + (l.valor_brl || 0), 0);
   const desBRL = lm.filter(l => l.tipo === 'despesa').reduce((s, l) => s + (l.valor_brl || 0), 0);
   const recGS  = lm.filter(l => l.tipo === 'receita').reduce((s, l) => s + (l.valor_gs  || 0), 0);
   const desGS  = lm.filter(l => l.tipo === 'despesa').reduce((s, l) => s + (l.valor_gs  || 0), 0);
 
-  setText('stat-saldo-brl', formatBRL(recBRL - desBRL));
-  setText('stat-saldo-gs',  formatGS(recGS  - desGS));
-  setText('dash-receita',   formatBRL(recBRL));
-  setText('dash-despesa',   formatBRL(desBRL));
-  setText('dash-saldo',     formatBRL(recBRL - desBRL));
+  setText('stat-saldo-brl', recBRL ? formatBRL(recBRL - desBRL) : formatGS(recGS - desGS));
+  setText('stat-saldo-gs',  recBRL ? formatGS(recGS - desGS) : '');
+  setText('dash-receita',   recBRL ? formatBRL(recBRL) : formatGS(recGS));
+  setText('dash-despesa',   desBRL ? formatBRL(desBRL) : formatGS(desGS));
+  setText('dash-saldo',     recBRL ? formatBRL(recBRL - desBRL) : formatGS(recGS - desGS));
 
   // Próximas entregas
   const proximas = clientes
@@ -188,11 +246,11 @@ async function carregarDashboard() {
   const divProx = document.getElementById('dash-proximas');
   if (divProx) {
     divProx.innerHTML = proximas.length
-      ? proximas.map(c => `
-          <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0ebe7">
-            <span><strong>${c.nome}</strong><br><small style="color:#6b5a4f">${c.plano || ''}</small></span>
-            <span style="font-weight:600;color:#e76f51">${fmtData(c.prox_entrega)}</span>
-          </div>`).join('')
+      ? `<div style="padding:4px 0">` + proximas.map(c => `
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 20px;border-bottom:1px solid var(--borda)">
+            <div><strong style="font-size:.9rem">${c.nome}</strong><br><small style="color:var(--texto-suave)">${c.plano || ''}</small></div>
+            <span style="font-weight:600;color:var(--laranja);white-space:nowrap;margin-left:12px">${fmtData(c.prox_entrega)}</span>
+          </div>`).join('') + `</div>`
       : '<p class="empty-msg">Nenhuma entrega próxima</p>';
   }
 
@@ -301,24 +359,7 @@ async function editarCliente(id) {
   document.getElementById('cli-endereco').value        = c.endereco        || '';
   document.getElementById('cli-obs').value             = c.obs             || '';
   document.getElementById('modal-cliente-titulo').textContent = 'Editar Cliente';
-
-  // Injeta (ou atualiza) a seção de pedidos da semana no modal
-  const modalBox = document.querySelector('#modal-cliente .modal-box');
-  let secao = document.getElementById('cli-pratos-semana-section');
-  if (modalBox && !secao) {
-    secao = document.createElement('div');
-    secao.id = 'cli-pratos-semana-section';
-    secao.style.cssText = 'margin-top:20px;border-top:1px solid #f0ebe7;padding-top:16px';
-    secao.innerHTML = '<div style="font-weight:600;color:#3d2c24;margin-bottom:10px">'
-      + '<i class="fas fa-utensils" style="color:#e76f51;margin-right:6px"></i>Pedidos da Semana</div>'
-      + '<div id="cli-pratos-semana-corpo" style="font-size:13px;color:#6b5a4f">Carregando...</div>';
-    modalBox.insertBefore(secao, modalBox.querySelector('.modal-actions'));
-  } else if (document.getElementById('cli-pratos-semana-corpo')) {
-    document.getElementById('cli-pratos-semana-corpo').textContent = 'Carregando...';
-  }
-
   document.getElementById('modal-cliente').classList.add('active');
-  _carregarPratosCliente(c.id);
 }
 
 async function _carregarPratosCliente(clienteId) {
@@ -490,11 +531,41 @@ function renderizarPedidosPendentes(lista) {
 }
 
 async function aceitarPedido(id) {
+  const p = pedidos.find(x => x.id === id);
   const { error } = await supabaseClient.from('pedidos')
     .update({ status: 'aceito', updated_at: new Date().toISOString() }).eq('id', id);
   if (error) { mostrarToast('Erro: ' + error.message, 'error'); return; }
-  mostrarToast('Pedido aceito!');
-  carregarPedidosPendentes();
+
+  // Auto-criar cliente se não existir (telefone como identificador)
+  if (p?.cliente_tel) {
+    const tel = p.cliente_tel;
+    const { data: existe } = await supabaseClient
+      .from('clientes').select('id').eq('tel', tel).maybeSingle();
+    if (!existe) {
+      const { data: novoCli } = await supabaseClient.from('clientes').insert([{
+        nome:            p.cliente_nome || 'Cliente',
+        tel:             tel,
+        plano:           p.plano || 'Individual',
+        status:          'ativo',
+        total_entregas:  1,
+        entregas_feitas: 0,
+      }]).select('id').single();
+      // Vincular pedido ao novo cliente
+      if (novoCli?.id) {
+        await supabaseClient.from('pedidos').update({ cliente_id: novoCli.id }).eq('id', id);
+      }
+      mostrarToast(`✅ Pedido aceito! Cliente "${p.cliente_nome}" criado.`);
+    } else {
+      mostrarToast('Pedido aceito!');
+    }
+  } else {
+    mostrarToast('Pedido aceito!');
+  }
+
+  pedidosSelecionados.delete(id);
+  await _buscarPedidos();
+  await _buscarClientes();
+  filtrarPedidosPendentes();
 }
 
 async function recusarPedido(id) {
@@ -532,9 +603,28 @@ async function aceitarPedidosBatch() {
   const { error } = await supabaseClient.from('pedidos')
     .update({ status: 'aceito', updated_at: new Date().toISOString() }).in('id', ids);
   if (error) { mostrarToast('Erro: ' + error.message, 'error'); return; }
-  mostrarToast(ids.length + ' pedido(s) aceito(s)!');
+
+  // Auto-criar clientes novos
+  for (const id of ids) {
+    const p = pedidos.find(x => x.id === id);
+    if (!p?.cliente_tel) continue;
+    const { data: existe } = await supabaseClient
+      .from('clientes').select('id').eq('tel', p.cliente_tel).maybeSingle();
+    if (!existe) {
+      const { data: novoCli } = await supabaseClient.from('clientes').insert([{
+        nome: p.cliente_nome || 'Cliente', tel: p.cliente_tel,
+        plano: p.plano || 'Individual', status: 'ativo',
+        total_entregas: 1, entregas_feitas: 0,
+      }]).select('id').single();
+      if (novoCli?.id) await supabaseClient.from('pedidos').update({ cliente_id: novoCli.id }).eq('id', id);
+    }
+  }
+
+  mostrarToast(`${ids.length} pedido(s) aceito(s)!`);
   pedidosSelecionados.clear();
-  carregarPedidosPendentes();
+  await _buscarPedidos();
+  await _buscarClientes();
+  filtrarPedidosPendentes();
 }
 
 async function recusarPedidosBatch() {
@@ -550,6 +640,51 @@ async function recusarPedidosBatch() {
 }
 
 /* ── EDITAR PEDIDO ────────────────────────────────────────── */
+let editPratosAtual = [];
+
+function renderizarPratosEdicao() {
+  const lista = document.getElementById('edit-pratos-lista');
+  if (!lista) return;
+  if (!editPratosAtual.length) {
+    lista.innerHTML = '<p style="color:#9ca3af;font-style:italic;padding:10px 6px;font-size:.875rem">Nenhum prato adicionado</p>';
+    return;
+  }
+  lista.innerHTML = editPratosAtual.map((pr, i) => `
+    <div style="display:flex;align-items:center;gap:10px;padding:9px 12px;background:#fff;border:1px solid #e5e4e0;border-radius:8px;margin-bottom:6px">
+      <span style="flex:1;font-weight:500;font-size:.9rem">${pr.nome}</span>
+      <div style="display:flex;align-items:center;gap:6px;background:#f5f4f0;border-radius:6px;padding:2px 6px">
+        <button onclick="editQtd(${i},-1)" style="width:24px;height:24px;border:none;background:none;cursor:pointer;font-size:1rem;color:#6b7280;display:flex;align-items:center;justify-content:center;border-radius:4px" onmouseover="this.style.background='#e5e4e0'" onmouseout="this.style.background='none'">−</button>
+        <span style="font-weight:700;min-width:22px;text-align:center;font-size:.9rem">${pr.qtd || 1}</span>
+        <button onclick="editQtd(${i},1)" style="width:24px;height:24px;border:none;background:none;cursor:pointer;font-size:1rem;color:#6b7280;display:flex;align-items:center;justify-content:center;border-radius:4px" onmouseover="this.style.background='#e5e4e0'" onmouseout="this.style.background='none'">+</button>
+      </div>
+      <button onclick="editRemovePrato(${i})" style="width:28px;height:28px;border:1px solid #fecaca;background:#fef2f2;color:#ef4444;border-radius:6px;cursor:pointer;font-size:.8rem;display:flex;align-items:center;justify-content:center" title="Remover"><i class="fas fa-times"></i></button>
+    </div>`).join('');
+}
+
+function editQtd(idx, delta) {
+  if (!editPratosAtual[idx]) return;
+  editPratosAtual[idx].qtd = Math.max(1, (editPratosAtual[idx].qtd || 1) + delta);
+  renderizarPratosEdicao();
+}
+
+function editRemovePrato(idx) {
+  editPratosAtual.splice(idx, 1);
+  renderizarPratosEdicao();
+}
+
+function adicionarPratoEdicao() {
+  const sel = document.getElementById('edit-add-prato-select');
+  const id  = sel?.value;
+  if (!id) return;
+  const prato = cardapio.find(c => c.id === id);
+  if (!prato) return;
+  const exist = editPratosAtual.find(p => p.id === id);
+  if (exist) { exist.qtd = (exist.qtd || 1) + 1; }
+  else { editPratosAtual.push({ id: prato.id, nome: prato.nome, qtd: 1, linha: prato.linha, preco: prato.preco, kcal: prato.kcal }); }
+  sel.value = '';
+  renderizarPratosEdicao();
+}
+
 // schema pedidos: cliente_nome, cliente_tel, plano, pratos(jsonb), observacoes, forma_pag, status
 async function abrirModalEditarPedido(id) {
   const p = pedidos.find(x => x.id === id);
@@ -559,29 +694,40 @@ async function abrirModalEditarPedido(id) {
   document.getElementById('edit-cliente-tel').value  = p.cliente_tel  || '';
   document.getElementById('edit-plano').value        = p.plano        || '';
   document.getElementById('edit-status').value       = p.status       || 'pendente';
-  document.getElementById('edit-pratos').value       = JSON.stringify(p.pratos || [], null, 2);
   document.getElementById('edit-obs').value          = p.observacoes  || '';
+
+  // populate dish select
+  const addSel = document.getElementById('edit-add-prato-select');
+  if (addSel && cardapio.length) {
+    addSel.innerHTML = '<option value="">Selecionar prato para adicionar...</option>' +
+      cardapio.filter(c => c.ativo !== false).map(c =>
+        `<option value="${c.id}">[${c.linha}] ${c.nome}</option>`).join('');
+  }
+
+  // parse existing pratos
+  editPratosAtual = (Array.isArray(p.pratos) ? p.pratos : []).map(pr => ({ ...pr, qtd: pr.qtd || 1 }));
+  renderizarPratosEdicao();
   document.getElementById('modal-editar-pedido').classList.add('active');
 }
 
 async function salvarEdicaoPedido() {
   const id = document.getElementById('edit-pedido-id').value;
-  let pratos;
-  try { pratos = JSON.parse(document.getElementById('edit-pratos').value); }
-  catch { mostrarToast('JSON dos pratos inválido', 'error'); return; }
   const { error } = await supabaseClient.from('pedidos').update({
     cliente_nome: document.getElementById('edit-cliente-nome').value,
     cliente_tel:  document.getElementById('edit-cliente-tel').value,
     plano:        document.getElementById('edit-plano').value,
     status:       document.getElementById('edit-status').value,
-    pratos,
+    pratos:       editPratosAtual,
     observacoes:  document.getElementById('edit-obs').value,
     updated_at:   new Date().toISOString(),
   }).eq('id', id);
   if (error) { mostrarToast('Erro: ' + error.message, 'error'); return; }
   mostrarToast('Pedido atualizado!');
   fecharModal('modal-editar-pedido');
-  carregarPedidosPendentes();
+  await _buscarPedidos();
+  // refresh whichever page is active
+  if (document.getElementById('page-pedidos-pendentes')?.classList.contains('active')) filtrarPedidosPendentes();
+  if (document.getElementById('page-pedidos-todos')?.classList.contains('active')) filtrarPedidos();
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -617,9 +763,19 @@ function filtrarPedidos() {
       <td>${pratos.length}</td>
       <td>${totalVal ? formatGS(totalVal) : '—'}</td>
       <td>${p.forma_pag || '—'}</td>
-      <td><button class="btn btn-sm btn-outline" onclick="abrirModalEditarPedido('${p.id}')"><i class="fas fa-edit"></i></button></td>
+      <td><button class="btn btn-sm btn-outline" onclick="abrirModalEditarPedido('${p.id}')"><i class="fas fa-edit"></i></button>
+          <button class="btn btn-sm btn-danger" style="margin-left:4px" onclick="excluirPedido('${p.id}')"><i class="fas fa-trash"></i></button></td>
     </tr>`;
   }).join('') || '<tr><td colspan="8" class="empty-msg">Nenhum pedido.</td></tr>';
+}
+
+async function excluirPedido(id) {
+  if (!confirm('Excluir este pedido permanentemente?')) return;
+  const { error } = await supabaseClient.from('pedidos').delete().eq('id', id);
+  if (error) { mostrarToast('Erro: ' + error.message, 'error'); return; }
+  mostrarToast('Pedido excluído!');
+  await _buscarPedidos();
+  filtrarPedidos();
 }
 
 function exportarPedidosExcel() {
@@ -650,56 +806,542 @@ function imprimirEtiquetas() {
 }
 
 /* ══════════════════════════════════════════════════════════
-   LISTA DA SEMANA
+   LISTA DA SEMANA — redesign completo
    ══════════════════════════════════════════════════════════ */
-async function carregarSemana() {
-  const tbody = document.getElementById('tbody-semana');
-  if (!tbody) return;
-  tbody.innerHTML = '<tr><td colspan="8" class="empty-msg">Carregando...</td></tr>';
-  const { data, error } = await supabaseClient
-    .from('pedidos').select('*, clientes(nome, endereco)')
-    .in('status', ['aceito','em_producao','pronto','em_entrega'])
-    .order('created_at');
-  if (error) { tbody.innerHTML = '<tr><td colspan="8">Erro ao carregar</td></tr>'; return; }
-  tbody.innerHTML = (data || []).map((p, i) => `<tr>
-    <td>${i + 1}</td>
-    <td>${p.clientes?.nome || p.cliente_nome || '—'}</td>
-    <td>${p.plano || '—'}</td>
-    <td>${fmtDataHora(p.created_at)}</td>
-    <td>${p.clientes?.endereco || '—'}</td>
-    <td>—</td>
-    <td><span class="badge">${p.status}</span></td>
-    <td>${p.observacoes || ''}</td>
-  </tr>`).join('') || '<tr><td colspan="8" class="empty-msg">Nenhuma entrega.</td></tr>';
+
+/* ── helpers de semana ISO ── */
+function getISOWeekStr(date) {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  const week = Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
+  return `${d.getUTCFullYear()}-W${String(week).padStart(2, '0')}`;
 }
 
-function imprimirListaSemana() { window.print(); }
+function semanaParaDatas(semStr) {
+  const [ano, ww] = semStr.split('-W');
+  const year = parseInt(ano), week = parseInt(ww);
+  const jan4 = new Date(year, 0, 4);
+  const jan4Dow = jan4.getDay() || 7;
+  const monday = new Date(jan4);
+  monday.setDate(jan4.getDate() - jan4Dow + 1 + (week - 1) * 7);
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+  return [monday.toISOString().split('T')[0], sunday.toISOString().split('T')[0]];
+}
+
+function popularSelectSemanas(sel) {
+  sel.innerHTML = '';
+  const hoje = new Date();
+  for (let i = 0; i < 12; i++) {
+    const d = new Date(hoje.getTime() - i * 7 * 86400000);
+    const semStr = getISOWeekStr(d);
+    const [de, ate] = semanaParaDatas(semStr);
+    const label = `${fmtData(de)} – ${fmtData(ate)}`;
+    sel.add(new Option(label, semStr));
+  }
+}
+
+/* ── estado semana ── */
+let semanaClientesData    = {};
+let semanaClientesSel     = new Set();
+
+async function carregarSemana() {
+  const sel = document.getElementById('semana-select');
+  if (!sel) return;
+  if (!sel.options.length) popularSelectSemanas(sel);
+
+  const semStr = sel.value || getISOWeekStr(new Date());
+  if (!sel.value) sel.value = semStr;
+  const [de, ate] = semanaParaDatas(semStr);
+
+  const tituloEl = document.getElementById('semana-titulo');
+  if (tituloEl) tituloEl.textContent = `Entregas de ${fmtData(de)} a ${fmtData(ate)}`;
+
+  const container = document.getElementById('semana-clientes-list');
+  if (!container) return;
+  container.innerHTML = '<p class="empty-msg">Carregando...</p>';
+
+  const { data, error } = await supabaseClient
+    .from('pedidos')
+    .select('*, clientes(nome, endereco, tel)')
+    .in('status', ['aceito', 'em_producao', 'pronto', 'em_entrega', 'entregue'])
+    .gte('created_at', de)
+    .lte('created_at', ate + 'T23:59:59')
+    .order('created_at');
+
+  if (error) { container.innerHTML = '<p class="empty-msg">Erro ao carregar dados.</p>'; return; }
+  if (!data?.length) { container.innerHTML = '<p class="empty-msg">Nenhuma entrega para esta semana.</p>'; return; }
+
+  // Agrupar por cliente
+  semanaClientesData = {};
+  semanaClientesSel  = new Set();
+  data.forEach(p => {
+    const nome = p.clientes?.nome || p.cliente_nome || 'Sem nome';
+    if (!semanaClientesData[nome]) {
+      semanaClientesData[nome] = {
+        nome,
+        endereco: p.clientes?.endereco || '—',
+        pedidos: [],
+      };
+    }
+    semanaClientesData[nome].pedidos.push(p);
+  });
+
+  renderizarClientesSemana();
+}
+
+/* ── chave única para agrupar pratos idênticos ── */
+function chaveAgrupamento(pr) {
+  return pr.nome + '||' + formatarAcomp(pr);
+}
+
+function renderizarClientesSemana() {
+  const container = document.getElementById('semana-clientes-list');
+  if (!container) return;
+  const lista = Object.values(semanaClientesData);
+  if (!lista.length) { container.innerHTML = '<p class="empty-msg">Nenhuma entrega.</p>'; return; }
+
+  container.innerHTML = lista.map((cli, idx) => {
+    // Agrupar pratos idênticos (mesma proteína + mesmo acomp)
+    const grupoMap = {};
+    cli.pedidos.forEach(p => {
+      (Array.isArray(p.pratos) ? p.pratos : []).forEach(pr => {
+        const chave = chaveAgrupamento(pr);
+        if (!grupoMap[chave]) {
+          grupoMap[chave] = { pr: { ...pr }, qtd: 0, status: p.status };
+        }
+        grupoMap[chave].qtd += (pr.qtd || 1);
+      });
+    });
+    const grupos = Object.values(grupoMap);
+    const totalPratos = grupos.reduce((s, g) => s + g.qtd, 0);
+    const isSel = semanaClientesSel.has(cli.nome);
+
+    const badgeCls = s => ({ aceito:'badge-green', entregue:'badge-blue', em_producao:'badge-orange', pronto:'badge-orange', em_entrega:'badge-blue' }[s] || 'badge-gray');
+
+    return `
+    <div class="semana-cli-row ${isSel ? 'semana-cli-row--sel' : ''}" id="scr-${idx}">
+      <div class="semana-cli-header" onclick="toggleSemanaRow(${idx})">
+        <div style="display:flex;align-items:center;gap:12px">
+          <input type="checkbox" class="semana-check"
+            onclick="event.stopPropagation();toggleSelSemana('${esc(cli.nome)}',this)"
+            ${isSel?'checked':''}
+            style="width:16px;height:16px;cursor:pointer">
+          <div>
+            <span class="semana-cli-nome">${cli.nome}</span>
+            ${cli.endereco !== '—' ? `<span class="semana-cli-end">📍 ${cli.endereco}</span>` : ''}
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <span class="badge badge-blue" style="font-size:.75rem">${totalPratos} prato${totalPratos!==1?'s':''}</span>
+          <i class="fas fa-chevron-down semana-chev" id="chev-${idx}"></i>
+        </div>
+      </div>
+      <div class="semana-cli-body" id="sbody-${idx}">
+        <table style="width:100%;font-size:.875rem;border-collapse:collapse">
+          <thead>
+            <tr>
+              <th style="padding:8px 20px;text-align:left;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6b7280;background:#fafaf8;border-bottom:1px solid #e5e4e0">Proteína</th>
+              <th style="padding:8px 20px;text-align:left;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6b7280;background:#fafaf8;border-bottom:1px solid #e5e4e0">Acompanhamentos</th>
+              <th style="padding:8px 20px;text-align:center;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6b7280;background:#fafaf8;border-bottom:1px solid #e5e4e0;width:60px">Qtd</th>
+              <th style="padding:8px 20px;text-align:left;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6b7280;background:#fafaf8;border-bottom:1px solid #e5e4e0;width:90px">Linha</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${grupos.map(g => {
+              const pr = g.pr;
+              const personalBadge = pr.personalizado ? ' <span style="font-size:.68rem;background:#fff7ed;color:#c2410c;padding:1px 6px;border-radius:4px;font-weight:600;vertical-align:middle">custom</span>' : '';
+              return `<tr>
+                <td style="padding:9px 20px;border-bottom:1px solid #f0f0ec;font-weight:600">${pr.nome}${personalBadge}</td>
+                <td style="padding:9px 20px;border-bottom:1px solid #f0f0ec;color:#6b7280">${formatarAcomp(pr)}</td>
+                <td style="padding:9px 20px;border-bottom:1px solid #f0f0ec;text-align:center;font-weight:700;font-size:1rem;color:#2d9b4f">${g.qtd}</td>
+                <td style="padding:9px 20px;border-bottom:1px solid #f0f0ec"><span class="badge badge-gray" style="font-size:.7rem">${pr.linhaNome||pr.linha||'—'}</span></td>
+              </tr>`;
+            }).join('')}
+            <tr style="background:#f5faf6">
+              <td colspan="2" style="padding:10px 20px;font-weight:700;color:#0d2112">TOTAL</td>
+              <td style="padding:10px 20px;font-weight:700;color:#2d9b4f;text-align:center">${totalPratos}</td>
+              <td></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+  }).join('');
+
+  atualizarToolbarSemana();
+}
+
+function formatarAcomp(pr) {
+  const acomps = Array.isArray(pr.acompanhamentos) ? pr.acompanhamentos : [];
+  const partes = acomps.map(a =>
+    pr.personalizado ? `${a.nome} (${a.gramas}g)` : a.nome
+  );
+  if (pr.seleta !== false) {
+    partes.push(pr.personalizado && pr.gramasSeleta ? `Seleta de Legumes (${pr.gramasSeleta}g)` : 'Seleta de Legumes');
+  }
+  if (!partes.length) return pr.seleta === false ? 'Sem acompanhamento' : 'Seleta de Legumes';
+  return partes.join(' + ');
+}
+
+function toggleSemanaRow(idx) {
+  const body = document.getElementById('sbody-' + idx);
+  const chev = document.getElementById('chev-' + idx);
+  if (!body) return;
+  const open = body.style.display !== 'none' && body.style.display !== '';
+  body.style.display = open ? 'none' : 'block';
+  if (chev) chev.style.transform = open ? '' : 'rotate(180deg)';
+}
+
+function toggleSelSemana(nome, cb) {
+  if (cb.checked) semanaClientesSel.add(nome);
+  else semanaClientesSel.delete(nome);
+  // update row highlight
+  const lista = Object.values(semanaClientesData);
+  const idx = lista.findIndex(c => c.nome === nome);
+  if (idx >= 0) {
+    const row = document.getElementById('scr-' + idx);
+    if (row) row.classList.toggle('semana-cli-row--sel', cb.checked);
+  }
+  atualizarToolbarSemana();
+}
+
+function selecionarTodosSemana(checked) {
+  document.querySelectorAll('.semana-check').forEach(cb => {
+    cb.checked = checked;
+    const nome = cb.getAttribute('onclick')?.match(/'([^']+)'/)?.[1];
+    if (nome) {
+      if (checked) semanaClientesSel.add(nome);
+      else semanaClientesSel.delete(nome);
+    }
+  });
+  document.querySelectorAll('.semana-cli-row').forEach(r => r.classList.toggle('semana-cli-row--sel', checked));
+  atualizarToolbarSemana();
+}
+
+function atualizarToolbarSemana() {
+  const toolbar = document.getElementById('semana-toolbar');
+  const cnt     = document.getElementById('semana-sel-count');
+  if (!toolbar) return;
+  toolbar.style.display = semanaClientesSel.size ? 'flex' : 'none';
+  if (cnt) cnt.textContent = semanaClientesSel.size + ' cliente' + (semanaClientesSel.size !== 1 ? 's' : '') + ' selecionado' + (semanaClientesSel.size !== 1 ? 's' : '');
+}
+
+function mostrarResumoSelecionados() {
+  const card    = document.getElementById('card-resumo-semana');
+  const content = document.getElementById('resumo-semana-content');
+  if (!card || !content) return;
+
+  const selecionados = Object.values(semanaClientesData).filter(c => semanaClientesSel.has(c.nome));
+  if (!selecionados.length) { mostrarToast('Nenhum cliente selecionado', 'error'); return; }
+
+  // Consolidado (proteína): group by nome, merge qtd — mas acomp pode variar, manter distintos
+  const consolidadoSimples = {};
+  selecionados.forEach(cli => {
+    cli.pedidos.forEach(p => {
+      (Array.isArray(p.pratos) ? p.pratos : []).forEach(pr => {
+        consolidadoSimples[pr.nome] = (consolidadoSimples[pr.nome] || 0) + (pr.qtd || 1);
+      });
+    });
+  });
+  const totalGeral = Object.values(consolidadoSimples).reduce((a, b) => a + b, 0);
+  const linhas = Object.entries(consolidadoSimples).sort((a, b) => b[1] - a[1]);
+
+  content.innerHTML = `
+    <div style="padding:20px">
+      <p style="font-size:.875rem;color:#6b7280;margin-bottom:16px">
+        <strong>${selecionados.length}</strong> cliente${selecionados.length!==1?'s':''} · <strong>${totalGeral}</strong> prato${totalGeral!==1?'s':''} no total
+      </p>
+      <!-- Por cliente -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;margin-bottom:20px">
+        ${selecionados.map(cli => {
+          const grupoMap = {};
+          cli.pedidos.forEach(p => {
+            (Array.isArray(p.pratos) ? p.pratos : []).forEach(pr => {
+              const chave = chaveAgrupamento(pr);
+              if (!grupoMap[chave]) grupoMap[chave] = { pr: { ...pr }, qtd: 0 };
+              grupoMap[chave].qtd += (pr.qtd||1);
+            });
+          });
+          const grupos = Object.values(grupoMap);
+          const total = grupos.reduce((s, g) => s + g.qtd, 0);
+          return `<div style="background:#f9f9f7;border:1px solid #e5e4e0;border-radius:10px;padding:14px">
+            <div style="font-weight:700;font-size:.9rem;margin-bottom:10px;color:#111827">${cli.nome}</div>
+            <table style="width:100%;font-size:.8rem;border-collapse:collapse">
+              <thead><tr>
+                <th style="text-align:center;padding:3px 0;color:#9ca3af;font-size:.72rem;text-transform:uppercase;width:32px">Qtd</th>
+                <th style="text-align:left;padding:3px 6px;color:#9ca3af;font-size:.72rem;text-transform:uppercase">Proteína</th>
+                <th style="text-align:left;padding:3px 6px;color:#9ca3af;font-size:.72rem;text-transform:uppercase">Acomp</th>
+              </tr></thead>
+              <tbody>
+                ${grupos.map(g => `<tr>
+                  <td style="padding:4px 0;border-bottom:1px solid #f0f0ec;text-align:center;font-weight:700;color:#2d9b4f">${g.qtd}x</td>
+                  <td style="padding:4px 6px;border-bottom:1px solid #f0f0ec;font-weight:600">${g.pr.nome}</td>
+                  <td style="padding:4px 6px;border-bottom:1px solid #f0f0ec;color:#6b7280;font-size:.78rem">${formatarAcomp(g.pr)}</td>
+                </tr>`).join('')}
+                <tr style="background:#f5faf6"><td style="padding:5px 0;font-weight:700;text-align:center">${total}</td><td style="padding:5px 0;font-weight:700" colspan="2">Total</td></tr>
+              </tbody>
+            </table>
+          </div>`;
+        }).join('')}
+      </div>
+      <!-- Consolidado de produção (proteína agrupada) -->
+      <div style="background:#0d2112;border-radius:10px;padding:16px 20px">
+        <div style="color:#d1fae5;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px">Consolidado de Produção</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px">
+          ${linhas.map(([n,q]) => `<div style="display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,.06);border-radius:6px;padding:8px 12px">
+            <span style="color:#fff;font-size:.875rem">${n}</span>
+            <span style="background:#2d9b4f;color:#fff;font-weight:700;padding:2px 10px;border-radius:12px;font-size:.8rem">${q}</span>
+          </div>`).join('')}
+        </div>
+        <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.1);color:#6ee7b7;font-weight:700;text-align:right">
+          Total: ${totalGeral} marmita${totalGeral!==1?'s':''}
+        </div>
+      </div>
+    </div>`;
+
+  card.style.display = 'block';
+  card.scrollIntoView({ behavior: 'smooth' });
+}
+
+function exportarSemanaExcel() {
+  const lista = Object.values(semanaClientesData);
+  if (!lista.length) { mostrarToast('Nenhum dado para exportar', 'error'); return; }
+
+  const rows = [['Cliente','Endereço','Linha','Proteína','Acompanhamentos','Qtd','Personalizado','Status']];
+  lista.forEach(cli => {
+    cli.pedidos.forEach(p => {
+      (Array.isArray(p.pratos) ? p.pratos : []).forEach(pr => {
+        rows.push([
+          cli.nome,
+          cli.endereco,
+          pr.linhaNome || pr.linha || '—',
+          pr.nome,
+          formatarAcomp(pr),
+          pr.qtd || 1,
+          pr.personalizado ? 'Sim' : 'Não',
+          p.status
+        ]);
+      });
+    });
+  });
+  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(';')).join('\n');
+  baixarCSV(csv, 'lista_semana');
+  mostrarToast('Exportado!');
+}
+
+function imprimirListaSemana() {
+  const lista = Object.values(semanaClientesData);
+  if (!lista.length) { mostrarToast('Nenhum dado para imprimir', 'error'); return; }
+  const titulo = document.getElementById('semana-titulo')?.textContent || 'Lista da Semana';
+
+  let html = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">
+  <title>Doña Maria — ${titulo}</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 14mm 18mm; color: #111; font-size: 16px; }
+    h1 { font-size: 22px; margin-bottom: 2px; }
+    .sub { color: #666; font-size: 13px; margin-bottom: 26px; }
+    .cli { margin-bottom: 28px; page-break-inside: avoid; }
+    .cli-nome { font-size: 17px; font-weight: bold; margin-bottom: 2px; }
+    .cli-end { font-size: 13px; color: #888; margin-bottom: 10px; }
+    table { width: 100%; border-collapse: collapse; font-size: 15px; }
+    th { background: #f0f0e8; padding: 5px 10px; text-align: left; font-size: 13px; text-transform: uppercase; letter-spacing: .04em; }
+    td { padding: 6px 10px; border-bottom: 1px solid #e8e8e0; vertical-align: top; }
+    .qty { font-weight: bold; color: #1a6b2e; text-align: center; }
+    .prot { font-weight: 600; }
+    .acomp { color: #555; }
+    .custom { font-size: 11px; background: #fff7ed; color: #c2410c; padding: 1px 5px; border-radius: 3px; }
+    .total-row { background: #f5fff5; font-weight: bold; }
+    @media print { body { padding: 8mm 12mm; } }
+  </style></head><body>
+  <h1>🍽 Doña Maria</h1>
+  <div class="sub">${titulo} &nbsp;·&nbsp; Impresso em ${new Date().toLocaleString('pt-BR')}</div>`;
+
+  lista.forEach(cli => {
+    // Group identical dishes
+    const grupoMap = {};
+    cli.pedidos.forEach(p => {
+      (Array.isArray(p.pratos) ? p.pratos : []).forEach(pr => {
+        const chave = chaveAgrupamento(pr);
+        if (!grupoMap[chave]) grupoMap[chave] = { pr: { ...pr }, qtd: 0 };
+        grupoMap[chave].qtd += (pr.qtd || 1);
+      });
+    });
+    const grupos = Object.values(grupoMap);
+    const total = grupos.reduce((s, g) => s + g.qtd, 0);
+
+    html += `<div class="cli">
+      <div class="cli-nome">${cli.nome}</div>
+      ${cli.endereco !== '—' ? `<div class="cli-end">📍 ${cli.endereco}</div>` : ''}
+      <table>
+        <thead><tr><th style="width:50px">Qtd</th><th>Proteína</th><th>Acompanhamentos</th></tr></thead>
+        <tbody>
+          ${grupos.map(g => `<tr>
+            <td class="qty">${g.qtd}x</td>
+            <td class="prot">${g.pr.nome}${g.pr.personalizado?' <span class="custom">custom</span>':''}</td>
+            <td class="acomp">${formatarAcomp(g.pr)}</td>
+          </tr>`).join('')}
+          <tr class="total-row"><td class="qty">${total}</td><td colspan="2">Total</td></tr>
+        </tbody>
+      </table>
+    </div>`;
+  });
+
+  html += `</body></html>`;
+  const w = window.open('', '_blank');
+  w.document.write(html);
+  w.document.close();
+  w.focus();
+  setTimeout(() => w.print(), 400);
+}
 
 /* ══════════════════════════════════════════════════════════
    PRODUÇÃO DO SÁBADO
    ══════════════════════════════════════════════════════════ */
-async function carregarProducao() {
-  const { data } = await supabaseClient.from('pedidos').select('pratos').eq('status', 'aceito');
-  const contagem = {};
-  (data || []).forEach(p => {
-    (Array.isArray(p.pratos) ? p.pratos : []).forEach(pr => {
-      contagem[pr.nome] = (contagem[pr.nome] || 0) + (pr.qtd || 1);
-    });
-  });
-  const itens = Object.entries(contagem).sort((a, b) => b[1] - a[1]);
-  setText('prod-total-marmitas', itens.reduce((s, [, q]) => s + q, 0) + ' marmitas');
-  const grid = document.getElementById('grid-producao');
-  if (grid) grid.innerHTML = itens.map(([nome, qtd]) =>
-    `<div class="card" style="padding:16px;text-align:center">
-      <div style="font-size:1.8rem;font-weight:700;color:#e76f51">${qtd}</div>
-      <div style="font-size:.9rem;margin-top:4px">${nome}</div>
-    </div>`).join('') || '<p class="empty-msg">Nenhum pedido aceito.</p>';
-  const tbody = document.getElementById('tbody-producao');
-  if (tbody) tbody.innerHTML = itens.map(([nome, qtd]) =>
-    `<tr><td>${nome}</td><td>—</td><td><strong>${qtd}</strong></td></tr>`).join('');
+
+// Fator de cocção por tipo de proteína (peso cru ÷ fator = peso cozido necessário)
+const FATOR_COCCAO = {
+  frango:      1.35,  // frango cozido perde ~26%
+  bovina:      1.30,  // bovina cozida perde ~23%
+  suino:       1.28,
+  peixe:       1.25,
+  default:     1.30,
+};
+// Mapeamento de nome de prato → tipo de proteína (por palavras-chave)
+function tipoProteinaFromNome(nome) {
+  const n = nome.toLowerCase();
+  if (/frango|peito|sobrecoxa|coxa|asa|panqueca de frango|escondidinho.*(frango)/i.test(n)) return 'frango';
+  if (/suino|suíno|lombo|costelinha|bisteca|carré|iscas/i.test(n)) return 'suino';
+  if (/peixe|tilapia|salmão|atum|bacalhau/i.test(n)) return 'peixe';
+  if (/carne|bovina|patinho|picadinho|alcatra|costela|moida|moída|panela|strogon|almondega/i.test(n)) return 'bovina';
+  return 'default';
 }
 
-function imprimirProducao() { window.print(); }
+// Peso base de proteína por prato (gramas cruas necessárias por unidade)
+const PESO_BASE_PROTEINA = 170; // g cru padrão por marmita
+
+let producaoData = []; // guarda os pedidos da semana para insumos
+
+async function carregarProducao() {
+  const sel = document.getElementById('prod-semana-select');
+  if (sel && !sel.options.length) popularSelectSemanas(sel);
+  const semStr = sel?.value || getISOWeekStr(new Date());
+  if (sel && !sel.value) sel.value = semStr;
+  const [de, ate] = semanaParaDatas(semStr);
+
+  const { data } = await supabaseClient.from('pedidos').select('pratos')
+    .in('status', ['aceito','em_producao','pronto','em_entrega'])
+    .gte('created_at', de).lte('created_at', ate + 'T23:59:59');
+
+  producaoData = data || [];
+
+  // Contagem com linha
+  const contagemMap = {};
+  producaoData.forEach(p => {
+    (Array.isArray(p.pratos) ? p.pratos : []).forEach(pr => {
+      if (!contagemMap[pr.nome]) {
+        contagemMap[pr.nome] = { qtd: 0, linha: pr.linhaNome || pr.linha || '—' };
+      }
+      contagemMap[pr.nome].qtd += (pr.qtd || 1);
+    });
+  });
+  const itens = Object.entries(contagemMap)
+    .map(([nome, v]) => ({ nome, qtd: v.qtd, linha: v.linha }))
+    .sort((a, b) => b.qtd - a.qtd);
+
+  const totalMarmitas = itens.reduce((s, it) => s + it.qtd, 0);
+  setText('prod-total-marmitas', totalMarmitas + ' marmitas');
+
+  const grid = document.getElementById('grid-producao');
+  if (grid) grid.innerHTML = itens.map(it =>
+    `<div class="card" style="padding:16px;text-align:center">
+      <div style="font-size:1.8rem;font-weight:700;color:#e76f51">${it.qtd}</div>
+      <div style="font-size:.85rem;font-weight:600;margin-top:4px">${it.nome}</div>
+      ${it.linha !== '—' ? `<div style="font-size:.75rem;color:#9ca3af;margin-top:2px">${it.linha}</div>` : ''}
+    </div>`).join('') || '<p class="empty-msg">Nenhum pedido aceito.</p>';
+
+  const tbody = document.getElementById('tbody-producao');
+  if (tbody) tbody.innerHTML = itens.map(it =>
+    `<tr>
+      <td>${it.nome}</td>
+      <td>${it.linha}</td>
+      <td><strong>${it.qtd}</strong></td>
+    </tr>`).join('');
+
+  // Calcular insumos por proteína
+  const insumos = {};
+  producaoData.forEach(p => {
+    (Array.isArray(p.pratos) ? p.pratos : []).forEach(pr => {
+      const tipo = tipoProteinaFromNome(pr.nome);
+      const fator = FATOR_COCCAO[tipo];
+      const pesoCru = pr.personalizado && pr.gramasProteina ? pr.gramasProteina * fator : PESO_BASE_PROTEINA * fator;
+      const chave = `${pr.nome}__${tipo}`;
+      if (!insumos[chave]) insumos[chave] = { nome: pr.nome, tipo, fatorCoccao: fator, qtd: 0, totalCru: 0 };
+      const qtd = pr.qtd || 1;
+      insumos[chave].qtd += qtd;
+      insumos[chave].totalCru += pesoCru * qtd;
+    });
+  });
+
+  const tbodyInsumos = document.getElementById('tbody-insumos');
+  if (tbodyInsumos) {
+    const insumosArr = Object.values(insumos).sort((a, b) => b.totalCru - a.totalCru);
+    tbodyInsumos.innerHTML = insumosArr.map(ins =>
+      `<tr>
+        <td><strong>${ins.nome}</strong></td>
+        <td><span class="badge badge-gray" style="font-size:.72rem">${ins.tipo}</span></td>
+        <td style="text-align:center">${ins.qtd}</td>
+        <td style="text-align:center">${ins.fatorCoccao.toFixed(2)}x</td>
+        <td style="font-weight:700;color:#2d9b4f;text-align:right">${(ins.totalCru / 1000).toFixed(2)} kg</td>
+        <td style="color:#6b7280;text-align:right">${Math.round(ins.totalCru)} g</td>
+      </tr>`).join('') || '<tr><td colspan="6" class="empty-msg">Sem dados</td></tr>';
+    const totalKg = Object.values(insumos).reduce((s, ins) => s + ins.totalCru, 0);
+    document.getElementById('insumos-total-kg') && (document.getElementById('insumos-total-kg').textContent = (totalKg/1000).toFixed(2) + ' kg total (proteínas)');
+  }
+}
+
+function imprimirProducao() {
+  const itens = [];
+  document.querySelectorAll('#tbody-producao tr').forEach(tr => {
+    const tds = tr.querySelectorAll('td');
+    if (tds.length >= 3) itens.push({ nome: tds[0].textContent, linha: tds[1].textContent, qtd: tds[2].textContent });
+  });
+  if (!itens.length) { mostrarToast('Sem dados para imprimir', 'error'); return; }
+
+  const titulo = document.getElementById('prod-semana-select');
+  const semTxt = titulo?.options[titulo.selectedIndex]?.text || '';
+  const data = new Date().toLocaleString('pt-BR');
+  const total = itens.reduce((s, it) => s + parseInt(it.qtd) || 0, 0);
+
+  const w = window.open('', '_blank');
+  w.document.write(`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8">
+  <title>Produção — Doña Maria</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 14mm 18mm; font-size: 16px; color: #111; }
+    h1 { font-size: 22px; margin-bottom: 2px; }
+    .sub { color: #666; font-size: 13px; margin-bottom: 24px; }
+    table { width: 100%; border-collapse: collapse; font-size: 15px; }
+    th { background: #f0f0e8; padding: 6px 12px; text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; }
+    td { padding: 7px 12px; border-bottom: 1px solid #e8e8e0; }
+    .qty { font-weight: bold; color: #1a6b2e; text-align: center; width: 70px; }
+    .total-row { background: #f0fff4; font-weight: bold; }
+    @media print { body { padding: 8mm 12mm; } }
+  </style></head><body>
+  <h1>🍽 Produção do Sábado</h1>
+  <div class="sub">Doña Maria &nbsp;·&nbsp; ${semTxt} &nbsp;·&nbsp; ${data}</div>
+  <table>
+    <thead><tr><th>Proteína</th><th>Linha</th><th style="text-align:center">Qtd</th></tr></thead>
+    <tbody>
+      ${itens.map(it => `<tr><td>${it.nome}</td><td>${it.linha}</td><td class="qty">${it.qtd}</td></tr>`).join('')}
+      <tr class="total-row"><td colspan="2">TOTAL</td><td class="qty">${total}</td></tr>
+    </tbody>
+  </table>
+  </body></html>`);
+  w.document.close();
+  w.focus();
+  setTimeout(() => w.print(), 400);
+}
 
 /* ══════════════════════════════════════════════════════════
    MOTOBOYS — schema: nome, telefone, ativo
@@ -783,15 +1425,34 @@ async function criarRotaEntrega() {
   await supabaseClient.from('pedidos')
     .update({ status: 'em_entrega', updated_at: new Date().toISOString() }).in('id', ids);
 
-  let msg = `*ROTA DOÑA MARIA - ${new Date().toLocaleDateString('pt-BR')}*\n\n`;
-  pedidosRota.forEach((p, i) => { msg += `${i+1}. *${p.cliente_nome}*\n📞 ${p.cliente_tel || '—'}\n\n`; });
+  // Buscar link_maps dos clientes pelos pedidos
+  const clientesTels = pedidosRota.map(p => p.cliente_tel).filter(Boolean);
+  let mapsMap = {};
+  if (clientesTels.length) {
+    const { data: cliData } = await supabaseClient
+      .from('clientes').select('tel,link_maps').in('tel', clientesTels);
+    (cliData || []).forEach(c => { if (c.link_maps) mapsMap[c.tel] = c.link_maps; });
+  }
+
+  const dataBr = new Date().toLocaleDateString('pt-BR');
+  let msg = `*🛵 ROTA DOÑA MARIA — ${dataBr}*\n\n`;
+  pedidosRota.forEach((p, i) => {
+    const maps = mapsMap[p.cliente_tel];
+    msg += `*${i+1}. ${p.cliente_nome}*\n`;
+    msg += `📞 ${p.cliente_tel || '—'}\n`;
+    if (maps) msg += `📍 ${maps}\n`;
+    msg += `\n`;
+  });
+  msg += `Total: ${pedidosRota.length} entrega${pedidosRota.length !== 1 ? 's' : ''}`;
+
   const tel = motoboy?.telefone?.replace(/\D/g, '');
   if (tel) window.open(`https://wa.me/${tel}?text=${encodeURIComponent(msg)}`, '_blank');
 
-  mostrarToast('Rota criada!');
+  mostrarToast('Rota enviada ao motoboy!');
   fecharModal('modal-criar-rota');
   pedidosSelecionados.clear();
-  carregarPedidosPendentes();
+  await _buscarPedidos();
+  filtrarPedidosPendentes();
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -799,15 +1460,22 @@ async function criarRotaEntrega() {
    ══════════════════════════════════════════════════════════ */
 async function carregarCaixa() {
   const sel = document.getElementById('filtro-mes-caixa');
-  if (sel && sel.options.length === 0) {
+  // Populate if only the placeholder option exists
+  if (sel && sel.options.length <= 1) {
+    sel.innerHTML = '<option value="">Selecione o mês...</option>';
     for (let i = 0; i < 12; i++) {
       const d = new Date(); d.setMonth(d.getMonth() - i);
       const val = d.toISOString().slice(0, 7);
-      sel.add(new Option(d.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' }), val));
+      const label = d.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+      sel.add(new Option(label.charAt(0).toUpperCase() + label.slice(1), val));
     }
+    // Default to current month
+    if (!sel.value) sel.selectedIndex = 1;
   }
   const mes = sel?.value || new Date().toISOString().slice(0, 7);
-  const { data } = await supabaseClient.from('lancamentos').select('*')
+  if (!mes) { return; } // nothing selected yet
+
+  const { data } = await supabaseClient.from('lancamentos').select('*, clientes(nome)')
     .gte('data_lancamento', mes + '-01')
     .lte('data_lancamento', mes + '-31')
     .order('data_lancamento');
@@ -822,17 +1490,36 @@ async function carregarCaixa() {
   setText('caixa-despesa-gs',  formatGS(desGS));
   setText('caixa-saldo-brl',   formatBRL(recBRL - desBRL));
   setText('caixa-saldo-gs',    formatGS(recGS  - desGS));
+
   const tbody = document.getElementById('tbody-caixa');
-  if (tbody) tbody.innerHTML = lista.map(l => `<tr>
+  if (tbody) tbody.innerHTML = lista.map(l => {
+    const nomeCliente = l.clientes?.nome || '—';
+    return `<tr>
     <td>${fmtData(l.data_lancamento)}</td>
     <td><span class="badge badge-${l.tipo === 'receita' ? 'green' : 'red'}">${l.tipo}</span></td>
     <td>${l.categoria}</td>
     <td>${l.descricao}</td>
     <td>${l.forma_pagamento || '—'}</td>
-    <td>${formatBRL(l.valor_brl)}</td>
-    <td>${formatGS(l.valor_gs)}</td>
-    <td>—</td>
-  </tr>`).join('') || '<tr><td colspan="8" class="empty-msg">Nenhum lançamento.</td></tr>';
+    <td class="${l.valor_brl ? 'td-receita' : ''}">${formatBRL(l.valor_brl)}</td>
+    <td class="${l.valor_gs ? 'td-receita' : ''}">${formatGS(l.valor_gs)}</td>
+    <td>${nomeCliente}</td>
+    <td>
+      <div class="td-actions">
+        <button class="btn btn-sm btn-outline" onclick="editarLancamento('${l.id}')" title="Editar"><i class="fas fa-edit"></i></button>
+        <button class="btn btn-sm btn-danger" onclick="excluirLancamentoCaixa('${l.id}')" title="Excluir"><i class="fas fa-trash"></i></button>
+      </div>
+    </td>
+  </tr>`;
+  }).join('') || '<tr><td colspan="9" class="empty-msg">Nenhum lançamento neste mês.</td></tr>';
+}
+
+async function excluirLancamentoCaixa(id) {
+  if (!confirm('Excluir este lançamento?')) return;
+  const { error } = await supabaseClient.from('lancamentos').delete().eq('id', id);
+  if (error) { mostrarToast('Erro: ' + error.message, 'error'); return; }
+  mostrarToast('Excluído!');
+  carregarCaixa();
+  if (document.getElementById('page-dashboard')?.classList.contains('active')) carregarDashboard();
 }
 
 function exportarCaixaExcel() { mostrarToast('Em breve', 'info'); }
@@ -919,6 +1606,9 @@ async function salvarLancamento() {
   mostrarToast('Lançamento salvo!');
   fecharModal('modal-lancamento');
   carregarLancamentos();
+  // Atualiza o dashboard e caixa se estiverem visíveis
+  if (document.getElementById('page-dashboard')?.classList.contains('active')) carregarDashboard();
+  if (document.getElementById('page-caixa')?.classList.contains('active')) carregarCaixa();
 }
 
 async function editarLancamento(id) {
