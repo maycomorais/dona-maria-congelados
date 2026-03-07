@@ -26,7 +26,9 @@ const NUTRI_DB = {
 };
 
 const PRECOS_LINHA = { Tradicional: 30000, Gourmet: 35000, Fit: 35000, Kids: 28000 };
-const GRAM_RULES = {
+// GRAM_RULES é preenchido dinamicamente do Supabase (tabela acompanhamentos)
+// Valores abaixo são o FALLBACK caso o Supabase não responda
+let GRAM_RULES = {
   'Proteína':            { base: 130, extra: 500 },
   'Arroz Branco':        { base: 80,  extra: 150 },
   'Feijão Preto':        { base: 90,  extra: 200 },
@@ -36,6 +38,47 @@ const GRAM_RULES = {
   'Macarrão':            { base: 120, extra: 200 },
   'Seleta':              { base: 80,  extra: 250 },
 };
+
+async function carregarAcompanhamentosDoSupabase() {
+  try {
+    const { data, error } = await supa
+      .from('acompanhamentos')
+      .select('nome, gramas_padrao, preco_extra_10g')
+      .eq('ativo', true)
+      .order('ordem', { ascending: true })
+      .order('nome');
+    if (error || !data?.length) return;   // mantém fallback
+    // Reconstrói GRAM_RULES sem sobrescrever Proteína e Seleta (gerenciadas à parte)
+    const protBackup = GRAM_RULES['Proteína'];
+    const selBackup  = GRAM_RULES['Seleta'];
+    GRAM_RULES = {};
+    if (protBackup) GRAM_RULES['Proteína'] = protBackup;
+    data.forEach(a => {
+      GRAM_RULES[a.nome] = { base: a.gramas_padrao, extra: a.preco_extra_10g };
+    });
+    if (selBackup && !GRAM_RULES['Seleta']) GRAM_RULES['Seleta'] = selBackup;
+    renderizarAcompRows(data);
+  } catch(e) { console.warn('Acompanhamentos fallback:', e.message); }
+}
+
+/* Renderiza dinamicamente as .acomp-row no modal de prato */
+function renderizarAcompRows(acomps) {
+  const grid = document.getElementById('acomp-grid');
+  if (!grid) return;
+  // Filtra Proteína e Seleta (têm campos próprios no modal)
+  const lista = acomps.filter(a => a.nome !== 'Proteína' && a.nome !== 'Seleta');
+  grid.innerHTML = lista.map(a => `
+    <div class="acomp-row">
+      <label class="acomp-label">
+        <input type="checkbox" class="acomp-check" value="${a.nome}">
+        <span>${a.nome}</span>
+      </label>
+      <span class="acomp-display-g gram-display" hidden>${a.gramas_padrao}g</span>
+      <span class="acomp-grams" hidden>
+        <input type="number" class="gram-input" value="${a.gramas_padrao}" min="20" max="500">g
+      </span>
+    </div>`).join('');
+}
 function calcularTaxaGrama(tipo, gramas) {
   const rule = GRAM_RULES[tipo];
   if (!rule || !gramas || gramas <= rule.base) return 0;
@@ -67,6 +110,9 @@ let pagamentoSel = '';
 let freteValor = 0;
 let freteLabel = '—';
 let linkMaps = '';
+let urgenciaOpcao  = null;
+let taxaUrgencia   = 0;
+let dataEntregaSel = null;
 let pratoPendente = null;
 let pratoPendenteTemp = null; // prato clicado antes de escolher plano
 let quereSeleta = true;
@@ -78,7 +124,12 @@ const ORIGEM = { lat: -25.240629, lon: -57.541956 };
 document.addEventListener("DOMContentLoaded", async () => {
   initNav(); initScroll(); initTyped();
   carregarDadosSalvos();
-  await carregarCardapio();
+  // Carrega acompanhamentos do Supabase (reconstrói GRAM_RULES + renderiza acomp-rows)
+  // em paralelo com o cardápio para não atrasar o load
+  await Promise.all([
+    carregarCardapio(),
+    carregarAcompanhamentosDoSupabase(),
+  ]);
   atualizarCarrinho();
 
   document.getElementById("modal-prato")?.addEventListener("click", e => {
@@ -89,6 +140,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
   document.getElementById("cliente-nome")?.addEventListener("input", verificarBotao);
   document.getElementById("cliente-tel")?.addEventListener("input", verificarBotao);
+  renderizarJanelaEntrega();
 });
 document.addEventListener("keydown", e => {
   if (e.key === "Escape") { fecharModalPrato(); fecharCarrinho(); }
@@ -705,9 +757,13 @@ function calcularTotalPedido() {
   } else if(plano==='Mensal'){
     baseTotal=(PRECOS_LINHA[linhaLocked]||30000)*56; desconto=0.10;
   }
-  const descValor=Math.round(baseTotal*desconto);
-  const total=(baseTotal-descValor)+extrasGrama+freteValor;
-  return {baseTotal,desconto,descValor,extrasGrama,frete:freteValor,total};
+  const descValor  = Math.round(baseTotal*desconto);
+  const subtotal   = baseTotal - descValor + extrasGrama;
+  const taxaUrgVal = Math.round(subtotal * taxaUrgencia);
+  const nEntregas  = cfg.entregasPorPlano || 1;
+  const freteTotal = freteValor * nEntregas;
+  const total      = subtotal + taxaUrgVal + freteTotal;
+  return {baseTotal,desconto,descValor,extrasGrama,frete:freteValor,freteTotal,nEntregas,taxaUrgencia,taxaUrgVal,total};
 }
 function renderizarResumo() {
   const wrap=document.getElementById('resumo-financeiro');
@@ -716,16 +772,20 @@ function renderizarResumo() {
   if(!t||itensPedido.length===0){wrap.hidden=true;return;}
   const fmt=v=>`₲ ${Math.round(v).toLocaleString('es-PY')}`;
   const plano=document.getElementById('plano-selecionado').value;
+  const cfg=CONFIG_PLANOS[plano];
   let html='';
   if(plano==='FDS'||plano==='Mensal'){
-    const nSem=cfg.max; const nEnt=cfg.entregasPorPlano;
-    html+=`<div class="resumo-row"><span>${nSem} marmitas × ${nEnt} semanas = ${cfg.totalPlano} total (${linhaLocked})</span><span>${fmt(t.baseTotal)}</span></div>`;
-  } else
+    html+=`<div class="resumo-row"><span>${cfg.max} marmitas × ${cfg.entregasPorPlano} sem = ${cfg.totalPlano} total (${linhaLocked})</span><span>${fmt(t.baseTotal)}</span></div>`;
+  } else {
     html+=`<div class="resumo-row"><span>${itensPedido.length} plato(s)</span><span>${fmt(t.baseTotal)}</span></div>`;
+  }
   if(t.desconto>0) html+=`<div class="resumo-row resumo-desconto"><span>Desconto ${(t.desconto*100).toFixed(0)}%</span><span>− ${fmt(t.descValor)}</span></div>`;
   if(t.extrasGrama>0) html+=`<div class="resumo-row"><span>Personalização</span><span>+ ${fmt(t.extrasGrama)}</span></div>`;
-  if(t.frete>0) html+=`<div class="resumo-row"><span>Frete</span><span>${fmt(t.frete)}</span></div>`;
-  else if(freteLabel!=='—') html+=`<div class="resumo-row resumo-desconto"><span>Frete</span><span>GRÁTIS</span></div>`;
+  if(t.taxaUrgVal>0) html+=`<div class="resumo-row" style="color:#d97706"><span>⚡ Urgencia (10%)</span><span>+ ${fmt(t.taxaUrgVal)}</span></div>`;
+  if(t.freteTotal>0){
+    if(t.nEntregas>1) html+=`<div class="resumo-row"><span>Frete (${fmt(t.frete)} × ${t.nEntregas} entregas)</span><span>${fmt(t.freteTotal)}</span></div>`;
+    else html+=`<div class="resumo-row"><span>Frete</span><span>${fmt(t.freteTotal)}</span></div>`;
+  } else if(freteLabel!=='—') html+=`<div class="resumo-row resumo-desconto"><span>Frete</span><span>GRÁTIS</span></div>`;
   html+=`<div class="resumo-total"><span>Total estimado</span><strong>${fmt(t.total)}</strong></div>`;
   wrap.innerHTML=html; wrap.hidden=false;
 }
@@ -741,11 +801,12 @@ function verificarBotao(){
   const nome=document.getElementById('cliente-nome').value.trim();
   const tel=document.getElementById('cliente-tel').value.trim();
   const cfg=CONFIG_PLANOS[plano]; const n=itensPedido.length;
+  const urgOk=calcularJanelaEntrega().janela!=='urgencia'||urgenciaOpcao!==null;
   let planOk=false;
   if(plano==='Individual') planOk=n>=5&&n<=13;
   else if(plano==='Personalizado') planOk=n>=5;
   else if(cfg?.exato) planOk=n===cfg.max;
-  const ok=planOk&&nome&&tel&&pagamentoSel;
+  const ok=planOk&&nome&&tel&&pagamentoSel&&urgOk;
   const btn=document.getElementById('btn-whatsapp');
   if(btn) btn.disabled=!ok;
   const hint=document.getElementById('botao-hint');
@@ -754,11 +815,58 @@ function verificarBotao(){
     else if((plano==='Individual'||plano==='Personalizado')&&n<5) hint.textContent='Mínimo 5 platos.';
     else if(plano==='Individual'&&n>13) hint.textContent='Máximo 13 platos en Individual.';
     else if(cfg?.exato&&n<cfg.max) hint.textContent=`Agregá ${cfg.max-n} plato(s) más para esta entrega.`;
+    else if(!urgOk) hint.textContent='Elegí una opción de entrega (período de urgencia).';
     else if(!nome||!tel) hint.textContent='Completá nombre y WhatsApp.';
     else if(!pagamentoSel) hint.textContent='Elegí la forma de pago.';
     else hint.textContent='';
     hint.hidden=!hint.textContent;
   }
+}
+
+/* ── JANELA DE ENTREGA ───────────────────────────────────────── */
+function calcularJanelaEntrega() {
+  const py  = new Date(new Date().toLocaleString('en-US', { timeZone:'America/Asuncion' }));
+  const dow = py.getDay(); const min = py.getHours()*60 + py.getMinutes();
+  const SEX16 = 16*60, SAB12 = 12*60;
+  function nextMonday(base, extraWeeks=0) {
+    const d=new Date(base); const dw=d.getDay();
+    const skip=dw===1?7:(8-dw)%7||7;
+    d.setDate(d.getDate()+skip+extraWeeks*7); d.setHours(0,0,0,0); return d;
+  }
+  const fmt = d => d.toLocaleDateString('es-PY',{weekday:'long',day:'numeric',month:'long'});
+  const nextMon=nextMonday(py,0), followingMon=nextMonday(py,1);
+  const isUrg  = (dow===5&&min>SEX16)||(dow===6&&min<=SAB12);
+  const isFech = (dow===6&&min>SAB12)||dow===0;
+  if(isUrg)  return{janela:'urgencia',   nextMon,followingMon,fmt};
+  if(isFech) return{janela:'fechamento', dataEntrega:followingMon,fmt};
+  return            {janela:'normal',    dataEntrega:nextMon,fmt};
+}
+function renderizarJanelaEntrega() {
+  const box=document.getElementById('janela-entrega-box'); if(!box) return;
+  const j=calcularJanelaEntrega();
+  if(j.janela==='normal'){
+    dataEntregaSel=j.dataEntrega; taxaUrgencia=0; urgenciaOpcao=null;
+    box.innerHTML=`<div class="janela-info janela-normal"><i class="fas fa-calendar-check"></i><div><strong>Entrega prevista:</strong> ${j.fmt(j.dataEntrega)}<span style="color:#6b7280;font-size:.8rem;display:block">Pedidos hasta el viernes a las 16:00 hs</span></div></div>`;
+    box.hidden=false;
+  } else if(j.janela==='urgencia'){
+    dataEntregaSel=null; taxaUrgencia=0; urgenciaOpcao=null;
+    box.innerHTML=`<div class="janela-info janela-urgencia"><i class="fas fa-bolt"></i><div style="flex:1"><strong>Período de urgencia — elige tu entrega:</strong><div style="margin-top:10px;display:flex;flex-direction:column;gap:8px">
+      <label class="urgencia-opt" id="opt-imediata"><input type="radio" name="urgencia" value="imediata" onchange="selecionarUrgencia('imediata','${j.nextMon.toISOString()}')"><div><span style="font-weight:600">⚡ Entrega inmediata</span><span style="color:#d97706;font-size:.82rem;margin-left:6px">+10% urgencia</span><span style="color:#6b7280;font-size:.8rem;display:block">${j.fmt(j.nextMon)}</span></div></label>
+      <label class="urgencia-opt" id="opt-proxima"><input type="radio" name="urgencia" value="proxima" onchange="selecionarUrgencia('proxima','${j.followingMon.toISOString()}')"><div><span style="font-weight:600">📅 Semana siguiente</span><span style="color:#059669;font-size:.82rem;margin-left:6px">precio normal</span><span style="color:#6b7280;font-size:.8rem;display:block">${j.fmt(j.followingMon)}</span></div></label>
+    </div></div></div>`; box.hidden=false; verificarBotao();
+  } else {
+    dataEntregaSel=j.dataEntrega; taxaUrgencia=0; urgenciaOpcao=null;
+    box.innerHTML=`<div class="janela-info janela-fechamento"><i class="fas fa-clock"></i><div><strong>Período de cierre</strong><span style="color:#6b7280;font-size:.8rem;display:block">Solo entrega la semana siguiente: ${j.fmt(j.dataEntrega)}</span></div></div>`;
+    box.hidden=false;
+  }
+  renderizarResumo();
+}
+function selecionarUrgencia(opcao, isoDate) {
+  urgenciaOpcao=opcao; taxaUrgencia=opcao==='imediata'?0.10:0;
+  dataEntregaSel=new Date(isoDate);
+  document.querySelectorAll('.urgencia-opt').forEach(el=>el.classList.remove('selected'));
+  document.getElementById(`opt-${opcao}`)?.classList.add('selected');
+  renderizarResumo(); verificarBotao();
 }
 
 /* ── FRETE ───────────────────────────────────────────────────── */
@@ -888,13 +996,21 @@ async function enviarPedidoZap(){
       }
     }catch(e){}
 
+    const t=calcularTotalPedido();
+    const cfg2=CONFIG_PLANOS[plano];
     const{data:pedido,error}=await supa.from('pedidos').insert([{
       cliente_nome:nome, cliente_tel:ddi+tel,
       cliente_id:clienteId,
       plano, pratos:itensPedido, observacoes:obs,
       forma_pag:pagamentoSel, semana:getSemanaAtual(),
       status:'pendente',
-      incluso_plano: inclusoPlan,
+      incluso_plano:    inclusoPlan,
+      data_entrega:     dataEntregaSel?dataEntregaSel.toISOString().split('T')[0]:null,
+      urgencia_opcao:   urgenciaOpcao,
+      taxa_urgencia:    taxaUrgencia||0,
+      frete_por_entrega:freteValor,
+      frete_total:      (freteValor||0)*(cfg2?.entregasPorPlano||1),
+      valor_total:      t?.total||0,
     }]).select().single();
     if(error) throw error;
 
@@ -964,6 +1080,8 @@ function gerarMensagemPedido(nome,plano,itens,obs,pedidoId,inclusoPlan=false){
   }
 
   msg += `*Pagamento:* ${inclusoPlan ? 'Incluso no plano' : pagamentoSel}`;
+  if(dataEntregaSel) msg += `\n📅 *Entrega prevista:* ${dataEntregaSel.toLocaleDateString('es-PY',{weekday:'long',day:'numeric',month:'long'})}`;
+  if(taxaUrgencia>0) msg += `\n⚡ *Taxa urgência 10%* aplicada`;
   if(linkMaps) msg += `\n📍 *Localização:* ${linkMaps}`;
   return msg;
 }
