@@ -15,8 +15,8 @@ let pedidosPendentes    = [];
 let motoboys            = [];
 let lancamentos         = [];
 let clientes            = [];
-let acompanhamentos     = [];   // tabela acompanhamentos do Supabase
 let pedidosSelecionados = new Set();
+let acompanhamentos     = [];   // tabela acompanhamentos do Supabase
 let graficoPratos       = null;
 let graficoFinanceiro   = null;
 
@@ -115,7 +115,7 @@ function navBtn(page) {
   return document.querySelector(`.bottom-nav-btn[data-page="${page}"]`) || null;
 }
 function toggleMobileDrawer() {
-  const drawer = document.getElementById('mobile-drawer'); if(!drawer) return;
+  const drawer = document.getElementById('mobile-drawer'); if (!drawer) return;
   drawer.classList.contains('open') ? closeMobileDrawer() : drawer.classList.add('open');
   document.getElementById('btn-mais')?.classList.toggle('active', drawer.classList.contains('open'));
 }
@@ -629,7 +629,7 @@ async function aceitarPedidosBatch() {
   pedidosSelecionados.clear();
   await _buscarPedidos();
   await _buscarClientes();
-  for (const id of ids) { const p=pedidos.find(x=>x.id===id); if(p) await sincronizarLancamentoPedido({...p,status:'aceito'}); }
+  for(const id of ids){ const p=pedidos.find(x=>x.id===id); if(p) await sincronizarLancamentoPedido({...p,status:'aceito'}); }
   filtrarPedidosPendentes();
 }
 
@@ -648,147 +648,145 @@ async function recusarPedidosBatch() {
 /* ── EDITAR PEDIDO ────────────────────────────────────────── */
 let editPratosAtual = [];
 
-const ACOMPS_DISPONIVEIS_EDIT = () =>
-  acompanhamentos.length
-    ? acompanhamentos.filter(a => a.ativo !== false && a.nome !== 'Proteína' && a.nome !== 'Seleta').map(a => ({nome:a.nome,base:a.gramas_padrao}))
-    : [{nome:'Arroz Branco',base:80},{nome:'Feijão Preto',base:90},{nome:'Purê de Batata',base:120},{nome:'Purê de Batata Doce',base:120},{nome:'Purê de Abóbora',base:120},{nome:'Macarrão',base:120},{nome:'Seleta',base:80}];
+const _acompsDisponiveisEdit = () =>
+  acompanhamentos.filter(a => a.ativo !== false && a.nome !== 'Proteína' && a.nome !== 'Seleta')
+    .map(a => ({ nome: a.nome, base: a.gramas_padrao }))
+  .length
+    ? acompanhamentos.filter(a => a.ativo !== false && a.nome !== 'Proteína' && a.nome !== 'Seleta').map(a => ({ nome: a.nome, base: a.gramas_padrao }))
+    : [{ nome:'Arroz Branco',base:80 },{ nome:'Feijão Preto',base:90 },{ nome:'Purê de Batata',base:120 },{ nome:'Purê de Batata Doce',base:120 },{ nome:'Purê de Abóbora',base:120 },{ nome:'Macarrão',base:120 }];
 
 function calcularTotalPedido_admin(pedido) {
   if (pedido.parceria === true) return 0;
   const pratos  = Array.isArray(pedido.pratos) ? pedido.pratos : [];
   const baseVal = pratos.reduce((s, pr) => s + (pr.precoItem || pr.precoBase || pr.preco || 0), 0);
-  const nEnt    = { FDS:4, Mensal:4 }[pedido.plano] || 1;
+  const nEnt    = { FDS: 4, Mensal: 4 }[pedido.plano] || 1;
   const frete   = (pedido.frete_por_entrega || 0) * nEnt;
   const urgVal  = pedido.taxa_urgencia ? Math.round(baseVal * parseFloat(pedido.taxa_urgencia)) : 0;
   return baseVal + frete + urgVal;
 }
+
 function atualizarPreviewTotal() {
   const parceria = document.getElementById('edit-parceria')?.checked === true;
   const preview  = document.getElementById('edit-total-preview');
   if (!preview) return;
-  if (parceria) { preview.style.display='block'; preview.innerHTML='🤝 <strong>Parceria</strong> — Total: <strong>₲ 0</strong>'; return; }
-  const baseVal = editPratosAtual.reduce((s,pr)=>s+(pr.precoItem||pr.precoBase||pr.preco||0),0);
-  if (!baseVal) { preview.style.display='none'; return; }
-  preview.style.display='block';
-  preview.innerHTML=`Total estimado: <strong>₲ ${Math.round(baseVal).toLocaleString('es-PY')}</strong>`;
+  if (parceria) { preview.style.display = 'block'; preview.innerHTML = '🤝 <strong>Parceria</strong> — Total: <strong>₲ 0</strong>'; return; }
+  const baseVal = editPratosAtual.reduce((s, pr) => s + (pr.precoItem || pr.precoBase || pr.preco || 0), 0);
+  if (!baseVal) { preview.style.display = 'none'; return; }
+  preview.style.display = 'block';
+  preview.innerHTML = `Total estimado: <strong>₲ ${Math.round(baseVal).toLocaleString('es-PY')}</strong>`;
 }
-function toggleParceria(cb) { atualizarPreviewTotal(); }
+function toggleParceria() { atualizarPreviewTotal(); }
 
 function renderizarPratosEdicao() {
   const lista = document.getElementById('edit-pratos-lista');
   if (!lista) return;
-  const disponiveis = ACOMPS_DISPONIVEIS_EDIT();
+  const disponiveis = _acompsDisponiveisEdit();
   if (!editPratosAtual.length) {
     lista.innerHTML = '<p style="color:#9ca3af;font-style:italic;padding:10px 6px;font-size:.875rem">Nenhum prato adicionado</p>';
     atualizarPreviewTotal(); return;
   }
   lista.innerHTML = editPratosAtual.map((pr, i) => {
     const acomps = Array.isArray(pr.acompanhamentos) ? pr.acompanhamentos : [];
-    const isPerso = pr.personalizado === true;
-    const tags = acomps.map(a=>`<span style="background:#f0fdf4;color:#166534;border:1px solid #bbf7d0;border-radius:4px;padding:1px 7px;font-size:.75rem">${a.nome}${isPerso?` ${a.gramas}g`:''}</span>`).join('');
-    const acompRows = acomps.map((a,ai)=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
-      <span style="flex:1;font-size:.82rem;color:#374151">${a.nome}</span>
-      ${isPerso?`<input type="number" min="10" max="500" step="5" value="${a.gramas}" onchange="editAcompGramas(${i},${ai},this.value)" style="width:65px;padding:3px 6px;border:1px solid #d1d5db;border-radius:5px;font-size:.82rem;text-align:center"><span style="font-size:.75rem;color:#6b7280">g</span>`:
-                `<span style="font-size:.78rem;color:#9ca3af">${a.gramas}g</span>`}
-      <button onclick="editRemoveAcomp(${i},${ai})" style="width:22px;height:22px;border:1px solid #fecaca;background:#fef2f2;color:#ef4444;border-radius:5px;cursor:pointer;font-size:.7rem">✕</button></div>`).join('');
-    const jaAdicionados = acomps.map(a=>a.nome);
-    const opcoesAdd = disponiveis.filter(a=>!jaAdicionados.includes(a.nome)).map(a=>`<option value="${a.nome}" data-base="${a.base}">${a.nome}</option>`).join('');
+    const tags = acomps.map(a => `<span style="background:#f0fdf4;color:#166534;border:1px solid #bbf7d0;border-radius:4px;padding:1px 7px;font-size:.75rem">${a.nome} ${a.gramas}g</span>`).join('');
+    const jaAdicionados = acomps.map(a => a.nome);
+    const opcoesAdd = disponiveis.filter(a => !jaAdicionados.includes(a.nome)).map(a => `<option value="${a.nome}" data-base="${a.base}">${a.nome}</option>`).join('');
     return `<div style="background:#fff;border:1.5px solid #e5e4e0;border-radius:9px;margin-bottom:8px;overflow:hidden">
       <div style="display:flex;align-items:center;gap:10px;padding:9px 12px">
         <div style="flex:1;min-width:0">
-          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-            <span style="font-weight:600;font-size:.9rem">${pr.nome}</span>
-            ${pr.linhaNome||pr.linha?`<span style="font-size:.72rem;color:#6b7280;background:#f3f4f6;border-radius:3px;padding:1px 6px">${pr.linhaNome||pr.linha}</span>`:''}
-            ${isPerso?`<span style="font-size:.72rem;color:#d97706;background:#fffbeb;border:1px solid #fde68a;border-radius:3px;padding:1px 6px">⚖ Personal.</span>`:''}
-          </div>
-          ${tags?`<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:5px">${tags}</div>`:''}
+          <span style="font-weight:600;font-size:.9rem">${pr.nome}</span>
+          ${pr.linhaNome||pr.linha?`<span style="font-size:.72rem;color:#6b7280;background:#f3f4f6;border-radius:3px;padding:1px 6px;margin-left:5px">${pr.linhaNome||pr.linha}</span>`:''}
+          ${tags ? `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:5px">${tags}</div>` : ''}
         </div>
-        <div style="display:flex;align-items:center;gap:6px;background:#f5f4f0;border-radius:6px;padding:2px 6px;flex-shrink:0">
-          <button onclick="editQtd(${i},-1)" style="width:24px;height:24px;border:none;background:none;cursor:pointer;font-size:1rem;color:#6b7280;border-radius:4px" onmouseover="this.style.background='#e5e4e0'" onmouseout="this.style.background='none'">−</button>
-          <span style="font-weight:700;min-width:22px;text-align:center;font-size:.9rem">${pr.qtd||1}</span>
-          <button onclick="editQtd(${i},1)" style="width:24px;height:24px;border:none;background:none;cursor:pointer;font-size:1rem;color:#6b7280;border-radius:4px" onmouseover="this.style.background='#e5e4e0'" onmouseout="this.style.background='none'">+</button>
+        <div style="display:flex;align-items:center;gap:4px;background:#f5f4f0;border-radius:6px;padding:2px 6px;flex-shrink:0">
+          <button onclick="editQtd(${i},-1)" style="width:22px;height:22px;border:none;background:none;cursor:pointer;color:#6b7280">−</button>
+          <span style="font-weight:700;min-width:20px;text-align:center;font-size:.9rem">${pr.qtd||1}</span>
+          <button onclick="editQtd(${i},1)" style="width:22px;height:22px;border:none;background:none;cursor:pointer;color:#6b7280">+</button>
         </div>
-        <button onclick="editToggleAcomps(${i})" style="width:28px;height:28px;border:1px solid #d1fae5;background:#ecfdf5;color:#059669;border-radius:6px;cursor:pointer;font-size:.8rem;flex-shrink:0"><i class="fas fa-utensils"></i></button>
-        <button onclick="editRemovePrato(${i})" style="width:28px;height:28px;border:1px solid #fecaca;background:#fef2f2;color:#ef4444;border-radius:6px;cursor:pointer;font-size:.8rem;flex-shrink:0"><i class="fas fa-times"></i></button>
+        <button onclick="editToggleAcomps(${i})" style="width:26px;height:26px;border:1px solid #d1fae5;background:#ecfdf5;color:#059669;border-radius:6px;cursor:pointer;font-size:.75rem;flex-shrink:0" title="Acompanhamentos"><i class="fas fa-utensils"></i></button>
+        <button onclick="editRemovePrato(${i})" style="width:26px;height:26px;border:1px solid #fecaca;background:#fef2f2;color:#ef4444;border-radius:6px;cursor:pointer;font-size:.75rem;flex-shrink:0"><i class="fas fa-times"></i></button>
       </div>
-      <div id="edit-acomps-panel-${i}" style="display:none;border-top:1px solid #f0f0ec;padding:12px 14px;background:#fafaf8">
-        <div style="font-size:.78rem;font-weight:600;color:#6b7280;text-transform:uppercase;margin-bottom:8px">Acompanhamentos</div>
-        ${isPerso?`<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px dashed #e5e4e0">
-          <span style="font-size:.82rem;font-weight:500">⚖ Proteína</span>
-          <input type="number" min="80" max="500" step="10" value="${pr.gramasProteina||130}" onchange="editGramasProteina(${i},this.value)" style="width:70px;padding:3px 6px;border:1px solid #d1d5db;border-radius:5px;font-size:.82rem;text-align:center">
-          <span style="font-size:.75rem;color:#6b7280">g</span></div>`:''}
-        <div id="edit-acomp-rows-${i}">${acompRows||'<p style="font-size:.8rem;color:#9ca3af;margin:0 0 8px">Nenhum acompanhamento</p>'}</div>
-        ${opcoesAdd?`<div style="display:flex;gap:6px;margin-top:6px">
+      <div id="edit-acomps-panel-${i}" style="display:none;border-top:1px solid #f0f0ec;padding:10px 12px;background:#fafaf8">
+        <div style="font-size:.75rem;font-weight:600;color:#6b7280;text-transform:uppercase;margin-bottom:8px">Acompanhamentos</div>
+        ${acomps.map((a,ai)=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+          <span style="flex:1;font-size:.82rem">${a.nome}</span>
+          <input type="number" value="${a.gramas}" min="10" max="500" step="5" onchange="editAcompGramas(${i},${ai},this.value)" style="width:65px;padding:3px 6px;border:1px solid #d1d5db;border-radius:5px;font-size:.82rem;text-align:center">
+          <span style="font-size:.75rem;color:#6b7280">g</span>
+          <button onclick="editRemoveAcomp(${i},${ai})" style="width:20px;height:20px;border:1px solid #fecaca;background:#fef2f2;color:#ef4444;border-radius:4px;cursor:pointer;font-size:.65rem">✕</button>
+        </div>`).join('') || '<p style="font-size:.8rem;color:#9ca3af;margin:0 0 8px">Nenhum</p>'}
+        ${opcoesAdd ? `<div style="display:flex;gap:6px;margin-top:6px">
           <select id="edit-add-acomp-${i}" style="flex:1;padding:5px 8px;border:1px solid #d1d5db;border-radius:6px;font-size:.82rem">
-            <option value="">+ Adicionar...</option>${opcoesAdd}
+            <option value="">+ Adicionar acompanhamento...</option>${opcoesAdd}
           </select>
-          <button onclick="editAdicionarAcomp(${i})" style="padding:5px 12px;background:#059669;color:#fff;border:none;border-radius:6px;font-size:.82rem;cursor:pointer">Add</button>
-        </div>`:''}
+          <button onclick="editAdicionarAcomp(${i})" style="padding:5px 10px;background:#059669;color:#fff;border:none;border-radius:6px;font-size:.82rem;cursor:pointer">Add</button>
+        </div>` : ''}
       </div>
     </div>`;
   }).join('');
   atualizarPreviewTotal();
 }
-function editToggleAcomps(i){const p=document.getElementById(`edit-acomps-panel-${i}`);if(p)p.style.display=p.style.display==='none'?'block':'none';}
-function editQtd(idx,delta){if(!editPratosAtual[idx])return;editPratosAtual[idx].qtd=Math.max(1,(editPratosAtual[idx].qtd||1)+delta);renderizarPratosEdicao();}
-function editRemovePrato(idx){editPratosAtual.splice(idx,1);renderizarPratosEdicao();}
-function editAcompGramas(pi,ai,val){if(editPratosAtual[pi]?.acompanhamentos?.[ai])editPratosAtual[pi].acompanhamentos[ai].gramas=parseInt(val)||80;}
-function editGramasProteina(pi,val){if(editPratosAtual[pi])editPratosAtual[pi].gramasProteina=parseInt(val)||130;}
-function editRemoveAcomp(pi,ai){editPratosAtual[pi]?.acompanhamentos?.splice(ai,1);renderizarPratosEdicao();setTimeout(()=>{const p=document.getElementById(`edit-acomps-panel-${pi}`);if(p)p.style.display='block';},0);}
-function editAdicionarAcomp(pi){const sel=document.getElementById(`edit-add-acomp-${pi}`);if(!sel?.value)return;const base=parseInt(sel.options[sel.selectedIndex].dataset.base)||80;if(!Array.isArray(editPratosAtual[pi].acompanhamentos))editPratosAtual[pi].acompanhamentos=[];editPratosAtual[pi].acompanhamentos.push({nome:sel.value,gramas:base});renderizarPratosEdicao();setTimeout(()=>{const p=document.getElementById(`edit-acomps-panel-${pi}`);if(p)p.style.display='block';},0);}
+
+function editToggleAcomps(i) { const p=document.getElementById(`edit-acomps-panel-${i}`); if(p)p.style.display=p.style.display==='none'?'block':'none'; }
+function editQtd(idx,delta) { if(!editPratosAtual[idx])return; editPratosAtual[idx].qtd=Math.max(1,(editPratosAtual[idx].qtd||1)+delta); renderizarPratosEdicao(); }
+function editRemovePrato(idx) { editPratosAtual.splice(idx,1); renderizarPratosEdicao(); }
+function editAcompGramas(pi,ai,val) { if(editPratosAtual[pi]?.acompanhamentos?.[ai]) editPratosAtual[pi].acompanhamentos[ai].gramas=parseInt(val)||80; }
+function editRemoveAcomp(pi,ai) { editPratosAtual[pi]?.acompanhamentos?.splice(ai,1); renderizarPratosEdicao(); setTimeout(()=>{ document.getElementById(`edit-acomps-panel-${pi}`)?.style && (document.getElementById(`edit-acomps-panel-${pi}`).style.display='block'); },0); }
+function editAdicionarAcomp(pi) {
+  const sel=document.getElementById(`edit-add-acomp-${pi}`); if(!sel?.value)return;
+  const base=parseInt(sel.options[sel.selectedIndex].dataset.base)||80;
+  if(!Array.isArray(editPratosAtual[pi].acompanhamentos)) editPratosAtual[pi].acompanhamentos=[];
+  editPratosAtual[pi].acompanhamentos.push({nome:sel.value,gramas:base});
+  renderizarPratosEdicao();
+  setTimeout(()=>{ document.getElementById(`edit-acomps-panel-${pi}`)?.style && (document.getElementById(`edit-acomps-panel-${pi}`).style.display='block'); },0);
+}
 
 function adicionarPratoEdicao() {
-  const sel = document.getElementById('edit-add-prato-select');
-  const id  = sel?.value; if (!id) return;
-  const prato = cardapio.find(c => c.id === id); if (!prato) return;
-  const exist = editPratosAtual.find(p => p.id === id);
-  if (exist) { exist.qtd = (exist.qtd||1)+1; }
+  const sel=document.getElementById('edit-add-prato-select');
+  const id=sel?.value; if(!id) return;
+  const prato=cardapio.find(c=>c.id===id); if(!prato) return;
+  const exist=editPratosAtual.find(p=>p.id===id);
+  if(exist){ exist.qtd=(exist.qtd||1)+1; }
   else { editPratosAtual.push({id:prato.id,nome:prato.nome,qtd:1,linha:prato.linha,preco:prato.preco,kcal:prato.kcal,acompanhamentos:[]}); }
-  sel.value = ''; renderizarPratosEdicao();
+  sel.value=''; renderizarPratosEdicao();
 }
 
 // schema pedidos: cliente_nome, cliente_tel, plano, pratos(jsonb), observacoes, forma_pag, status
 async function abrirModalEditarPedido(id) {
-  const p = pedidos.find(x => x.id === id); if (!p) return;
+  const p=pedidos.find(x=>x.id===id); if(!p) return;
   document.getElementById('edit-pedido-id').value    = p.id;
-  document.getElementById('edit-cliente-nome').value = p.cliente_nome || '';
-  document.getElementById('edit-cliente-tel').value  = p.cliente_tel  || '';
-  document.getElementById('edit-plano').value        = p.plano        || '';
-  document.getElementById('edit-status').value       = p.status       || 'pendente';
-  document.getElementById('edit-obs').value          = p.observacoes  || '';
-  const formaPagEl = document.getElementById('edit-forma-pag');
-  if (formaPagEl) formaPagEl.value = p.forma_pag || '';
-  const parcelaEl = document.getElementById('edit-parceria');
-  if (parcelaEl) parcelaEl.checked = p.parceria === true;
-  const addSel = document.getElementById('edit-add-prato-select');
-  if (addSel && cardapio.length) {
-    addSel.innerHTML = '<option value="">Selecionar prato para adicionar...</option>' +
+  document.getElementById('edit-cliente-nome').value = p.cliente_nome||'';
+  document.getElementById('edit-cliente-tel').value  = p.cliente_tel ||'';
+  document.getElementById('edit-plano').value        = p.plano       ||'';
+  document.getElementById('edit-status').value       = p.status      ||'pendente';
+  document.getElementById('edit-obs').value          = p.observacoes ||'';
+  const fpEl=document.getElementById('edit-forma-pag'); if(fpEl) fpEl.value=p.forma_pag||'';
+  const parEl=document.getElementById('edit-parceria'); if(parEl) parEl.checked=p.parceria===true;
+  const addSel=document.getElementById('edit-add-prato-select');
+  if(addSel&&cardapio.length){
+    addSel.innerHTML='<option value="">Selecionar prato para adicionar...</option>'+
       cardapio.filter(c=>c.ativo!==false).map(c=>`<option value="${c.id}">[${c.linha}] ${c.nome}</option>`).join('');
   }
-  editPratosAtual = (Array.isArray(p.pratos)?p.pratos:[]).map(pr=>({...pr,qtd:pr.qtd||1}));
+  editPratosAtual=(Array.isArray(p.pratos)?p.pratos:[]).map(pr=>({...pr,qtd:pr.qtd||1}));
   renderizarPratosEdicao();
   document.getElementById('modal-editar-pedido').classList.add('active');
 }
 
-/* ══════════════════════════════════════════════════════════════
-   SINCRONIZAÇÃO FINANCEIRA (upsert via pedido_id)
-   ══════════════════════════════════════════════════════════════ */
+/* Sincronizar lançamento financeiro — upsert via pedido_id */
 async function sincronizarLancamentoPedido(pedido) {
-  if (!pedido?.id) return;
-  const totalGs = calcularTotalPedido_admin(pedido);
-  const payload = {
-    tipo:            'receita',
-    categoria:       'Vendas',
-    descricao:       `Pedido #${String(pedido.id).slice(-6).toUpperCase()} — ${pedido.cliente_nome||''}${pedido.parceria?' (Parceria)':''}`,
-    forma_pagamento: pedido.forma_pag || null,
-    valor_gs:        totalGs, valor_brl: 0,
-    data_lancamento: (pedido.data_entrega||pedido.created_at||new Date().toISOString()).split('T')[0],
-    cliente_id:      pedido.cliente_id || null,
-    pedido_id:       pedido.id,
+  if(!pedido?.id) return;
+  const totalGs=calcularTotalPedido_admin(pedido);
+  const payload={
+    tipo:'receita', categoria:'Vendas',
+    descricao:`Pedido #${String(pedido.id).slice(-6).toUpperCase()} — ${pedido.cliente_nome||''}${pedido.parceria?' (Parceria)':''}`,
+    forma_pagamento:pedido.forma_pag||null,
+    valor_gs:totalGs, valor_brl:0,
+    data_lancamento:(pedido.data_entrega||pedido.created_at||new Date().toISOString()).split('T')[0],
+    cliente_id:pedido.cliente_id||null,
+    pedido_id:pedido.id,
   };
-  const { error } = await supabaseClient.from('lancamentos').upsert(payload, { onConflict:'pedido_id' });
-  if (error) console.warn('[Financeiro] Upsert failed:', error.message);
-  else {
+  // Resiliente: se coluna pedido_id não existe, ignora silenciosamente
+  const {error}=await supabaseClient.from('lancamentos').upsert(payload,{onConflict:'pedido_id'});
+  if(error && !error.message?.includes('column') && !error.message?.includes('schema cache')) console.warn('[Lancamento]',error.message);
+  if(!error){
     if(document.getElementById('page-lancamentos')?.classList.contains('active')) carregarLancamentos();
     if(document.getElementById('page-dashboard')?.classList.contains('active'))   carregarDashboard();
     if(document.getElementById('page-caixa')?.classList.contains('active'))       carregarCaixa();
@@ -799,19 +797,32 @@ async function salvarEdicaoPedido() {
   const id       = document.getElementById('edit-pedido-id').value;
   const parceria = document.getElementById('edit-parceria')?.checked === true;
   const formaPag = document.getElementById('edit-forma-pag')?.value || null;
-  const pedidoBase = pedidos.find(x=>x.id===id) || {};
-  const pedidoUpdate = { ...pedidoBase, cliente_nome:document.getElementById('edit-cliente-nome').value,
-    cliente_tel:document.getElementById('edit-cliente-tel').value, plano:document.getElementById('edit-plano').value,
-    status:document.getElementById('edit-status').value, observacoes:document.getElementById('edit-obs').value,
-    pratos:editPratosAtual, parceria, ...(formaPag?{forma_pag:formaPag}:{}) };
+  const pedidoBase = pedidos.find(x=>x.id===id)||{};
+  const pedidoUpdate = { ...pedidoBase,
+    cliente_nome: document.getElementById('edit-cliente-nome').value,
+    cliente_tel:  document.getElementById('edit-cliente-tel').value,
+    plano:        document.getElementById('edit-plano').value,
+    status:       document.getElementById('edit-status').value,
+    observacoes:  document.getElementById('edit-obs').value,
+    pratos: editPratosAtual, parceria,
+    ...(formaPag ? {forma_pag:formaPag} : {}),
+  };
   const valorTotal = calcularTotalPedido_admin(pedidoUpdate);
-  const payload = { cliente_nome:pedidoUpdate.cliente_nome, cliente_tel:pedidoUpdate.cliente_tel,
-    plano:pedidoUpdate.plano, status:pedidoUpdate.status, pratos:editPratosAtual,
-    observacoes:pedidoUpdate.observacoes, parceria, valor_total:valorTotal, updated_at:new Date().toISOString() };
-  if (formaPag) payload.forma_pag = formaPag;
-  const { error } = await supabaseClient.from('pedidos').update(payload).eq('id', id);
-  if (error) { mostrarToast('Erro: ' + error.message, 'error'); return; }
-  await sincronizarLancamentoPedido({ ...pedidoUpdate, id });
+  const payload = {
+    cliente_nome:pedidoUpdate.cliente_nome, cliente_tel:pedidoUpdate.cliente_tel,
+    plano:pedidoUpdate.plano, status:pedidoUpdate.status,
+    pratos:editPratosAtual, observacoes:pedidoUpdate.observacoes,
+    parceria, valor_total:valorTotal, updated_at:new Date().toISOString(),
+  };
+  if(formaPag) payload.forma_pag=formaPag;
+  // Resiliente: se valor_total/parceria ainda não existem, remove campos extras
+  let res = await supabaseClient.from('pedidos').update(payload).eq('id',id);
+  if(res.error && (res.error.code==='42703' || res.error.message?.includes('schema cache') || res.error.message?.includes('column'))) {
+    const {parceria:_,valor_total:__,...basePayload}=payload;
+    res = await supabaseClient.from('pedidos').update(basePayload).eq('id',id);
+  }
+  if(res.error){ mostrarToast('Erro: '+res.error.message,'error'); return; }
+  await sincronizarLancamentoPedido({...pedidoUpdate,id});
   mostrarToast('Pedido atualizado!');
   fecharModal('modal-editar-pedido');
   await _buscarPedidos();
@@ -2025,20 +2036,17 @@ async function excluirLancamento(id) {
 async function carregarCardapioAdmin() {
   await Promise.all([_buscarCardapio(), carregarAcompanhamentosAdmin()]);
   filtrarCardapio();
-  // garante que a aba certa está visível
-  mostrarAbaCardapio(document.getElementById('aba-acomp-cardapio')?.style.display === 'none' ? 'pratos' : 'acomp');
 }
 
 /* ── ABA SWITCH ─────────────────────────────────────────────── */
 function mostrarAbaCardapio(aba) {
   const isAcomp = aba === 'acomp';
-  document.getElementById('aba-pratos-cardapio').style.display  = isAcomp ? 'none'  : '';
-  document.getElementById('aba-acomp-cardapio').style.display   = isAcomp ? ''      : 'none';
-  document.getElementById('btn-novo-prato').style.display       = isAcomp ? 'none'  : '';
-  document.getElementById('btn-aba-acomp').style.display        = isAcomp ? 'none'  : '';
-  document.getElementById('filtro-linha-cardapio').closest('.filtros-pedidos').style.display = isAcomp ? 'none' : '';
-
-  // botão voltar (injetado dinâmicamente)
+  document.getElementById('aba-pratos-cardapio').style.display  = isAcomp ? 'none' : '';
+  document.getElementById('aba-acomp-cardapio').style.display   = isAcomp ? ''     : 'none';
+  document.getElementById('btn-novo-prato').style.display       = isAcomp ? 'none' : '';
+  document.getElementById('btn-aba-acomp').style.display        = isAcomp ? 'none' : '';
+  const filtros = document.getElementById('filtro-linha-cardapio')?.closest('.filtros-pedidos');
+  if (filtros) filtros.style.display = isAcomp ? 'none' : '';
   let btnVoltar = document.getElementById('btn-voltar-pratos');
   if (isAcomp && !btnVoltar) {
     const wrap = document.getElementById('btn-aba-acomp').parentElement;
@@ -2050,22 +2058,20 @@ function mostrarAbaCardapio(aba) {
     wrap.insertBefore(btnVoltar, wrap.firstChild);
   }
   if (btnVoltar) btnVoltar.style.display = isAcomp ? '' : 'none';
-
   if (isAcomp) renderizarTabelaAcomps();
 }
 
 /* ══════════════════════════════════════════════════════════════
-   ACOMPANHAMENTOS
-   Tabela Supabase:
-     CREATE TABLE acompanhamentos (
-       id              uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-       nome            text NOT NULL UNIQUE,
-       gramas_padrao   integer NOT NULL DEFAULT 80,
-       preco_extra_10g integer NOT NULL DEFAULT 150,
-       ativo           boolean NOT NULL DEFAULT true,
-       ordem           integer DEFAULT 0,
-       created_at      timestamptz DEFAULT now()
-     );
+   ACOMPANHAMENTOS ADMIN
+   SQL: CREATE TABLE acompanhamentos (
+     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+     nome text NOT NULL UNIQUE,
+     gramas_padrao integer NOT NULL DEFAULT 80,
+     preco_extra_10g integer NOT NULL DEFAULT 150,
+     ativo boolean NOT NULL DEFAULT true,
+     ordem integer DEFAULT 0,
+     created_at timestamptz DEFAULT now()
+   );
    ══════════════════════════════════════════════════════════════ */
 async function carregarAcompanhamentosAdmin() {
   const { data, error } = await supabaseClient
@@ -2073,7 +2079,21 @@ async function carregarAcompanhamentosAdmin() {
     .select('*')
     .order('ordem', { ascending: true })
     .order('nome');
-  if (error) { console.warn('Acompanhamentos:', error.message); return; }
+  if (error) {
+    if (error.message?.includes('schema cache') || error.message?.includes('relation')) {
+      // Tabela não existe ainda — mostra aviso na aba
+      acompanhamentos = [];
+      const tbody = document.getElementById('tbody-acomp-admin');
+      if (tbody) tbody.innerHTML = `<tr><td colspan="5">
+        <div style="padding:20px;background:#fef9c3;border:1px solid #fde68a;border-radius:8px;text-align:center">
+          <strong style="color:#92400e">⚠️ Tabela não encontrada</strong><br>
+          <span style="color:#78350f;font-size:.88rem">Execute a migration SQL no painel do Supabase para criar a tabela <code>acompanhamentos</code></span>
+        </div></td></tr>`;
+    } else {
+      console.warn('Acompanhamentos:', error.message);
+    }
+    return;
+  }
   acompanhamentos = data || [];
 }
 
@@ -2081,49 +2101,35 @@ function renderizarTabelaAcomps() {
   const tbody = document.getElementById('tbody-acomp-admin');
   if (!tbody) return;
   if (!acompanhamentos.length) {
-    tbody.innerHTML = '<tr><td colspan="5" class="empty-msg">Nenhum acompanhamento cadastrado.<br><small>Clique em "Novo Acompanhamento" para começar.</small></td></tr>';
+    const temTabela = !document.querySelector('#tbody-acomp-admin td[colspan="5"] div');
+    if (temTabela) tbody.innerHTML = '<tr><td colspan="5" class="empty-msg">Nenhum acompanhamento cadastrado.<br><button class="btn btn-primary btn-sm" style="margin-top:8px" onclick="abrirModalAcomp()"><i class="fas fa-plus"></i> Criar primeiro</button></td></tr>';
     return;
   }
   tbody.innerHTML = acompanhamentos.map(a => `
     <tr>
       <td>
         <strong>${a.nome}</strong>
-        <div style="font-size:.75rem;color:#9ca3af;font-family:monospace">GRAM_RULES['${a.nome}']</div>
+        <div style="font-size:.72rem;color:#9ca3af;font-family:monospace">GRAM_RULES['${a.nome}'] = {base:${a.gramas_padrao}, extra:${a.preco_extra_10g}}</div>
       </td>
-      <td>
-        <span style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:5px;padding:3px 10px;font-weight:600;color:#0369a1">${a.gramas_padrao}g</span>
-      </td>
-      <td>
-        <span style="background:#fefce8;border:1px solid #fde68a;border-radius:5px;padding:3px 10px;font-weight:600;color:#854d0e">₲ ${(a.preco_extra_10g||0).toLocaleString('es-PY')} / 10g</span>
-        ${a.preco_extra_10g === 0 ? '<span style="font-size:.75rem;color:#6b7280;margin-left:6px">(sem cobrança extra)</span>' : ''}
-      </td>
-      <td>
-        <span class="badge badge-${a.ativo ? 'green' : 'gray'}">${a.ativo ? 'Ativo' : 'Inativo'}</span>
-      </td>
+      <td><span style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:5px;padding:3px 10px;font-weight:600;color:#0369a1">${a.gramas_padrao}g</span></td>
+      <td><span style="background:#fefce8;border:1px solid #fde68a;border-radius:5px;padding:3px 10px;font-weight:600;color:#854d0e">₲ ${(a.preco_extra_10g||0).toLocaleString('es-PY')} / 10g</span>${!a.preco_extra_10g?'<span style="font-size:.75rem;color:#9ca3af;margin-left:6px">(sem cobrança extra)</span>':''}</td>
+      <td><span class="badge badge-${a.ativo?'green':'gray'}">${a.ativo?'Ativo':'Inativo'}</span></td>
       <td style="display:flex;gap:6px">
-        <button class="btn btn-sm btn-outline" onclick="editarAcomp('${a.id}')" title="Editar">
-          <i class="fas fa-edit"></i>
-        </button>
-        <button class="btn btn-sm" style="background:#e74c3c;color:#fff" onclick="excluirAcomp('${a.id}','${a.nome}')" title="Excluir">
-          <i class="fas fa-trash"></i>
-        </button>
+        <button class="btn btn-sm btn-outline" onclick="editarAcomp('${a.id}')"><i class="fas fa-edit"></i></button>
+        <button class="btn btn-sm" style="background:#e74c3c;color:#fff" onclick="excluirAcomp('${a.id}','${a.nome.replace("'","\'")}')"><i class="fas fa-trash"></i></button>
       </td>
     </tr>`).join('');
 }
 
 function abrirModalAcomp() {
-  document.getElementById('acomp-id').value     = '';
-  document.getElementById('acomp-nome').value   = '';
-  document.getElementById('acomp-base').value   = '80';
-  document.getElementById('acomp-extra').value  = '150';
+  document.getElementById('acomp-id').value      = '';
+  document.getElementById('acomp-nome').value    = '';
+  document.getElementById('acomp-base').value    = '80';
+  document.getElementById('acomp-extra').value   = '150';
   document.getElementById('acomp-ativo').checked = true;
   document.getElementById('modal-acomp-titulo').textContent = 'Novo Acompanhamento';
+  _bindAcompPreview();
   _atualizarPreviewAcomp();
-  // Listeners para preview em tempo real
-  ['acomp-nome','acomp-base','acomp-extra'].forEach(id => {
-    const el = document.getElementById(id);
-    el.oninput = _atualizarPreviewAcomp;
-  });
   document.getElementById('modal-acomp').classList.add('active');
 }
 
@@ -2136,11 +2142,15 @@ function editarAcomp(id) {
   document.getElementById('acomp-extra').value   = a.preco_extra_10g;
   document.getElementById('acomp-ativo').checked = a.ativo !== false;
   document.getElementById('modal-acomp-titulo').textContent = 'Editar Acompanhamento';
+  _bindAcompPreview();
   _atualizarPreviewAcomp();
+  document.getElementById('modal-acomp').classList.add('active');
+}
+
+function _bindAcompPreview() {
   ['acomp-nome','acomp-base','acomp-extra'].forEach(id => {
     document.getElementById(id).oninput = _atualizarPreviewAcomp;
   });
-  document.getElementById('modal-acomp').classList.add('active');
 }
 
 function _atualizarPreviewAcomp() {
@@ -2149,13 +2159,12 @@ function _atualizarPreviewAcomp() {
   const extra = parseInt(document.getElementById('acomp-extra').value) || 0;
   const txt   = document.getElementById('acomp-preview-texto');
   if (!txt) return;
-  const exemploGramas = base + 30;  // +30g acima do padrão
-  const taxaExemplo   = Math.ceil(30 / 10) * extra;
+  const taxaEx = Math.ceil(30 / 10) * extra;
   txt.innerHTML =
     `<code style="background:#dcfce7;padding:2px 6px;border-radius:4px">GRAM_RULES['${nome}'] = { base: ${base}, extra: ${extra} }</code>` +
     (extra > 0
-      ? `<br><span style="margin-top:4px;display:inline-block">Exemplo: ${exemploGramas}g (+${30}g) → <strong>₲ ${taxaExemplo.toLocaleString('es-PY')}</strong> extra</span>`
-      : `<br><span style="margin-top:4px;display:inline-block;color:#6b7280">Sem cobrança extra por gramagem acima do padrão</span>`);
+      ? `<br><span style="margin-top:4px;display:inline-block">Exemplo: ${base+30}g (+30g) → <strong>₲ ${taxaEx.toLocaleString('es-PY')}</strong> extra</span>`
+      : `<br><span style="margin-top:4px;display:inline-block;color:#6b7280">Sem cobrança extra</span>`);
 }
 
 async function salvarAcomp() {
@@ -2164,19 +2173,17 @@ async function salvarAcomp() {
   const base  = parseInt(document.getElementById('acomp-base').value)  || 0;
   const extra = parseInt(document.getElementById('acomp-extra').value) || 0;
   const ativo = document.getElementById('acomp-ativo').checked;
-
-  if (!nome)   { mostrarToast('Nome obrigatório', 'error'); return; }
-  if (base < 1){ mostrarToast('Gramas padrão deve ser > 0', 'error'); return; }
-
+  if (!nome)    { mostrarToast('Nome obrigatório', 'error'); return; }
+  if (base < 1) { mostrarToast('Gramas padrão deve ser > 0', 'error'); return; }
   const payload = { nome, gramas_padrao: base, preco_extra_10g: extra, ativo };
-
   const { error } = id
     ? await supabaseClient.from('acompanhamentos').update(payload).eq('id', id)
     : await supabaseClient.from('acompanhamentos').insert([payload]);
-
   if (error) {
-    // Erro de unique constraint = nome duplicado
-    if (error.code === '23505') { mostrarToast(`Já existe um acompanhamento com o nome "${nome}"`, 'error'); return; }
+    if (error.code === '23505') { mostrarToast(`Nome "${nome}" já existe`, 'error'); return; }
+    if (error.message?.includes('schema cache') || error.message?.includes('relation')) {
+      mostrarToast('Tabela não existe — execute a migration SQL no Supabase', 'error'); return;
+    }
     mostrarToast('Erro: ' + error.message, 'error'); return;
   }
   mostrarToast(id ? 'Acompanhamento atualizado!' : 'Acompanhamento criado!');
@@ -2186,10 +2193,10 @@ async function salvarAcomp() {
 }
 
 async function excluirAcomp(id, nome) {
-  if (!confirm(`Excluir "${nome}"?\n\nIsso removerá o acompanhamento da lista do app.`)) return;
+  if (!confirm(`Excluir "${nome}"?`)) return;
   const { error } = await supabaseClient.from('acompanhamentos').delete().eq('id', id);
   if (error) { mostrarToast('Erro: ' + error.message, 'error'); return; }
-  mostrarToast('Acompanhamento excluído!');
+  mostrarToast('Excluído!');
   await carregarAcompanhamentosAdmin();
   renderizarTabelaAcomps();
 }

@@ -12,14 +12,14 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="stylesheet" href="style.css">
   <style>
-    .janela-info{display:flex;align-items:flex-start;gap:12px;padding:13px 15px;border-radius:10px;font-size:.88rem}
+    .janela-info{display:flex;align-items:flex-start;gap:12px;padding:13px 16px;border-radius:10px;font-size:.88rem;line-height:1.5}
     .janela-info>i{margin-top:2px;font-size:1.05rem;flex-shrink:0}
-    .janela-normal{background:#f0fdf4;border:1.5px solid #bbf7d0;color:#15803d}
-    .janela-urgencia{background:#fffbeb;border:1.5px solid #fde68a;color:#92400e}
+    .janela-normal   {background:#f0fdf4;border:1.5px solid #bbf7d0;color:#15803d}
+    .janela-urgencia {background:#fffbeb;border:1.5px solid #fde68a;color:#92400e}
     .janela-fechamento{background:#f1f5f9;border:1.5px solid #cbd5e1;color:#475569}
-    .urgencia-opt{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border:1.5px solid #e5e7eb;border-radius:8px;cursor:pointer;transition:.15s}
+    .urgencia-opt{display:flex;align-items:flex-start;gap:10px;padding:10px 13px;border:1.5px solid #e5e7eb;border-radius:8px;cursor:pointer;transition:border-color .15s,background .15s}
     .urgencia-opt:hover{border-color:#fbbf24;background:#fefce8}
-    .urgencia-opt.selected{border-color:#f59e0b;background:#fffbeb}
+    .urgencia-opt.selected{border-color:#f59e0b;background:#fffbeb;box-shadow:0 0 0 2px #fde68a44}
     .urgencia-opt input[type=radio]{margin-top:3px;flex-shrink:0;accent-color:#d97706}
   </style>
 </head>
@@ -217,7 +217,8 @@
           <div id="frete-detalhe" hidden></div>
           <div id="valor-frete-display" style="margin-top:8px;font-weight:600;">—</div>
         </div>
-        <!-- Janela de Entrega -->
+
+        <!-- ── JANELA DE ENTREGA ─────────────────────── -->
         <div id="janela-entrega-box" class="form-group" hidden></div>
 
         <!-- Observações -->
@@ -507,38 +508,14 @@
         <div class="modal-section">
           <label class="modal-section-title">Guarniciones <small>(máx. 2)</small></label>
           <div class="acomp-grid" id="acomp-grid">
-            <!-- Preenchido dinamicamente por renderizarAcompRows() em script.js -->
-            <!-- Fallback estático caso o Supabase não responda (removido após carga) -->
-            <div class="acomp-row" data-fallback>
-              <label class="acomp-label"><input type="checkbox" class="acomp-check" value="Arroz Branco"><span>Arroz Branco</span></label>
-              <span class="acomp-display-g gram-display" hidden>80g</span>
-              <span class="acomp-grams" hidden><input type="number" class="gram-input" value="80" min="20" max="500">g</span>
-            </div>
-            <div class="acomp-row" data-fallback>
-              <label class="acomp-label"><input type="checkbox" class="acomp-check" value="Feijão Preto"><span>Feijão Preto</span></label>
-              <span class="acomp-display-g gram-display" hidden>90g</span>
-              <span class="acomp-grams" hidden><input type="number" class="gram-input" value="90" min="20" max="500">g</span>
-            </div>
-            <div class="acomp-row" data-fallback>
-              <label class="acomp-label"><input type="checkbox" class="acomp-check" value="Purê de Batata"><span>Purê de Batata</span></label>
-              <span class="acomp-display-g gram-display" hidden>120g</span>
-              <span class="acomp-grams" hidden><input type="number" class="gram-input" value="120" min="20" max="500">g</span>
-            </div>
-            <div class="acomp-row" data-fallback>
-              <label class="acomp-label"><input type="checkbox" class="acomp-check" value="Purê de Batata Doce"><span>Purê de Batata Doce</span></label>
-              <span class="acomp-display-g gram-display" hidden>120g</span>
-              <span class="acomp-grams" hidden><input type="number" class="gram-input" value="120" min="20" max="500">g</span>
-            </div>
-            <div class="acomp-row" data-fallback>
-              <label class="acomp-label"><input type="checkbox" class="acomp-check" value="Purê de Abóbora"><span>Purê de Abóbora</span></label>
-              <span class="acomp-display-g gram-display" hidden>120g</span>
-              <span class="acomp-grams" hidden><input type="number" class="gram-input" value="120" min="20" max="500">g</span>
-            </div>
-            <div class="acomp-row" data-fallback>
-              <label class="acomp-label"><input type="checkbox" class="acomp-check" value="Macarrão"><span>Macarrão</span></label>
-              <span class="acomp-display-g gram-display" hidden>120g</span>
-              <span class="acomp-grams" hidden><input type="number" class="gram-input" value="120" min="20" max="500">g</span>
-            </div>
+            <!-- Preenchido por renderizarAcompRows() em script.js -->
+            <!-- Fallback estático usado enquanto Supabase não responde -->
+            <div class="acomp-row"><label class="acomp-label"><input type="checkbox" class="acomp-check" value="Arroz Branco"><span>Arroz Branco</span></label><span class="acomp-display-g gram-display" hidden>80g</span><span class="acomp-grams" hidden><input type="number" class="gram-input" value="80" min="20" max="500">g</span></div>
+            <div class="acomp-row"><label class="acomp-label"><input type="checkbox" class="acomp-check" value="Feijão Preto"><span>Feijão Preto</span></label><span class="acomp-display-g gram-display" hidden>90g</span><span class="acomp-grams" hidden><input type="number" class="gram-input" value="90" min="20" max="500">g</span></div>
+            <div class="acomp-row"><label class="acomp-label"><input type="checkbox" class="acomp-check" value="Purê de Batata"><span>Purê de Batata</span></label><span class="acomp-display-g gram-display" hidden>120g</span><span class="acomp-grams" hidden><input type="number" class="gram-input" value="120" min="20" max="500">g</span></div>
+            <div class="acomp-row"><label class="acomp-label"><input type="checkbox" class="acomp-check" value="Purê de Batata Doce"><span>Purê de Batata Doce</span></label><span class="acomp-display-g gram-display" hidden>120g</span><span class="acomp-grams" hidden><input type="number" class="gram-input" value="120" min="20" max="500">g</span></div>
+            <div class="acomp-row"><label class="acomp-label"><input type="checkbox" class="acomp-check" value="Purê de Abóbora"><span>Purê de Abóbora</span></label><span class="acomp-display-g gram-display" hidden>120g</span><span class="acomp-grams" hidden><input type="number" class="gram-input" value="120" min="20" max="500">g</span></div>
+            <div class="acomp-row"><label class="acomp-label"><input type="checkbox" class="acomp-check" value="Macarrão"><span>Macarrão</span></label><span class="acomp-display-g gram-display" hidden>120g</span><span class="acomp-grams" hidden><input type="number" class="gram-input" value="120" min="20" max="500">g</span></div>
           </div>
         </div>
 

@@ -576,7 +576,7 @@
         <!-- CARDÁPIO ADMIN -->
         <div class="page" id="page-cardapio-admin">
           <div class="page-actions">
-            <div class="filtros-pedidos">
+            <div class="filtros-pedidos" id="filtros-cardapio-wrap">
               <select class="form-control" id="filtro-linha-cardapio" onchange="filtrarCardapio()">
                 <option value="">Todas as linhas</option>
                 <option value="Tradicional">Tradicional</option>
@@ -586,11 +586,11 @@
               </select>
               <input type="text" class="form-control" id="filtro-nome-cardapio" placeholder="Buscar prato..." oninput="filtrarCardapio()">
             </div>
-            <div style="display:flex;gap:8px">
-              <button class="btn btn-outline" onclick="mostrarAbaCardapio('acomp')" id="btn-aba-acomp">
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+              <button class="btn btn-outline" id="btn-aba-acomp" onclick="mostrarAbaCardapio('acomp')">
                 <i class="fas fa-leaf"></i> Acompanhamentos
               </button>
-              <button class="btn btn-primary" onclick="abrirModalPratoAdmin()" id="btn-novo-prato">
+              <button class="btn btn-primary" id="btn-novo-prato" onclick="abrirModalPratoAdmin()">
                 <i class="fas fa-plus"></i> Novo Prato
               </button>
             </div>
@@ -616,10 +616,10 @@
           <!-- ABA: ACOMPANHAMENTOS -->
           <div id="aba-acomp-cardapio" style="display:none">
             <div class="card">
-              <div class="card-header" style="display:flex;justify-content:space-between;align-items:center">
+              <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
                 <div>
                   <h3>Acompanhamentos</h3>
-                  <p style="color:#6b7280;font-size:.85rem;margin:2px 0 0">Guarnições disponíveis no app — nome, gramagem padrão e preço extra por 10g adicional</p>
+                  <p style="color:#6b7280;font-size:.83rem;margin:2px 0 0">Guarnições disponíveis no app — nome, gramagem padrão e preço extra por +10g</p>
                 </div>
                 <button class="btn btn-primary btn-sm" onclick="abrirModalAcomp()">
                   <i class="fas fa-plus"></i> Novo Acompanhamento
@@ -630,8 +630,8 @@
                   <thead>
                     <tr>
                       <th>Nome</th>
-                      <th title="Gramagem padrão exibida no app">Gramas Padrão</th>
-                      <th title="Preço em ₲ cobrado a cada 10g acima do padrão">Preço extra / 10g (₲)</th>
+                      <th>Gramas Padrão</th>
+                      <th>Preço extra / 10g (₲)</th>
                       <th>Status</th>
                       <th>Ações</th>
                     </tr>
@@ -640,14 +640,10 @@
                 </table>
               </div>
             </div>
-
-            <!-- Legenda das colunas -->
-            <div style="margin-top:12px;padding:14px 18px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;font-size:.82rem;color:#64748b;line-height:1.7">
-              <strong style="color:#374151">Como os campos são usados no app:</strong><br>
-              <span style="display:inline-block;margin-top:4px">
-                <strong>Gramas Padrão</strong> → valor inicial do input ao marcar o acompanhamento (ex: Arroz Branco = 80g)<br>
-                <strong>Preço extra / 10g</strong> → cobrado por cada 10g <em>acima</em> do padrão no modo Personalizado (ex: 150 = ₲ 150 a cada +10g)
-              </span>
+            <div style="margin-top:12px;padding:12px 16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;font-size:.82rem;color:#64748b;line-height:1.8">
+              <strong style="color:#374151">Como os campos são usados no app (script.js):</strong><br>
+              <strong>Gramas Padrão</strong> → valor inicial do input ao marcar o acomp (ex: Arroz Branco = 80g)<br>
+              <strong>Preço extra / 10g</strong> → cobrado a cada 10g <em>acima</em> do padrão no modo Personalizado
             </div>
           </div>
         </div>
@@ -903,8 +899,7 @@
             <label>Observações</label>
             <textarea class="form-control" id="edit-obs" rows="2"></textarea>
           </div>
-
-          <div class="form-row" style="align-items:center">
+          <div class="form-row" style="align-items:flex-start">
             <div class="form-group">
               <label>Forma de Pagamento</label>
               <select class="form-control" id="edit-forma-pag">
@@ -915,8 +910,8 @@
                 <option value="Transferência">Transferência</option>
               </select>
             </div>
-            <div class="form-group" style="display:flex;align-items:center;gap:10px;background:#fef9f0;border:1.5px solid #fde68a;border-radius:8px;padding:10px 14px;margin-top:8px">
-              <input type="checkbox" id="edit-parceria" style="width:18px;height:18px;accent-color:#d97706;cursor:pointer" onchange="toggleParceria(this)">
+            <div class="form-group" style="display:flex;align-items:center;gap:10px;background:#fef9f0;border:1.5px solid #fde68a;border-radius:8px;padding:12px 14px;margin-top:8px">
+              <input type="checkbox" id="edit-parceria" style="width:18px;height:18px;accent-color:#d97706;cursor:pointer;flex-shrink:0" onchange="toggleParceria(this)">
               <div>
                 <label for="edit-parceria" style="font-weight:600;color:#92400e;cursor:pointer;margin:0">🤝 Parceria</label>
                 <span style="color:#b45309;font-size:.78rem;display:block">Valor zerado no financeiro</span>
@@ -1059,7 +1054,7 @@
             <label>Gramas Padrão <span style="color:#ef4444">*</span></label>
             <div style="display:flex;align-items:center;gap:8px">
               <input type="number" class="form-control" id="acomp-base" placeholder="80" min="10" max="500" step="5" style="flex:1">
-              <span style="color:#6b7280;font-size:.9rem">g</span>
+              <span style="color:#6b7280">g</span>
             </div>
             <small style="color:#9ca3af">Gramagem inicial ao selecionar no app</small>
           </div>
@@ -1070,13 +1065,12 @@
           </div>
         </div>
 
-        <!-- Preview do cálculo -->
         <div id="acomp-preview" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px 14px;font-size:.84rem;color:#166534;margin-bottom:16px">
           <strong>Preview:</strong> <span id="acomp-preview-texto">—</span>
         </div>
 
         <div class="form-group" style="display:flex;align-items:center;gap:10px">
-          <input type="checkbox" id="acomp-ativo" checked style="width:16px;height:16px;accent-color:#16a34a">
+          <input type="checkbox" id="acomp-ativo" checked style="width:16px;height:16px;accent-color:#16a34a;cursor:pointer">
           <label for="acomp-ativo" style="margin:0;cursor:pointer">Ativo no app (aparece na lista de guarnições)</label>
         </div>
 
