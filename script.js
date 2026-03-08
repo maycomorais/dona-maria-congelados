@@ -188,7 +188,7 @@ async function carregarCardapio() {
 const CARDAPIO_LOCAL = {
   Tradicional: [
     {id:"t1",nome:"Carne Moída Refogada",linha:"Tradicional",img_url:"img/carne-moída.webp",ingredientes:"Carne moída, alho, cebola, tomate, sal e temperos naturais.",kcal:420,tipo_nutri:"bovina",alergenos:""},
-    {id:"t2",nome:"Macarrão com Almôndega",linha:"Tradicional",img_url:"img/macarrao-com-almondega.webp",ingredientes:"Macarrão, almôndegas, molho de tomate, queijo parmesão.",kcal:480,tipo_nutri:"bovina",alergenos:"Contém glúten e laticínios."},
+    {id:"t2",nome:"Almôndega",linha:"Tradicional",img_url:"img/macarrao-com-almondega.webp",ingredientes:"Almôndegas, molho de tomate.",kcal:480,tipo_nutri:"bovina",alergenos:"Contém glúten e laticínios."},
     {id:"t3",nome:"Carne de Panela Desfiada",linha:"Tradicional",img_url:"img/carne-desfiada.webp",ingredientes:"Carne de panela, cenoura, batata, cebola, alho, louro.",kcal:390,tipo_nutri:"bovina",alergenos:""},
     {id:"t4",nome:"Carré Suíno",linha:"Tradicional",img_url:"img/carre-suino.webp",ingredientes:"Carré suíno, alho, ervas, azeite, sal.",kcal:450,tipo_nutri:"suino",alergenos:""},
     {id:"t5",nome:"Frango em Cubos Cremoso",linha:"Tradicional",img_url:"img/frango-cremoso.webp",ingredientes:"Frango, creme de leite, requeijão, alho, cebola.",kcal:380,tipo_nutri:"frango",alergenos:"Contém laticínios."},
