@@ -785,10 +785,58 @@ function renderizarResumo() {
 }
 
 /* ── PAGAMENTO ───────────────────────────────────────────────── */
-function selecionarPagamento(el,forma){
-  document.querySelectorAll(".pag-opt").forEach(b=>b.classList.remove("selected"));
-  el.classList.add("selected"); pagamentoSel=forma;
-  document.getElementById("forma-pagamento").value=forma; verificarBotao();
+let _cotacaoPix = null; // { brl_pgy: number, atualizado: string }
+
+async function _buscarCotacaoPix() {
+  if (_cotacaoPix) return _cotacaoPix;
+  try {
+    const r = await fetch('https://economia.awesomeapi.com.br/json/last/BRL-PYG');
+    const d = await r.json();
+    const rate = parseFloat(d?.BRLPYG?.bid);
+    if (rate && !isNaN(rate)) {
+      _cotacaoPix = { rate, atualizado: new Date().toLocaleTimeString('es-PY',{hour:'2-digit',minute:'2-digit'}) };
+    }
+  } catch(e) { console.warn('[Pix cotação]', e); }
+  return _cotacaoPix;
+}
+
+function selecionarPagamento(el, forma) {
+  document.querySelectorAll(".pag-opt").forEach(b => b.classList.remove("selected"));
+  el.classList.add("selected"); pagamentoSel = forma;
+  document.getElementById("forma-pagamento").value = forma;
+  const pixBox = document.getElementById('pix-info-box');
+  if (forma === 'Pix') {
+    if (pixBox) pixBox.style.display = 'block';
+    mostrarCotacaoPix();
+  } else {
+    if (pixBox) pixBox.style.display = 'none';
+  }
+  verificarBotao();
+}
+
+async function mostrarCotacaoPix() {
+  const box = document.getElementById('pix-info-box');
+  if (!box) return;
+  const cot = await _buscarCotacaoPix();
+  const total = calcularTotalPedido();
+  const totalGs = total?.total || 0;
+  let cotHtml = '';
+  if (cot && totalGs > 0) {
+    const brl = (totalGs / cot.rate).toFixed(2);
+    cotHtml = `<div style="margin-top:8px;padding:8px 10px;background:#fef3c7;border-radius:6px;font-size:.82rem;color:#92400e">
+      💱 Cotação moneygram: <strong>1 BRL = ${Math.round(cot.rate).toLocaleString('es-PY')} ₲</strong>
+      · Total: <strong>R$ ${parseFloat(brl).toLocaleString('pt-BR',{minimumFractionDigits:2})}</strong>
+      <span style="color:#b45309;font-size:.75rem">(${cot.atualizado})</span>
+    </div>`;
+  }
+  box.innerHTML = `
+    <div style="font-size:.88rem;font-weight:700;color:#166534;margin-bottom:6px">🏦 Dados para Pix</div>
+    <div style="font-size:.85rem;line-height:1.7">
+      <div>📧 <strong>Chave:</strong> congeladosdonamaria@gmail.com</div>
+      <div>🏛 <strong>Banco:</strong> Wise</div>
+      <div>👤 <strong>Titular:</strong> Maria Renata Gonçalves Reis</div>
+    </div>
+    ${cotHtml}`;
 }
 function verificarBotao(){
   const plano=document.getElementById('plano-selecionado').value;
@@ -1115,14 +1163,31 @@ function gerarMensagemPedido(nome,plano,itens,obs,pedidoId,inclusoPlan=false){
     msg += `*── RESUMO ──*\n`;
     msg += `📋 *Entrega inclusa no plano ativo* — sem cobrança adicional\n\n`;
   } else if(total){
+    const plano=document.getElementById('plano-selecionado').value;
+    const cfg=CONFIG_PLANOS[plano]||{};
+    const nEnt=cfg.entregasPorPlano||1;
     msg += `*── RESUMO ──*\n`;
     if(total.desconto>0) msg += `Desconto ${(total.desconto*100).toFixed(0)}%: -${fmt(total.descValor)}\n`;
     if(total.extrasGrama>0) msg += `Personalização: +${fmt(total.extrasGrama)}\n`;
-    msg += `Frete: ${freteValor>0?fmt(freteValor):'A calcular'}\n`;
-    msg += `*TOTAL: ${fmt(total.total)}*\n\n`;
+    msg += `Frete: ${freteValor>0?fmt(freteValor*nEnt)+(nEnt>1?' ('+nEnt+'× '+fmt(freteValor)+')'  :''):'A calcular'}\n`;
+    if(nEnt>1){
+      const totalPlano=(total.total-(freteValor*nEnt))*nEnt + freteValor*nEnt;
+      msg += `*TOTAL PLANO (${nEnt} entregas): ${fmt(totalPlano)}*\n`;
+      msg += `_Por entrega: ${fmt(total.total)}_\n\n`;
+    } else {
+      msg += `*TOTAL: ${fmt(total.total)}*\n\n`;
+    }
   }
 
   msg += `*Pagamento:* ${inclusoPlan ? 'Incluso no plano' : pagamentoSel}`;
+  if (pagamentoSel === 'Pix' && !inclusoPlan) {
+    msg += `\n💳 *Chave Pix:* congeladosdonamaria@gmail.com`;
+    msg += `\n🏛 *Banco Wise* — Maria Renata Gonçalves Reis`;
+    if (_cotacaoPix && total?.total) {
+      const brl = (total.total / _cotacaoPix.rate).toFixed(2);
+      msg += `\n💱 *Valor em BRL:* R$ ${parseFloat(brl).toLocaleString('pt-BR',{minimumFractionDigits:2})} (cotação ${Math.round(_cotacaoPix.rate).toLocaleString('es-PY')} ₲/R$)`;
+    }
+  }
   if(dataEntregaSel) msg += `\n📅 *Entrega prevista:* ${dataEntregaSel.toLocaleDateString('es-PY',{weekday:'long',day:'numeric',month:'long'})}`;
   if(taxaUrgencia>0) msg += `\n⚡ *Taxa urgência 10%* aplicada`;
   if(linkMaps) msg += `\n📍 *Localização:* ${linkMaps}`;

@@ -667,13 +667,32 @@ function calcularTotalPedido_admin(pedido) {
 
 function atualizarPreviewTotal() {
   const parceria = document.getElementById('edit-parceria')?.checked === true;
+  const incluso  = document.getElementById('edit-incluso')?.checked  === true;
   const preview  = document.getElementById('edit-total-preview');
   if (!preview) return;
-  if (parceria) { preview.style.display = 'block'; preview.innerHTML = '🤝 <strong>Parceria</strong> — Total: <strong>₲ 0</strong>'; return; }
-  const baseVal = editPratosAtual.reduce((s, pr) => s + (pr.precoItem || pr.precoBase || pr.preco || 0), 0);
-  if (!baseVal) { preview.style.display = 'none'; return; }
+  if (incluso)  { preview.style.display='block'; preview.innerHTML='📦 <strong>Incluso no Plano</strong> — sem cobrança adicional'; return; }
+  if (parceria) { preview.style.display='block'; preview.innerHTML='🤝 <strong>Parceria</strong> — Total: <strong>₲ 0</strong>'; return; }
+  if (!editPratosAtual.length) { preview.style.display='none'; return; }
+  const fmt = v => `₲ ${Math.round(v).toLocaleString('es-PY')}`;
+  let baseTotal = 0, extrasTotal = 0;
+  editPratosAtual.forEach(pr => {
+    const qtd  = pr.qtd || 1;
+    const ln   = pr.linhaNome || pr.linha || 'Tradicional';
+    const base = PRECOS_LINHA_ADMIN[ln] || 30000;
+    baseTotal  += base * qtd;
+    extrasTotal += (pr.extrasGrama || 0) * qtd;
+  });
+  const freteVal   = parseInt(document.getElementById('edit-frete')?.value || '0') || 0;
+  const plano      = document.getElementById('edit-plano')?.value || '';
+  const nEnt       = { FDS: 4, Mensal: 4 }[plano] || 1;
+  const freteTotal = freteVal * nEnt;
+  const total      = baseTotal + extrasTotal + freteTotal;
+  let html = `<span style="color:#166534">Total: <strong>${fmt(total)}</strong></span>`;
+  if (nEnt > 1) html += ` <span style="color:#9ca3af;font-size:.8rem">(${nEnt} entregas × ${fmt((baseTotal+extrasTotal)/nEnt)})</span>`;
+  if (extrasTotal > 0) html += ` <span style="color:#9ca3af;font-size:.8rem">· ${fmt(extrasTotal)} extras personaliz.</span>`;
+  if (freteTotal  > 0) html += ` <span style="color:#9ca3af;font-size:.8rem">· frete ${fmt(freteTotal)}</span>`;
   preview.style.display = 'block';
-  preview.innerHTML = `Total estimado: <strong>₲ ${Math.round(baseVal).toLocaleString('es-PY')}</strong>`;
+  preview.innerHTML = html;
 }
 function toggleParceria() { atualizarPreviewTotal(); }
 
@@ -687,7 +706,12 @@ function renderizarPratosEdicao() {
   }
   lista.innerHTML = editPratosAtual.map((pr, i) => {
     const acomps = Array.isArray(pr.acompanhamentos) ? pr.acompanhamentos : [];
-    const tags = acomps.map(a => `<span style="background:#f0fdf4;color:#166534;border:1px solid #bbf7d0;border-radius:4px;padding:1px 7px;font-size:.75rem">${a.nome} ${a.gramas}g</span>`).join('');
+    const tags = [
+      ...acomps.map(a => `<span style="background:#f0fdf4;color:#166534;border:1px solid #bbf7d0;border-radius:4px;padding:1px 7px;font-size:.75rem">${a.nome} ${a.gramas}g</span>`),
+      pr.seleta !== false
+        ? `<span style="background:#ecfdf5;color:#065f46;border:1px solid #6ee7b7;border-radius:4px;padding:1px 7px;font-size:.75rem">🥦 Seleta${pr.personalizado&&pr.gramasSeleta?' '+pr.gramasSeleta+'g':''}</span>`
+        : '',
+    ].filter(Boolean).join('');
     const jaAdicionados = acomps.map(a => a.nome);
     const opcoesAdd = disponiveis.filter(a => !jaAdicionados.includes(a.nome)).map(a => `<option value="${a.nome}" data-base="${a.base}">${a.nome}</option>`).join('');
     return `<div style="background:#fff;border:1.5px solid #e5e4e0;border-radius:9px;margin-bottom:8px;overflow:hidden">
@@ -706,19 +730,55 @@ function renderizarPratosEdicao() {
         <button onclick="editRemovePrato(${i})" style="width:26px;height:26px;border:1px solid #fecaca;background:#fef2f2;color:#ef4444;border-radius:6px;cursor:pointer;font-size:.75rem;flex-shrink:0"><i class="fas fa-times"></i></button>
       </div>
       <div id="edit-acomps-panel-${i}" style="display:none;border-top:1px solid #f0f0ec;padding:10px 12px;background:#fafaf8">
-        <div style="font-size:.75rem;font-weight:600;color:#6b7280;text-transform:uppercase;margin-bottom:8px">Acompanhamentos</div>
+        <!-- LINHA + PERSONALIZADO -->
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;padding-bottom:8px;border-bottom:1.5px dashed #e5e4e0">
+          <span style="font-size:.78rem;font-weight:600;color:#6b7280;flex:1">Linha</span>
+          <select onchange="editLinha(${i},this.value)" style="padding:4px 8px;border:1px solid #d1d5db;border-radius:6px;font-size:.82rem">
+            ${['Tradicional','Gourmet','Fit','Kids'].map(l=>`<option value="${l}" ${(pr.linhaNome||pr.linha)===l?'selected':''}>${l} — ₲${(PRECOS_LINHA_ADMIN[l]/1000).toFixed(0)}k</option>`).join('')}
+          </select>
+          <label style="display:flex;align-items:center;gap:5px;font-size:.78rem;cursor:pointer">
+            <input type="checkbox" ${pr.personalizado?'checked':''} onchange="editPersonalizado(${i},this.checked)" style="accent-color:#d97706">
+            <span style="color:#92400e;font-weight:600">Personal.</span>
+          </label>
+        </div>
+        <!-- PROTEÍNA -->
+        <div style="font-size:.75rem;font-weight:600;color:#6b7280;text-transform:uppercase;margin-bottom:6px">Proteína + Acompanhamentos</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;padding-bottom:8px;border-bottom:1px dashed #e5e7eb">
+          <span style="font-size:.82rem;font-weight:600;color:#374151;flex:1">⚖ Proteína</span>
+          <input type="number" value="${pr.gramasProteina||130}" min="50" max="500" step="10"
+            onchange="editGramasProteina(${i},this.value)"
+            style="width:72px;padding:4px 6px;border:1.5px solid #d1fae5;border-radius:6px;font-size:.88rem;text-align:center;background:#f0fdf4">
+          <span style="font-size:.78rem;color:#6b7280">g</span>
+        </div>
+        <!-- ACOMPANHAMENTOS -->
         ${acomps.map((a,ai)=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
           <span style="flex:1;font-size:.82rem">${a.nome}</span>
           <input type="number" value="${a.gramas}" min="10" max="500" step="5" onchange="editAcompGramas(${i},${ai},this.value)" style="width:65px;padding:3px 6px;border:1px solid #d1d5db;border-radius:5px;font-size:.82rem;text-align:center">
           <span style="font-size:.75rem;color:#6b7280">g</span>
           <button onclick="editRemoveAcomp(${i},${ai})" style="width:20px;height:20px;border:1px solid #fecaca;background:#fef2f2;color:#ef4444;border-radius:4px;cursor:pointer;font-size:.65rem">✕</button>
-        </div>`).join('') || '<p style="font-size:.8rem;color:#9ca3af;margin:0 0 8px">Nenhum</p>'}
+        </div>`).join('') || '<p style="font-size:.8rem;color:#9ca3af;margin:0 0 4px">Sem acompanhamentos</p>'}
         ${opcoesAdd ? `<div style="display:flex;gap:6px;margin-top:6px">
           <select id="edit-add-acomp-${i}" style="flex:1;padding:5px 8px;border:1px solid #d1d5db;border-radius:6px;font-size:.82rem">
             <option value="">+ Adicionar acompanhamento...</option>${opcoesAdd}
           </select>
           <button onclick="editAdicionarAcomp(${i})" style="padding:5px 10px;background:#059669;color:#fff;border:none;border-radius:6px;font-size:.82rem;cursor:pointer">Add</button>
         </div>` : ''}
+        <!-- SELETA DE LEGUMES -->
+        <div style="display:flex;align-items:center;gap:8px;margin-top:8px;padding-top:8px;border-top:1px dashed #e5e7eb">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:.82rem;flex:1">
+            <input type="checkbox" ${pr.seleta!==false?'checked':''} onchange="editSeleta(${i},this.checked)" style="accent-color:#059669">
+            <span style="font-weight:600">🥦 Seleta de Legumes</span>
+          </label>
+          ${pr.seleta!==false && pr.personalizado ? `<input type="number" value="${pr.gramasSeleta||80}" min="20" max="400" step="10"
+            onchange="editGramasSeleta(${i},this.value)"
+            style="width:65px;padding:3px 6px;border:1px solid #d1d5db;border-radius:5px;font-size:.82rem;text-align:center">
+            <span style="font-size:.75rem;color:#6b7280">g</span>` : ''}
+        </div>
+        <!-- PREÇO DO PRATO (preview) -->
+        <div style="margin-top:8px;padding:6px 10px;background:#f0fdf4;border-radius:6px;font-size:.82rem;color:#166534;text-align:right">
+          <span style="font-weight:600">₲ ${((pr.precoItem||pr.precoBase||PRECOS_LINHA_ADMIN[pr.linhaNome||pr.linha]||30000)).toLocaleString('es-PY')}</span>
+          ${pr.extrasGrama>0?`<span style="color:#9ca3af;margin-left:4px">(base + ₲${pr.extrasGrama.toLocaleString('es-PY')} extras)</span>`:''}
+        </div>
       </div>
     </div>`;
   }).join('');
@@ -728,25 +788,248 @@ function renderizarPratosEdicao() {
 function editToggleAcomps(i) { const p=document.getElementById(`edit-acomps-panel-${i}`); if(p)p.style.display=p.style.display==='none'?'block':'none'; }
 function editQtd(idx,delta) { if(!editPratosAtual[idx])return; editPratosAtual[idx].qtd=Math.max(1,(editPratosAtual[idx].qtd||1)+delta); renderizarPratosEdicao(); }
 function editRemovePrato(idx) { editPratosAtual.splice(idx,1); renderizarPratosEdicao(); }
-function editAcompGramas(pi,ai,val) { if(editPratosAtual[pi]?.acompanhamentos?.[ai]) editPratosAtual[pi].acompanhamentos[ai].gramas=parseInt(val)||80; }
+function editAcompGramas(pi,ai,val) {
+  if (editPratosAtual[pi]?.acompanhamentos?.[ai]) {
+    editPratosAtual[pi].acompanhamentos[ai].gramas = parseInt(val) || 80;
+    editPratosAtual[pi].personalizado = true;
+    recalcularPrecoEditPrato(pi);
+  }
+}
+function editGramasProteina(pi, val) {
+  if (!editPratosAtual[pi]) return;
+  editPratosAtual[pi].gramasProteina = parseInt(val) || 130;
+  editPratosAtual[pi].personalizado  = true;
+  recalcularPrecoEditPrato(pi);
+}
+function editLinha(pi, linhaNome) {
+  if (!editPratosAtual[pi]) return;
+  editPratosAtual[pi].linhaNome = linhaNome;
+  editPratosAtual[pi].linha     = linhaNome;
+  recalcularPrecoEditPrato(pi);
+  renderizarPratosEdicao();
+  setTimeout(() => { document.getElementById(`edit-acomps-panel-${pi}`)?.style && (document.getElementById(`edit-acomps-panel-${pi}`).style.display = 'block'); }, 0);
+}
+function editPersonalizado(pi, val) {
+  if (!editPratosAtual[pi]) return;
+  editPratosAtual[pi].personalizado = val;
+  recalcularPrecoEditPrato(pi);
+  renderizarPratosEdicao();
+  setTimeout(() => { document.getElementById(`edit-acomps-panel-${pi}`)?.style && (document.getElementById(`edit-acomps-panel-${pi}`).style.display = 'block'); }, 0);
+}
+function editSeleta(pi, val) {
+  if (!editPratosAtual[pi]) return;
+  editPratosAtual[pi].seleta = val;
+  if (val && !editPratosAtual[pi].gramasSeleta) editPratosAtual[pi].gramasSeleta = 80;
+  recalcularPrecoEditPrato(pi);
+  renderizarPratosEdicao();
+  setTimeout(() => { document.getElementById(`edit-acomps-panel-${pi}`)?.style && (document.getElementById(`edit-acomps-panel-${pi}`).style.display = 'block'); }, 0);
+}
+function editGramasSeleta(pi, val) {
+  if (!editPratosAtual[pi]) return;
+  editPratosAtual[pi].gramasSeleta = parseInt(val) || 80;
+  recalcularPrecoEditPrato(pi);
+}
 function editRemoveAcomp(pi,ai) { editPratosAtual[pi]?.acompanhamentos?.splice(ai,1); renderizarPratosEdicao(); setTimeout(()=>{ document.getElementById(`edit-acomps-panel-${pi}`)?.style && (document.getElementById(`edit-acomps-panel-${pi}`).style.display='block'); },0); }
 function editAdicionarAcomp(pi) {
   const sel=document.getElementById(`edit-add-acomp-${pi}`); if(!sel?.value)return;
   const base=parseInt(sel.options[sel.selectedIndex].dataset.base)||80;
   if(!Array.isArray(editPratosAtual[pi].acompanhamentos)) editPratosAtual[pi].acompanhamentos=[];
   editPratosAtual[pi].acompanhamentos.push({nome:sel.value,gramas:base});
+  recalcularPrecoEditPrato(pi);
   renderizarPratosEdicao();
   setTimeout(()=>{ document.getElementById(`edit-acomps-panel-${pi}`)?.style && (document.getElementById(`edit-acomps-panel-${pi}`).style.display='block'); },0);
 }
 
+/* ══════════════════════════════════════════════════════════════
+   CONFIGURADOR INLINE DE PRATO (editar pedido)
+   ══════════════════════════════════════════════════════════════ */
+let _cfgPratoId = null;  // id do prato sendo configurado
+
+/** Gera chave única para comparar se dois itens são "o mesmo prato" */
+function _chavePratoEdicao(pr) {
+  const acompKey = (pr.acompanhamentos || []).map(a => `${a.nome}:${a.gramas}`).sort().join('|');
+  const selKey   = pr.seleta !== false ? `seleta:${pr.gramasSeleta || 80}` : 'sem-seleta';
+  const persKey  = pr.personalizado ? `P:${pr.gramasProteina || 130}` : 'N';
+  const linhaKey = pr.linhaNome || pr.linha || 'Tradicional';
+  return `${String(pr.id)}__${linhaKey}__${persKey}__${acompKey}__${selKey}`;
+}
+
+function mostrarConfiguradorPrato(rawId) {
+  if (!rawId) { fecharConfiguradorPrato(); return; }
+  const prato = cardapio.find(c => String(c.id) === String(rawId));
+  if (!prato) return;
+  _cfgPratoId = rawId;
+
+  // Preenche cabeçalho
+  const linhaPrato = prato.linha || prato.linhaNome || 'Tradicional';
+  document.getElementById('cfg-prato-nome').textContent       = prato.nome;
+  document.getElementById('cfg-prato-linha-badge').textContent = linhaPrato;
+  document.getElementById('cfg-linha').value                   = linhaPrato;
+  document.getElementById('cfg-personalizado').checked         = false;
+  document.getElementById('cfg-proteina-g').value              = '130';
+  document.getElementById('cfg-seleta').checked                = true;
+  document.getElementById('cfg-proteina-row').style.display    = 'none';
+  document.getElementById('cfg-seleta-g-wrap').style.display   = 'none';
+
+  // Renderiza checkboxes de acompanhamentos
+  _renderCfgAcomps();
+  atualizarCfgPreco();
+
+  document.getElementById('edit-prato-configurador').style.display = 'block';
+}
+
+function atualizarStatusClienteEdicao() {
+  const sel   = document.getElementById('edit-cliente-id-sel');
+  const banner= document.getElementById('edit-cliente-plano-banner');
+  if (!banner || !sel) return;
+  const opt   = sel.options[sel.selectedIndex];
+  const isAtivo = opt && opt.text.includes('✅');
+  const isIncluso = document.getElementById('edit-incluso')?.checked;
+  if (isAtivo && sel.value) {
+    banner.style.display = 'flex';
+    banner.innerHTML = `<span>✅ Cliente com plano ativo — entrega pode ser marcada como <strong>Inclusa no Plano</strong></span>`;
+    banner.style.background = '#f0fdf4';
+    banner.style.borderColor = '#bbf7d0';
+  } else {
+    banner.style.display = 'none';
+  }
+}
+
+function fecharConfiguradorPrato() {
+  _cfgPratoId = null;
+  document.getElementById('edit-prato-configurador').style.display = 'none';
+  document.getElementById('edit-add-prato-select').value = '';
+}
+
+function toggleCfgPersonalizado() {
+  const isPerso = document.getElementById('cfg-personalizado').checked;
+  document.getElementById('cfg-proteina-row').style.display    = isPerso ? 'flex'  : 'none';
+  document.getElementById('cfg-seleta-g-wrap').style.display   = isPerso ? 'flex'  : 'none';
+  // Atualiza inputs de gramas de acompanhamentos
+  document.querySelectorAll('.cfg-acomp-g-wrap').forEach(w => {
+    w.style.display = isPerso ? 'flex' : 'none';
+  });
+  atualizarCfgPreco();
+}
+
+function _renderCfgAcomps() {
+  const container = document.getElementById('cfg-acomps-lista');
+  if (!container) return;
+  const acomps = _acompsDisponiveisEdit();
+  container.innerHTML = acomps.map(a => `
+    <div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid #f3f4f6">
+      <label style="display:flex;align-items:center;gap:7px;cursor:pointer;flex:1;font-size:.875rem">
+        <input type="checkbox" class="cfg-acomp-chk" value="${a.nome}" data-base="${a.base}"
+          onchange="_limitarCfgAcomps(this); atualizarCfgPreco()"
+          style="width:15px;height:15px;accent-color:#059669">
+        <span>${a.nome}</span>
+      </label>
+      <div class="cfg-acomp-g-wrap" style="display:none;align-items:center;gap:4px">
+        <input type="number" class="cfg-acomp-g" value="${a.base}" min="10" max="500" step="5"
+          oninput="atualizarCfgPreco()"
+          style="width:62px;padding:3px 6px;border:1px solid #d1d5db;border-radius:5px;font-size:.82rem;text-align:center">
+        <span style="font-size:.75rem;color:#6b7280">g</span>
+      </div>
+    </div>`).join('');
+}
+
+function _limitarCfgAcomps(changed) {
+  const chks = document.querySelectorAll('.cfg-acomp-chk:checked');
+  if (chks.length > 2) { changed.checked = false; }
+}
+
+function atualizarCfgPreco() {
+  const prato = cardapio.find(c => String(c.id) === String(_cfgPratoId));
+  if (!prato) return;
+  const gramRules = _getGramRules();
+  const linhaNome = document.getElementById('cfg-linha').value;
+  const precoBase = PRECOS_LINHA_ADMIN[linhaNome] || 30000;
+  const isPerso   = document.getElementById('cfg-personalizado').checked;
+  let extras = 0;
+  if (isPerso) {
+    const gProt = parseInt(document.getElementById('cfg-proteina-g').value) || 130;
+    extras += calcularTaxaGrama_admin('Proteína', gProt, gramRules);
+    document.querySelectorAll('.cfg-acomp-chk:checked').forEach(chk => {
+      const row = chk.closest('div').parentElement;
+      const g   = parseInt(row.querySelector('.cfg-acomp-g')?.value) || parseInt(chk.dataset.base) || 80;
+      extras += calcularTaxaGrama_admin(chk.value, g, gramRules);
+    });
+    const temSeleta = document.getElementById('cfg-seleta').checked;
+    if (temSeleta) {
+      const gSel = parseInt(document.getElementById('cfg-seleta-g').value) || 80;
+      extras += calcularTaxaGrama_admin('Seleta', gSel, gramRules);
+    }
+  }
+  const total = precoBase + extras;
+  const fmt   = v => `₲ ${Math.round(v).toLocaleString('es-PY')}`;
+  const el    = document.getElementById('cfg-preco-preview');
+  if (el) el.innerHTML = `<strong>${fmt(total)}</strong>${extras>0?` <span style="color:#9ca3af;font-size:.8rem">(${fmt(precoBase)} base + ${fmt(extras)} extras)</span>`:''}`;
+}
+
+function confirmarAdicionarPrato() {
+  if (!_cfgPratoId) return;
+  const prato = cardapio.find(c => String(c.id) === String(_cfgPratoId));
+  if (!prato) return;
+
+  const gramRules = _getGramRules();
+  const linhaNome  = document.getElementById('cfg-linha').value;
+  const isPerso    = document.getElementById('cfg-personalizado').checked;
+  const gProt      = parseInt(document.getElementById('cfg-proteina-g').value) || 130;
+  const temSeleta  = document.getElementById('cfg-seleta').checked;
+  const gSel       = parseInt(document.getElementById('cfg-seleta-g').value) || 80;
+  const precoBase  = PRECOS_LINHA_ADMIN[linhaNome] || 30000;
+
+  // Coleta acompanhamentos selecionados
+  const acomps = [];
+  document.querySelectorAll('.cfg-acomp-chk:checked').forEach(chk => {
+    const row = chk.closest('div').parentElement;
+    const g   = parseInt(row.querySelector('.cfg-acomp-g')?.value) || parseInt(chk.dataset.base) || 80;
+    acomps.push({ nome: chk.value, gramas: isPerso ? g : (parseInt(chk.dataset.base) || 80) });
+  });
+
+  // Calcula extras
+  let extrasGrama = 0;
+  if (isPerso) {
+    extrasGrama += calcularTaxaGrama_admin('Proteína', gProt, gramRules);
+    acomps.forEach(a => { extrasGrama += calcularTaxaGrama_admin(a.nome, a.gramas, gramRules); });
+    if (temSeleta) extrasGrama += calcularTaxaGrama_admin('Seleta', gSel, gramRules);
+  }
+
+  const novoPrato = {
+    id:             prato.id,
+    nome:           prato.nome,
+    qtd:            1,
+    linhaNome,
+    linha:          linhaNome,
+    precoBase,
+    preco:          precoBase,
+    kcal:           prato.kcal || 0,
+    acompanhamentos: acomps,
+    gramasProteina:  gProt,
+    personalizado:   isPerso,
+    seleta:          temSeleta,
+    gramasSeleta:    temSeleta ? gSel : null,
+    extrasGrama,
+    precoItem:       precoBase + extrasGrama,
+  };
+
+  // Verifica se configuração idêntica já existe → junta; se não → novo item
+  const chaveNovo = _chavePratoEdicao(novoPrato);
+  const identical = editPratosAtual.find(p => _chavePratoEdicao(p) === chaveNovo);
+  if (identical) {
+    identical.qtd = (identical.qtd || 1) + 1;
+  } else {
+    editPratosAtual.push(novoPrato);
+  }
+
+  fecharConfiguradorPrato();
+  renderizarPratosEdicao();
+  recalcularPrecoEditPrato(editPratosAtual.length - 1);
+}
+
 function adicionarPratoEdicao() {
-  const sel=document.getElementById('edit-add-prato-select');
-  const id=sel?.value; if(!id) return;
-  const prato=cardapio.find(c=>c.id===id); if(!prato) return;
-  const exist=editPratosAtual.find(p=>p.id===id);
-  if(exist){ exist.qtd=(exist.qtd||1)+1; }
-  else { editPratosAtual.push({id:prato.id,nome:prato.nome,qtd:1,linha:prato.linha,preco:prato.preco,kcal:prato.kcal,acompanhamentos:[]}); }
-  sel.value=''; renderizarPratosEdicao();
+  // Compatibilidade com chamadas antigas — delega ao configurador
+  mostrarConfiguradorPrato(document.getElementById('edit-add-prato-select')?.value);
 }
 
 // schema pedidos: cliente_nome, cliente_tel, plano, pratos(jsonb), observacoes, forma_pag, status
@@ -758,15 +1041,44 @@ async function abrirModalEditarPedido(id) {
   document.getElementById('edit-plano').value        = p.plano       ||'';
   document.getElementById('edit-status').value       = p.status      ||'pendente';
   document.getElementById('edit-obs').value          = p.observacoes ||'';
-  const fpEl=document.getElementById('edit-forma-pag'); if(fpEl) fpEl.value=p.forma_pag||'';
-  const parEl=document.getElementById('edit-parceria'); if(parEl) parEl.checked=p.parceria===true;
-  const addSel=document.getElementById('edit-add-prato-select');
-  if(addSel&&cardapio.length){
-    addSel.innerHTML='<option value="">Selecionar prato para adicionar...</option>'+
-      cardapio.filter(c=>c.ativo!==false).map(c=>`<option value="${c.id}">[${c.linha}] ${c.nome}</option>`).join('');
+  // Popula select de pratos — sempre re-popula para ter dados frescos
+  const addSel = document.getElementById('edit-add-prato-select');
+  if (addSel) {
+    const pratosFiltrados = cardapio.filter(c => c.ativo !== false);
+    if (pratosFiltrados.length) {
+      addSel.innerHTML = '<option value="">Selecionar prato para adicionar...</option>' +
+        pratosFiltrados.map(c => `<option value="${c.id}">[${c.linha||c.linhaNome}] ${c.nome}</option>`).join('');
+    } else {
+      // Cardápio ainda não carregado — tenta recarregar
+      addSel.innerHTML = '<option value="">Carregando cardápio...</option>';
+      _buscarCardapio().then(() => {
+        if (cardapio.length) {
+          addSel.innerHTML = '<option value="">Selecionar prato...</option>' +
+            cardapio.filter(c => c.ativo !== false).map(c => `<option value="${c.id}">[${c.linha||c.linhaNome}] ${c.nome}</option>`).join('');
+        }
+      });
+    }
   }
   editPratosAtual=(Array.isArray(p.pratos)?p.pratos:[]).map(pr=>({...pr,qtd:pr.qtd||1}));
   renderizarPratosEdicao();
+
+  // Campos extras (forma_pag, parceria, incluso_plano, frete)
+  const fpEl  = document.getElementById('edit-forma-pag');  if (fpEl)  fpEl.value  = p.forma_pag  || '';
+  const parEl = document.getElementById('edit-parceria');   if (parEl) parEl.checked = p.parceria  === true;
+  const incEl = document.getElementById('edit-incluso');    if (incEl) incEl.checked = p.incluso_plano === true;
+  const frEl  = document.getElementById('edit-frete');      if (frEl)  frEl.value   = p.frete_por_entrega || 0;
+  const cliSel= document.getElementById('edit-cliente-id-sel');
+  if (cliSel) {
+    // Popula select de clientes
+    if (!cliSel.options.length || cliSel.options[0].value === '') {
+      const { data: clis } = await supabaseClient.from('clientes').select('id,nome,status,plano').order('nome');
+      cliSel.innerHTML = '<option value="">— Sem vinculação —</option>' +
+        (clis||[]).map(c => `<option value="${c.id}">${c.nome} (${c.plano||'—'}) ${c.status==='ativo'?'✅':'⏸'}</option>`).join('');
+    }
+    cliSel.value = p.cliente_id || '';
+    atualizarStatusClienteEdicao();
+  }
+  atualizarPreviewTotal();
   document.getElementById('modal-editar-pedido').classList.add('active');
 }
 
@@ -794,40 +1106,64 @@ async function sincronizarLancamentoPedido(pedido) {
 }
 
 async function salvarEdicaoPedido() {
-  const id       = document.getElementById('edit-pedido-id').value;
-  const parceria = document.getElementById('edit-parceria')?.checked === true;
-  const formaPag = document.getElementById('edit-forma-pag')?.value || null;
-  const pedidoBase = pedidos.find(x=>x.id===id)||{};
-  const pedidoUpdate = { ...pedidoBase,
-    cliente_nome: document.getElementById('edit-cliente-nome').value,
-    cliente_tel:  document.getElementById('edit-cliente-tel').value,
-    plano:        document.getElementById('edit-plano').value,
-    status:       document.getElementById('edit-status').value,
-    observacoes:  document.getElementById('edit-obs').value,
-    pratos: editPratosAtual, parceria,
-    ...(formaPag ? {forma_pag:formaPag} : {}),
+  const id         = document.getElementById('edit-pedido-id').value;
+  const parceria   = document.getElementById('edit-parceria')?.checked   === true;
+  const incluso    = document.getElementById('edit-incluso')?.checked    === true;
+  const formaPag   = document.getElementById('edit-forma-pag')?.value    || null;
+  const freteVal   = parseInt(document.getElementById('edit-frete')?.value || '0') || 0;
+  const clienteIdV = document.getElementById('edit-cliente-id-sel')?.value || null;
+
+  const pedidoBase = pedidos.find(x => x.id === id) || {};
+  const pedidoUpdate = {
+    ...pedidoBase,
+    cliente_nome:   document.getElementById('edit-cliente-nome').value,
+    cliente_tel:    document.getElementById('edit-cliente-tel').value,
+    plano:          document.getElementById('edit-plano').value,
+    status:         document.getElementById('edit-status').value,
+    observacoes:    document.getElementById('edit-obs').value,
+    pratos:         editPratosAtual,
+    parceria,
+    incluso_plano:  incluso,
+    frete_por_entrega: freteVal,
+    cliente_id:     clienteIdV || pedidoBase.cliente_id || null,
+    ...(formaPag ? { forma_pag: formaPag } : {}),
   };
-  const valorTotal = calcularTotalPedido_admin(pedidoUpdate);
+
+  // Recalcular total com base nos pratos editados
+  const nEnt        = { FDS: 4, Mensal: 4 }[pedidoUpdate.plano] || 1;
+  const baseVal     = editPratosAtual.reduce((s, pr) => {
+    const ln    = pr.linhaNome || pr.linha || 'Tradicional';
+    const base  = PRECOS_LINHA_ADMIN[ln] || 30000;
+    const extra = pr.extrasGrama || 0;
+    return s + (base + extra) * (pr.qtd || 1);
+  }, 0);
+  const freteTotal  = freteVal * nEnt;
+  const valorTotal  = parceria ? 0 : (baseVal + freteTotal);
+
   const payload = {
-    cliente_nome:pedidoUpdate.cliente_nome, cliente_tel:pedidoUpdate.cliente_tel,
-    plano:pedidoUpdate.plano, status:pedidoUpdate.status,
-    pratos:editPratosAtual, observacoes:pedidoUpdate.observacoes,
-    parceria, valor_total:valorTotal, updated_at:new Date().toISOString(),
+    cliente_nome: pedidoUpdate.cliente_nome, cliente_tel: pedidoUpdate.cliente_tel,
+    plano:        pedidoUpdate.plano,        status:      pedidoUpdate.status,
+    pratos:       editPratosAtual,           observacoes: pedidoUpdate.observacoes,
+    parceria,     incluso_plano: incluso,    valor_total: valorTotal,
+    frete_por_entrega: freteVal,
+    updated_at:   new Date().toISOString(),
   };
-  if(formaPag) payload.forma_pag=formaPag;
-  // Resiliente: se valor_total/parceria ainda não existem, remove campos extras
-  let res = await supabaseClient.from('pedidos').update(payload).eq('id',id);
-  if(res.error && (res.error.code==='42703' || res.error.message?.includes('schema cache') || res.error.message?.includes('column'))) {
-    const {parceria:_,valor_total:__,...basePayload}=payload;
-    res = await supabaseClient.from('pedidos').update(basePayload).eq('id',id);
+  if (formaPag)   payload.forma_pag  = formaPag;
+  if (clienteIdV) payload.cliente_id = clienteIdV;
+
+  let res = await supabaseClient.from('pedidos').update(payload).eq('id', id);
+  if (res.error && (res.error.code === '42703' || res.error.message?.includes('schema cache') || res.error.message?.includes('column'))) {
+    const { parceria: _p, valor_total: _v, incluso_plano: _i, frete_por_entrega: _f, ...basePayload } = payload;
+    res = await supabaseClient.from('pedidos').update(basePayload).eq('id', id);
   }
-  if(res.error){ mostrarToast('Erro: '+res.error.message,'error'); return; }
-  await sincronizarLancamentoPedido({...pedidoUpdate,id});
+  if (res.error) { mostrarToast('Erro: ' + res.error.message, 'error'); return; }
+
+  await sincronizarLancamentoPedido({ ...pedidoUpdate, id, valor_total: valorTotal, frete_total: freteTotal });
   mostrarToast('Pedido atualizado!');
   fecharModal('modal-editar-pedido');
   await _buscarPedidos();
-  if(document.getElementById('page-pedidos-pendentes')?.classList.contains('active')) filtrarPedidosPendentes();
-  if(document.getElementById('page-pedidos-todos')?.classList.contains('active')) filtrarPedidos();
+  if (document.getElementById('page-pedidos-pendentes')?.classList.contains('active')) filtrarPedidosPendentes();
+  if (document.getElementById('page-pedidos-todos')?.classList.contains('active')) filtrarPedidos();
 }
 
 /* ══════════════════════════════════════════════════════════
@@ -852,16 +1188,28 @@ function filtrarPedidos() {
   if (!tbody) return;
   tbody.innerHTML = lista.map(p => {
     const pratos   = Array.isArray(p.pratos) ? p.pratos : [];
-    const totalVal = pratos.reduce((s, pr) => s + (pr.precoItem || 0), 0);
+    // Usa valor_total salvo (DB) se existir; senão calcula com fallback de precoBase/linha
+    const totalVal = p.valor_total > 0 ? p.valor_total : calcularTotalPedido_admin(p);
     const sc = { pendente:'badge-orange', aceito:'badge-green', recusado:'badge-red',
       entregue:'badge-blue', cancelado:'badge-gray' }[p.status] || 'badge-gray';
-    const incluso = p.incluso_plano === true;
+    const incluso   = p.incluso_plano === true;
+    const parceria  = p.parceria === true;
 
     let pagCell, valorCell, formaCell;
     if (incluso) {
       pagCell   = `<span class="incluso-badge"><i class="fas fa-box"></i> Incluso no Plano</span>`;
       valorCell = `<span style="color:#6b7280;font-size:.8rem">—</span>`;
       formaCell = `<span style="color:#6b7280;font-size:.8rem">—</span>`;
+    } else if (parceria) {
+      const pagSt  = p.pagamento_status || 'em_aberto';
+      const pagCls = { pago:'pag-badge--pago', receber_entrega:'pag-badge--receber', em_aberto:'pag-badge--aberto' }[pagSt];
+      pagCell   = `<select class="pag-badge ${pagCls}" onchange="salvarPagamentoStatus('${p.id}', this.value, this)">
+          <option value="em_aberto" ${pagSt==='em_aberto'?'selected':''}>⏳ Em aberto</option>
+          <option value="pago" ${pagSt==='pago'?'selected':''}>✅ Pago</option>
+          <option value="receber_entrega" ${pagSt==='receber_entrega'?'selected':''}>💵 Receber</option>
+        </select>`;
+      valorCell = `<span style="color:#6b7280;font-size:.85rem;font-weight:600">₲ 0 <small style="font-weight:400">(parceria)</small></span>`;
+      formaCell = p.forma_pag || '—';
     } else {
       const pagSt  = p.pagamento_status || 'em_aberto';
       const pagCls = { pago:'pag-badge--pago', receber_entrega:'pag-badge--receber', em_aberto:'pag-badge--aberto' }[pagSt];
@@ -1023,6 +1371,63 @@ async function carregarSemana() {
   });
 
   renderizarClientesSemana();
+  renderizarInsumosAcomp(data);
+  // Mostra o card de acompanhamentos
+  const cardAcomp = document.getElementById('card-insumos-acomp');
+  if (cardAcomp) cardAcomp.style.display = data?.length ? '' : 'none';
+}
+
+/* ── Insumos de Acompanhamentos (Lista da Semana) ── */
+function renderizarInsumosAcomp(pedidos) {
+  const tbody = document.getElementById('tbody-insumos-acomp');
+  const totalEl = document.getElementById('insumos-acomp-total');
+  if (!tbody) return;
+
+  const gramRules = _getGramRules ? _getGramRules() : {
+    'Arroz Branco':{base:80,extra:150},'Feijão Preto':{base:90,extra:200},
+    'Purê de Batata':{base:120,extra:200},'Purê de Batata Doce':{base:120,extra:200},
+    'Purê de Abóbora':{base:120,extra:200},'Macarrão':{base:120,extra:200},
+    'Seleta':{base:80,extra:250},
+  };
+
+  // Acumular por acompanhamento
+  const map = {};  // nome → { base: total gramas padrão, extra: total gramas personalizados, qtd: contagem }
+
+  (pedidos || []).forEach(p => {
+    (Array.isArray(p.pratos) ? p.pratos : []).forEach(pr => {
+      const qtd = pr.qtd || 1;
+      // Acompanhamentos
+      (pr.acompanhamentos || []).forEach(a => {
+        if (!map[a.nome]) map[a.nome] = { nome: a.nome, qtd: 0, totalG: 0, padrao: gramRules[a.nome]?.base || 80 };
+        map[a.nome].qtd    += qtd;
+        map[a.nome].totalG += (a.gramas || gramRules[a.nome]?.base || 80) * qtd;
+      });
+      // Seleta
+      if (pr.seleta !== false) {
+        const nomeS = 'Seleta de Legumes';
+        if (!map[nomeS]) map[nomeS] = { nome: nomeS, qtd: 0, totalG: 0, padrao: 80 };
+        map[nomeS].qtd    += qtd;
+        map[nomeS].totalG += (pr.gramasSeleta || 80) * qtd;
+      }
+    });
+  });
+
+  const arr = Object.values(map).sort((a, b) => b.qtd - a.qtd);
+  if (!arr.length) { tbody.innerHTML = '<tr><td colspan="4" class="empty-msg">Sem dados de acompanhamentos</td></tr>'; return; }
+
+  tbody.innerHTML = arr.map(a => {
+    const mediaG  = Math.round(a.totalG / a.qtd);
+    const totalKg = (a.totalG / 1000).toFixed(2);
+    return `<tr>
+      <td><strong>${a.nome}</strong></td>
+      <td style="text-align:center">${a.qtd}</td>
+      <td style="text-align:center;color:#6b7280">${mediaG}g <span style="font-size:.72rem;color:#9ca3af">(média)</span></td>
+      <td style="font-weight:700;color:#059669;text-align:right">${totalKg} kg <span style="font-size:.75rem;color:#9ca3af">(${Math.round(a.totalG)}g)</span></td>
+    </tr>`;
+  }).join('');
+
+  const totalG = arr.reduce((s, a) => s + a.totalG, 0);
+  if (totalEl) totalEl.textContent = (totalG / 1000).toFixed(2) + ' kg total';
 }
 
 /* ── chave única para agrupar pratos idênticos ── */
@@ -1350,6 +1755,51 @@ function tipoProteinaFromNome(nome) {
   if (/peixe|tilapia|salmão|atum|bacalhau/i.test(n)) return 'peixe';
   if (/carne|bovina|patinho|picadinho|alcatra|costela|moida|moída|panela|strogon|almondega/i.test(n)) return 'bovina';
   return 'default';
+}
+
+// Preços por linha (espelhado do script.js)
+const PRECOS_LINHA_ADMIN = { Tradicional: 30000, Gourmet: 35000, Fit: 35000, Kids: 28000 };
+
+function calcularTaxaGrama_admin(tipo, gramas, gramRules) {
+  const rule = gramRules[tipo];
+  if (!rule || !gramas || gramas <= rule.base) return 0;
+  return Math.ceil((gramas - rule.base) / 10) * rule.extra;
+}
+
+function _getGramRules() {
+  // Constrói GRAM_RULES a partir do array local de acompanhamentos
+  const rules = {
+    'Proteína': { base: 130, extra: 500 },
+    'Seleta':   { base: 80,  extra: 250 },
+    'Arroz Branco':        { base: 80,  extra: 150 },
+    'Feijão Preto':        { base: 90,  extra: 200 },
+    'Purê de Batata':      { base: 120, extra: 200 },
+    'Purê de Batata Doce': { base: 120, extra: 200 },
+    'Purê de Abóbora':     { base: 120, extra: 200 },
+    'Macarrão':            { base: 120, extra: 200 },
+  };
+  acompanhamentos.forEach(a => { rules[a.nome] = { base: a.gramas_padrao, extra: a.preco_extra_10g }; });
+  return rules;
+}
+
+function recalcularPrecoEditPrato(idx) {
+  const pr = editPratosAtual[idx];
+  if (!pr) return;
+  const gramRules = _getGramRules();
+  const linhaNome = pr.linhaNome || pr.linha || 'Tradicional';
+  const precoBase = PRECOS_LINHA_ADMIN[linhaNome] || 30000;
+  pr.precoBase = precoBase;
+  if (pr.personalizado) {
+    let extras = calcularTaxaGrama_admin('Proteína', pr.gramasProteina || 130, gramRules);
+    (pr.acompanhamentos || []).forEach(a => { extras += calcularTaxaGrama_admin(a.nome, a.gramas, gramRules); });
+    if (pr.seleta !== false && pr.gramasSeleta) extras += calcularTaxaGrama_admin('Seleta', pr.gramasSeleta, gramRules);
+    pr.extrasGrama = extras;
+    pr.precoItem   = precoBase + extras;
+  } else {
+    pr.extrasGrama = 0;
+    pr.precoItem   = precoBase;
+  }
+  atualizarPreviewTotal();
 }
 
 // Peso base de proteína por prato (gramas cruas necessárias por unidade)

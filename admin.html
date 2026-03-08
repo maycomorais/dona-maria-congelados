@@ -576,7 +576,7 @@
         <!-- CARDÁPIO ADMIN -->
         <div class="page" id="page-cardapio-admin">
           <div class="page-actions">
-            <div class="filtros-pedidos" id="filtros-cardapio-wrap">
+            <div class="filtros-pedidos">
               <select class="form-control" id="filtro-linha-cardapio" onchange="filtrarCardapio()">
                 <option value="">Todas as linhas</option>
                 <option value="Tradicional">Tradicional</option>
@@ -586,64 +586,27 @@
               </select>
               <input type="text" class="form-control" id="filtro-nome-cardapio" placeholder="Buscar prato..." oninput="filtrarCardapio()">
             </div>
-            <div style="display:flex;gap:8px;flex-wrap:wrap">
-              <button class="btn btn-outline" id="btn-aba-acomp" onclick="mostrarAbaCardapio('acomp')">
-                <i class="fas fa-leaf"></i> Acompanhamentos
-              </button>
-              <button class="btn btn-primary" id="btn-novo-prato" onclick="abrirModalPratoAdmin()">
-                <i class="fas fa-plus"></i> Novo Prato
-              </button>
-            </div>
+            <button class="btn btn-primary" onclick="abrirModalPratoAdmin()">
+              <i class="fas fa-plus"></i> Novo Prato
+            </button>
           </div>
-
-          <!-- ABA: PRATOS -->
-          <div id="aba-pratos-cardapio">
-            <div class="card">
-              <div class="card-header"><h3>Gerenciar Cardápio</h3></div>
-              <div class="table-wrap">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Imagem</th><th>Nome</th><th>Linha</th><th>Preço</th><th>Kcal</th><th>Status</th><th>Ações</th>
-                    </tr>
-                  </thead>
-                  <tbody id="tbody-cardapio-admin"></tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-
-          <!-- ABA: ACOMPANHAMENTOS -->
-          <div id="aba-acomp-cardapio" style="display:none">
-            <div class="card">
-              <div class="card-header" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
-                <div>
-                  <h3>Acompanhamentos</h3>
-                  <p style="color:#6b7280;font-size:.83rem;margin:2px 0 0">Guarnições disponíveis no app — nome, gramagem padrão e preço extra por +10g</p>
-                </div>
-                <button class="btn btn-primary btn-sm" onclick="abrirModalAcomp()">
-                  <i class="fas fa-plus"></i> Novo Acompanhamento
-                </button>
-              </div>
-              <div class="table-wrap">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Nome</th>
-                      <th>Gramas Padrão</th>
-                      <th>Preço extra / 10g (₲)</th>
-                      <th>Status</th>
-                      <th>Ações</th>
-                    </tr>
-                  </thead>
-                  <tbody id="tbody-acomp-admin"></tbody>
-                </table>
-              </div>
-            </div>
-            <div style="margin-top:12px;padding:12px 16px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;font-size:.82rem;color:#64748b;line-height:1.8">
-              <strong style="color:#374151">Como os campos são usados no app (script.js):</strong><br>
-              <strong>Gramas Padrão</strong> → valor inicial do input ao marcar o acomp (ex: Arroz Branco = 80g)<br>
-              <strong>Preço extra / 10g</strong> → cobrado a cada 10g <em>acima</em> do padrão no modo Personalizado
+          <div class="card">
+            <div class="card-header"><h3>Gerenciar Cardápio</h3></div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Imagem</th>
+                    <th>Nome</th>
+                    <th>Linha</th>
+                    <th>Preço</th>
+                    <th>Kcal</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-cardapio-admin"></tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -883,15 +846,82 @@
 
           <!-- Visual dish editor -->
           <div class="form-group">
-            <label>Pratos</label>
+            <label>Pratos <small style="color:#9ca3af;font-weight:400">— clique em 🍴 para editar linha/acomp/seleta/gramas</small></label>
             <div id="edit-pratos-lista" style="background:#f9f9f7;border:1.5px solid #e5e4e0;border-radius:9px;min-height:52px;padding:8px;margin-bottom:10px"></div>
+
+            <!-- Seletor de prato -->
             <div style="display:flex;gap:8px">
-              <select class="form-control" id="edit-add-prato-select" style="flex:1">
-                <option value="">Selecionar prato para adicionar...</option>
+              <select class="form-control" id="edit-add-prato-select" style="flex:1" onchange="mostrarConfiguradorPrato(this.value)">
+                <option value="">Selecionar proteína para adicionar...</option>
               </select>
-              <button class="btn btn-outline btn-sm" onclick="adicionarPratoEdicao()" style="white-space:nowrap">
-                <i class="fas fa-plus"></i> Adicionar
+              <button class="btn btn-outline btn-sm" id="btn-add-prato" onclick="mostrarConfiguradorPrato(document.getElementById('edit-add-prato-select').value)" style="white-space:nowrap">
+                <i class="fas fa-cog"></i> Configurar
               </button>
+            </div>
+
+            <!-- Configurador inline (aparece ao selecionar proteína) -->
+            <div id="edit-prato-configurador" style="display:none;margin-top:10px;background:#fff;border:2px solid #059669;border-radius:10px;padding:14px 16px">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+                <div>
+                  <span id="cfg-prato-nome" style="font-weight:700;font-size:.95rem"></span>
+                  <span id="cfg-prato-linha-badge" style="font-size:.72rem;color:#6b7280;background:#f3f4f6;border-radius:3px;padding:1px 7px;margin-left:6px"></span>
+                </div>
+                <button onclick="fecharConfiguradorPrato()" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:1rem">✕</button>
+              </div>
+
+              <!-- Linha + Personalizado -->
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:10px;border-bottom:1px dashed #e5e7eb">
+                <div style="flex:1">
+                  <label style="font-size:.75rem;font-weight:600;color:#6b7280;display:block;margin-bottom:3px">LINHA</label>
+                  <select id="cfg-linha" onchange="atualizarCfgPreco()" style="width:100%;padding:5px 8px;border:1px solid #d1d5db;border-radius:6px;font-size:.85rem">
+                    <option value="Tradicional">Tradicional — ₲ 30.000</option>
+                    <option value="Gourmet">Gourmet — ₲ 35.000</option>
+                    <option value="Fit">Fit — ₲ 35.000</option>
+                    <option value="Kids">Kids — ₲ 28.000</option>
+                  </select>
+                </div>
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;margin-top:16px;white-space:nowrap">
+                  <input type="checkbox" id="cfg-personalizado" onchange="toggleCfgPersonalizado()" style="width:15px;height:15px;accent-color:#d97706">
+                  <span style="font-size:.85rem;font-weight:600;color:#92400e">⚖ Personalizado</span>
+                </label>
+              </div>
+
+              <!-- Proteína gramas (personalizado) -->
+              <div id="cfg-proteina-row" style="display:none;align-items:center;gap:8px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px dashed #e5e7eb">
+                <span style="font-size:.85rem;font-weight:600;flex:1">⚖ Proteína</span>
+                <input type="number" id="cfg-proteina-g" value="130" min="50" max="500" step="10"
+                  oninput="atualizarCfgPreco()"
+                  style="width:75px;padding:5px 8px;border:1.5px solid #d1fae5;border-radius:6px;font-size:.88rem;text-align:center;background:#f0fdf4">
+                <span style="font-size:.8rem;color:#6b7280">g</span>
+              </div>
+
+              <!-- Acompanhamentos -->
+              <div style="margin-bottom:10px">
+                <div style="font-size:.75rem;font-weight:600;color:#6b7280;text-transform:uppercase;margin-bottom:8px">Acompanhamentos <small style="font-weight:400;text-transform:none">(máx. 2)</small></div>
+                <div id="cfg-acomps-lista"></div>
+              </div>
+
+              <!-- Seleta de Legumes -->
+              <div style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:#f0fdf4;border-radius:7px;margin-bottom:10px">
+                <label style="display:flex;align-items:center;gap:7px;cursor:pointer;font-size:.88rem;flex:1">
+                  <input type="checkbox" id="cfg-seleta" checked onchange="atualizarCfgPreco()" style="width:15px;height:15px;accent-color:#059669">
+                  <span style="font-weight:600">🥦 Seleta de Legumes</span>
+                </label>
+                <div id="cfg-seleta-g-wrap" style="display:none;align-items:center;gap:5px">
+                  <input type="number" id="cfg-seleta-g" value="80" min="20" max="400" step="10"
+                    oninput="atualizarCfgPreco()"
+                    style="width:65px;padding:4px 6px;border:1px solid #d1d5db;border-radius:5px;font-size:.82rem;text-align:center">
+                  <span style="font-size:.78rem;color:#6b7280">g</span>
+                </div>
+              </div>
+
+              <!-- Preview preço + botão confirmar -->
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:4px">
+                <div id="cfg-preco-preview" style="font-size:.88rem;color:#166534;font-weight:600">₲ 30.000</div>
+                <button onclick="confirmarAdicionarPrato()" style="padding:8px 20px;background:#059669;color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:.9rem">
+                  <i class="fas fa-plus"></i> Adicionar ao Pedido
+                </button>
+              </div>
             </div>
           </div>
 
@@ -899,26 +929,49 @@
             <label>Observações</label>
             <textarea class="form-control" id="edit-obs" rows="2"></textarea>
           </div>
-          <div class="form-row" style="align-items:flex-start">
+
+          <!-- Pagamento + Frete -->
+          <div class="form-row">
             <div class="form-group">
               <label>Forma de Pagamento</label>
-              <select class="form-control" id="edit-forma-pag">
-                <option value="">— Manter atual —</option>
+              <select class="form-control" id="edit-forma-pag" onchange="atualizarPreviewTotal()">
+                <option value="">— Não informado —</option>
                 <option value="Efetivo ₲">Efetivo ₲</option>
-                <option value="Pix">Pix</option>
+                <option value="Pix">Pix 🇧🇷</option>
                 <option value="Cartão">Cartão</option>
                 <option value="Transferência">Transferência</option>
               </select>
             </div>
-            <div class="form-group" style="display:flex;align-items:center;gap:10px;background:#fef9f0;border:1.5px solid #fde68a;border-radius:8px;padding:12px 14px;margin-top:8px">
-              <input type="checkbox" id="edit-parceria" style="width:18px;height:18px;accent-color:#d97706;cursor:pointer;flex-shrink:0" onchange="toggleParceria(this)">
-              <div>
-                <label for="edit-parceria" style="font-weight:600;color:#92400e;cursor:pointer;margin:0">🤝 Parceria</label>
-                <span style="color:#b45309;font-size:.78rem;display:block">Valor zerado no financeiro</span>
-              </div>
+            <div class="form-group">
+              <label>Frete por Entrega (₲)</label>
+              <input type="number" class="form-control" id="edit-frete" min="0" step="1000" placeholder="0"
+                oninput="atualizarPreviewTotal()">
             </div>
           </div>
-          <div id="edit-total-preview" style="display:none;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px 14px;font-size:.88rem;color:#166534;margin-bottom:4px"></div>
+
+          <!-- Parceria + Incluso no Plano -->
+          <div class="form-row" style="align-items:flex-start;gap:10px">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:10px 14px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;flex:1">
+              <input type="checkbox" id="edit-parceria" onchange="atualizarPreviewTotal()" style="width:16px;height:16px;accent-color:#d97706">
+              <span style="font-size:.88rem;font-weight:600;color:#92400e">🤝 Parceria — valor ₲ 0</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;padding:10px 14px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;flex:1">
+              <input type="checkbox" id="edit-incluso" onchange="atualizarPreviewTotal()" style="width:16px;height:16px;accent-color:#059669">
+              <span style="font-size:.88rem;font-weight:600;color:#166534">📦 Incluso no Plano</span>
+            </label>
+          </div>
+
+          <!-- Vincular ao cliente cadastrado -->
+          <div class="form-group" style="margin-top:6px">
+            <label>Vincular a Cliente Cadastrado <small style="color:#9ca3af;font-weight:400">(opcional — identifica plano ativo)</small></label>
+            <select class="form-control" id="edit-cliente-id-sel" onchange="atualizarStatusClienteEdicao()">
+              <option value="">— Sem vinculação —</option>
+            </select>
+            <div id="edit-cliente-plano-banner" style="display:none;padding:8px 12px;border-radius:7px;border:1.5px solid #bbf7d0;font-size:.82rem;gap:8px;margin-top:6px;align-items:center"></div>
+          </div>
+
+          <!-- Total preview -->
+          <div id="edit-total-preview" style="display:none;margin-top:8px;padding:10px 14px;background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:8px;font-size:.88rem"></div>
         </div>
         <div class="modal-actions">
           <button class="btn btn-outline" onclick="fecharModal('modal-editar-pedido')">Cancelar</button>
@@ -1030,53 +1083,6 @@
         <div class="modal-actions">
           <button class="btn btn-outline" onclick="fecharModal('modal-prato-admin')">Cancelar</button>
           <button class="btn btn-primary" onclick="salvarPratoAdmin()">
-            <i class="fas fa-save"></i> Salvar
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- MODAL: ACOMPANHAMENTO -->
-    <div class="modal-overlay" id="modal-acomp">
-      <div class="modal-box">
-        <button class="modal-close" onclick="fecharModal('modal-acomp')">✕</button>
-        <div class="modal-title" id="modal-acomp-titulo">Novo Acompanhamento</div>
-        <input type="hidden" id="acomp-id">
-
-        <div class="form-group">
-          <label>Nome <span style="color:#ef4444">*</span></label>
-          <input type="text" class="form-control" id="acomp-nome" placeholder="Ex: Arroz Branco">
-          <small style="color:#9ca3af">Deve ser idêntico ao usado nos pedidos (case-sensitive)</small>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label>Gramas Padrão <span style="color:#ef4444">*</span></label>
-            <div style="display:flex;align-items:center;gap:8px">
-              <input type="number" class="form-control" id="acomp-base" placeholder="80" min="10" max="500" step="5" style="flex:1">
-              <span style="color:#6b7280">g</span>
-            </div>
-            <small style="color:#9ca3af">Gramagem inicial ao selecionar no app</small>
-          </div>
-          <div class="form-group">
-            <label>Preço extra / 10g (₲) <span style="color:#ef4444">*</span></label>
-            <input type="number" class="form-control" id="acomp-extra" placeholder="150" min="0" step="50">
-            <small style="color:#9ca3af">₲ cobrado a cada 10g acima do padrão</small>
-          </div>
-        </div>
-
-        <div id="acomp-preview" style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px 14px;font-size:.84rem;color:#166534;margin-bottom:16px">
-          <strong>Preview:</strong> <span id="acomp-preview-texto">—</span>
-        </div>
-
-        <div class="form-group" style="display:flex;align-items:center;gap:10px">
-          <input type="checkbox" id="acomp-ativo" checked style="width:16px;height:16px;accent-color:#16a34a;cursor:pointer">
-          <label for="acomp-ativo" style="margin:0;cursor:pointer">Ativo no app (aparece na lista de guarnições)</label>
-        </div>
-
-        <div class="modal-actions">
-          <button class="btn btn-outline" onclick="fecharModal('modal-acomp')">Cancelar</button>
-          <button class="btn btn-primary" onclick="salvarAcomp()">
             <i class="fas fa-save"></i> Salvar
           </button>
         </div>
